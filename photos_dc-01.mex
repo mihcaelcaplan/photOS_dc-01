@@ -96,7 +96,7 @@
                <pin_label pin_num="C13" pin_signal="GPIO_B1_11" label="ENET_RXER" identifier="ENET_RXER"/>
                <pin_label pin_num="D13" pin_signal="GPIO_B1_12" label="SD_CD_SW" identifier="SD_CD_SW"/>
                <pin_label pin_num="D14" pin_signal="GPIO_B1_13" label="WDOG_B" identifier="WDOG_B"/>
-               <pin_label pin_num="C14" pin_signal="GPIO_B1_14" label="SD0_VSELECT" identifier="SD0_VSELECT"/>
+               <pin_label pin_num="C14" pin_signal="GPIO_B1_14" label="MUX_S" identifier="MUX_S"/>
                <pin_label pin_num="B14" pin_signal="GPIO_B1_15" label="USB_HOST_PWR/BACKLIGHT_CTL" identifier="BACKLIGHT_CTL"/>
                <pin_label pin_num="E9" pin_signal="NVCC_GPIO0" label="DCDC_3V3/NVCC_GPIO_3V3"/>
                <pin_label pin_num="F10" pin_signal="NVCC_GPIO1" label="DCDC_3V3/NVCC_GPIO_3V3"/>
@@ -251,7 +251,7 @@
                   <pin peripheral="USDHC1" signal="usdhc_data, 2" pin_num="H2" pin_signal="GPIO_SD_B0_04"/>
                   <pin peripheral="USDHC1" signal="usdhc_data, 3" pin_num="J2" pin_signal="GPIO_SD_B0_05"/>
                   <pin peripheral="USDHC1" signal="usdhc_data, 0" pin_num="J1" pin_signal="GPIO_SD_B0_02"/>
-                  <pin peripheral="USDHC1" signal="usdhc_cd_b" pin_num="D13" pin_signal="GPIO_B1_12"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 30" pin_num="C14" pin_signal="GPIO_B1_14"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">
@@ -671,11 +671,8 @@
          </dcdx_profile>
          <dcdx_configurations/>
       </dcdx>
-      <periphs name="Peripherals" version="15.0" enabled="true" update_project_code="true">
-         <generated_project_files>
-            <file path="board/peripherals.c" update_enabled="true"/>
-            <file path="board/peripherals.h" update_enabled="true"/>
-         </generated_project_files>
+      <periphs name="Peripherals" version="15.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
          <peripherals_profile>
             <processor_version>24.12.10</processor_version>
          </peripherals_profile>

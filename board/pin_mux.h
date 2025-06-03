@@ -37,6 +37,8 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
+#define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0x40000000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
+
 /* GPIO_SD_B0_01 (coord J3), SD1_CLK/J24[3] */
 /* Routed pin properties */
 #define BOARD_INITPINS_SD1_CLK_PERIPHERAL                                 USDHC1   /*!< Peripheral name */
@@ -71,10 +73,19 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_SD1_D0_SIGNAL                                  usdhc_data   /*!< Signal name */
 #define BOARD_INITPINS_SD1_D0_CHANNEL                                         0U   /*!< Signal channel */
 
-/* GPIO_B1_12 (coord D13), SD_CD_SW */
+/* GPIO_B1_14 (coord C14), MUX_S */
 /* Routed pin properties */
-#define BOARD_INITPINS_SD_CD_SW_PERIPHERAL                                USDHC1   /*!< Peripheral name */
-#define BOARD_INITPINS_SD_CD_SW_SIGNAL                                usdhc_cd_b   /*!< Signal name */
+#define BOARD_INITPINS_MUX_S_PERIPHERAL                                    GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_MUX_S_SIGNAL                                      gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_MUX_S_CHANNEL                                         30U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_MUX_S_GPIO                                          GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_MUX_S_GPIO_PIN                                        30U   /*!< GPIO pin number */
+#define BOARD_INITPINS_MUX_S_GPIO_PIN_MASK                           (1U << 30U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_MUX_S_PORT                                          GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_MUX_S_PIN                                             30U   /*!< PORT pin number */
+#define BOARD_INITPINS_MUX_S_PIN_MASK                                (1U << 30U)   /*!< PORT pin mask */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
