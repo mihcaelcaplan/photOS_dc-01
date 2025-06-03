@@ -2,3 +2,4 @@
 /Release/
 *.launch
 /.settings/
+*.DS_Store
