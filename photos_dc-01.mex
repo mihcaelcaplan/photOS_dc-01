@@ -228,13 +228,31 @@
                   <enableClock>true</enableClock>
                </options>
                <dependencies>
+                  <dependency resourceType="Peripheral" resourceId="USDHC1" description="Peripheral USDHC1 signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.iomuxc" description="Pins initialization requires the IOMUXC Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
+                     <feature name="enabled" evaluation="equal" configuration="core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                </dependencies>
-               <pins/>
+               <pins>
+                  <pin peripheral="USDHC1" signal="usdhc_clk" pin_num="J3" pin_signal="GPIO_SD_B0_01"/>
+                  <pin peripheral="USDHC1" signal="usdhc_cmd" pin_num="J4" pin_signal="GPIO_SD_B0_00"/>
+                  <pin peripheral="USDHC1" signal="usdhc_data, 1" pin_num="K1" pin_signal="GPIO_SD_B0_03"/>
+                  <pin peripheral="USDHC1" signal="usdhc_data, 2" pin_num="H2" pin_signal="GPIO_SD_B0_04"/>
+                  <pin peripheral="USDHC1" signal="usdhc_data, 3" pin_num="J2" pin_signal="GPIO_SD_B0_05"/>
+                  <pin peripheral="USDHC1" signal="usdhc_data, 0" pin_num="J1" pin_signal="GPIO_SD_B0_02"/>
+                  <pin peripheral="USDHC1" signal="usdhc_cd_b" pin_num="D13" pin_signal="GPIO_B1_12"/>
+               </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">
                <description>Configures pin routing and optionally pin electrical features.</description>

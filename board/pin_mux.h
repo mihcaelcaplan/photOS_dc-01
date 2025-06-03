@@ -37,6 +37,45 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
+/* GPIO_SD_B0_01 (coord J3), SD1_CLK/J24[3] */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_CLK_PERIPHERAL                                 USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_CLK_SIGNAL                                  usdhc_clk   /*!< Signal name */
+
+/* GPIO_SD_B0_00 (coord J4), SD1_CMD/J24[6] */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_CMD_PERIPHERAL                                 USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_CMD_SIGNAL                                  usdhc_cmd   /*!< Signal name */
+
+/* GPIO_SD_B0_03 (coord K1), SD1_D1/J24[5]/SPI_MISO */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_D1_PERIPHERAL                                  USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_D1_SIGNAL                                  usdhc_data   /*!< Signal name */
+#define BOARD_INITPINS_SD1_D1_CHANNEL                                         1U   /*!< Signal channel */
+
+/* GPIO_SD_B0_04 (coord H2), SD1_D2 */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_D2_PERIPHERAL                                  USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_D2_SIGNAL                                  usdhc_data   /*!< Signal name */
+#define BOARD_INITPINS_SD1_D2_CHANNEL                                         2U   /*!< Signal channel */
+
+/* GPIO_SD_B0_05 (coord J2), SD1_D3 */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_D3_PERIPHERAL                                  USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_D3_SIGNAL                                  usdhc_data   /*!< Signal name */
+#define BOARD_INITPINS_SD1_D3_CHANNEL                                         3U   /*!< Signal channel */
+
+/* GPIO_SD_B0_02 (coord J1), SD1_D0/J24[4]/SPI_MOSI/PWM */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD1_D0_PERIPHERAL                                  USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD1_D0_SIGNAL                                  usdhc_data   /*!< Signal name */
+#define BOARD_INITPINS_SD1_D0_CHANNEL                                         0U   /*!< Signal channel */
+
+/* GPIO_B1_12 (coord D13), SD_CD_SW */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD_CD_SW_PERIPHERAL                                USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD_CD_SW_SIGNAL                                usdhc_cd_b   /*!< Signal name */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *
