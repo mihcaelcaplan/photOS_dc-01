@@ -16,6 +16,7 @@
 #include "clock_config.h"
 #include "fsl_debug_console.h"
 
+
 #include "usb_device_config.h"
 #include "usb.h"
 #include "usb_device.h"
@@ -29,6 +30,7 @@
 
 /* TODO: insert other include files here. */
 #include "usb_mux.h"
+#include "debug_shell.h"
 
 /* TODO: insert other definitions and declarations here. */
 
@@ -458,7 +460,7 @@ void USB_DeviceApplicationInit(void)
 {
     USB_DeviceClockInit();
 
-    PRINTF("Please insert disk \r\n");
+//    PRINTF("Please insert disk \r\n");
 
     if (kStatus_USB_Success != USB_DeviceMscDiskStorageInit())
     {
@@ -476,15 +478,22 @@ void USB_DeviceApplicationInit(void)
     }
     else
     {
-        PRINTF("USB device mass storage demo\r\n");
+//        PRINTF("USB device mass storage demo\r\n");
         g_msc.mscHandle = msc_config_list.config->classHandle;
     }
 
     USB_DeviceIsrEnable();
 
     /*Add one delay here to make the DP pull down long enough to allow host to detect the previous disconnection.*/
-    SDK_DelayAtLeastUs(5000, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
-    USB_DeviceRun(g_msc.deviceHandle);
+//    SDK_DelayAtLeastUs(5000, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
+//    USB_DeviceRun(g_msc.deviceHandle);
+}
+
+void USB_DeviceAppStart(void){
+	USB_DeviceRun(g_msc.deviceHandle);
+}
+void USB_DeviceAppStop(void){
+	USB_DeviceStop(g_msc.deviceHandle);
 }
 
 void USB_DeviceMscApp(void)
@@ -524,7 +533,9 @@ int main(void) {
     USB_DeviceApplicationInit();
 
     while(1) {
-    	USB_DeviceMscAppTask();
+
+    	SHELL_WaitForInput();
+
     }
     return 0 ;
 }
