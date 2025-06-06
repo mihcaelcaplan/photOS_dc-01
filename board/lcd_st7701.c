@@ -51,7 +51,6 @@ void ST7701_Init(void){
 												 | LPSPI_TCR_PCS(0) ;
 
 //	wait for empty tx fifo (shared btw. command and data)
-//	txCount = SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK >> LPSPI_FSR_TXCOUNT_SHIFT;
 	while( SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK >> LPSPI_FSR_TXCOUNT_SHIFT != 0 ){
 		PRINTF(".");
 	}
@@ -77,7 +76,7 @@ uint8_t ST7701_SPIReadReg(uint8_t value){
 		                                         |   LPSPI_TCR_WIDTH(0)| LPSPI_TCR_PCS(0) ;
 
 //	wait for empty tx fifo (shared btw. command and data)
-	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) > 0U){}
+	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) != 0U){}
 
 
 //  set up the first part of the half duplex transfer
@@ -89,25 +88,29 @@ uint8_t ST7701_SPIReadReg(uint8_t value){
 												 |   LPSPI_TCR_FRAMESZ(8) |   LPSPI_TCR_CONT(1) |   LPSPI_TCR_TXMSK(0) |   LPSPI_TCR_RXMSK(1);
 
 //	wait for empty tx fifo (shared btw. command and data)
-	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) > 0U){}
+	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) != 0U){}
 
 //send the data to transmit to the command/transmit fifo
 	SPI_LCD_CONTROL->TDR = data_out;
 
-	//  set up the second part of the half duplex transfer
-	// 	frame size for 8 bit receive
-	//	cont off to release cs after receive
-	//  contc on to keep assert cs
-	//	tx mask 1 so transfer starts when data added to fifo
-	//	rx mask 0
+
+//	wait for empty tx fifo (shared btw. command and data)
+		while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) != 0U){}
+
+//  set up the second part of the half duplex transfer
+// 	frame size for 8 bit receive
+//	cont off to release cs after receive
+//  contc on to keep assert cs
+//	tx mask 1 so transfer starts when data added to fifo
+//	rx mask 0
 	SPI_LCD_CONTROL->TCR = (SPI_LCD_CONTROL->TCR & ~(LPSPI_TCR_FRAMESZ_MASK | LPSPI_TCR_CONT_MASK | LPSPI_TCR_CONTC_MASK | LPSPI_TCR_TXMSK_MASK | LPSPI_TCR_RXMSK_MASK))
 												 |   LPSPI_TCR_FRAMESZ(7) |   LPSPI_TCR_CONT(0) |   LPSPI_TCR_CONTC(1) |   LPSPI_TCR_TXMSK(1) |   LPSPI_TCR_RXMSK(0);
 
 //	wait for empty tx fifo (shared btw. command and data)
-	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) > 0U){}
+//	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_TXCOUNT_MASK) >> LPSPI_FSR_TXCOUNT_SHIFT) != 0U){}
 
 //  double check that rx fifo got filled correctly
-	while( ((SPI_LCD_CONTROL->FSR & LPSPI_FSR_RXCOUNT_MASK) >> LPSPI_FSR_RXCOUNT_SHIFT) < 1U){}
+	while(LPSPI_GetRxFifoCount(SPI_LCD_CONTROL) != 1U){}
 
 //	get the data from rx fifo
 	uint32_t data_in = SPI_LCD_CONTROL->RDR;
@@ -135,11 +138,15 @@ void DISPLAY_Init(void){
 	ST7701_Init();
 
 //	read an easy register
-	uint8_t regAddr = 0xAD; // the _ register
-	uint8_t response = ST7701_SPIReadReg(regAddr);
+	uint8_t response;
+	response = ST7701_SPIReadReg(0xDA);
+	PRINTF("Read 0x%02x, received 0x%02x\r\n", 0xDA, response);
 
-	PRINTF("Read 0x%02x, received 0x%02x\r\n", regAddr, response);
+	 response = ST7701_SPIReadReg(0xDB);
+	PRINTF("Read 0x%02x, received 0x%02x\r\n", 0xDB, response);
 
+	 response = ST7701_SPIReadReg(0xDC);
+	PRINTF("Read 0x%02x, received 0x%02x\r\n", 0xDC, response);
 
  // manufacturer init code
 
