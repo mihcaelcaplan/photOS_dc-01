@@ -86,6 +86,11 @@ int hist_len  = 0;
 		 input.inputString[j] = '\0';
 	 }
 
+//clear the arg
+	 for(int j = 0; j < (sizeof(input.argString)-1); j++){
+	 		 input.argString[j] = '\0';
+	 	 }
+
  }
 
 // execution logic
@@ -109,6 +114,19 @@ int hist_len  = 0;
 			 PRINTF("usage: transfer {start | stop}");
 		 }
 	 }
+	 else if (commandEquals("screen")) {
+	 		 if( argEquals("on") ){
+	 			 PRINTF("initializing screen");
+	 			 DISPLAY_Init();
+	 		 }
+	 		 else if( argEquals("off") ){
+//	 			 PRINTF("stopping MSC device");
+//	 			 USB_DeviceAppStop();
+	 		 }
+	 		 else{
+	 			 PRINTF("usage: screen {on | off}");
+	 		 }
+	 	 }
 	 else {
 		 PRINTF("received input %s, nothing to do", input.inputString);
 	 }

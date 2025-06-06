@@ -37,6 +37,7 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
+#define BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK 0x0200U /*!< GPIO1 and GPIO6 share same IO MUX function, GPIO_MUX1 selects one GPIO function: affected bits mask */
 #define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0x40000000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
 
 /* GPIO_SD_B0_01 (coord J3), SD1_CLK/J24[3] */
@@ -86,6 +87,25 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_MUX_S_PORT                                          GPIO2   /*!< PORT peripheral base pointer */
 #define BOARD_INITPINS_MUX_S_PIN                                             30U   /*!< PORT pin number */
 #define BOARD_INITPINS_MUX_S_PIN_MASK                                (1U << 30U)   /*!< PORT pin mask */
+
+/* GPIO_B1_12 (coord D13), SD_CD_SW */
+/* Routed pin properties */
+#define BOARD_INITPINS_SD_CD_SW_PERIPHERAL                                USDHC1   /*!< Peripheral name */
+#define BOARD_INITPINS_SD_CD_SW_SIGNAL                                usdhc_cd_b   /*!< Signal name */
+
+/* GPIO_AD_B0_09 (coord F14), LCD_PWREN */
+/* Routed pin properties */
+#define BOARD_INITPINS_LCD_PWREN_PERIPHERAL                                GPIO1   /*!< Peripheral name */
+#define BOARD_INITPINS_LCD_PWREN_SIGNAL                                  gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_LCD_PWREN_CHANNEL                                      9U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_LCD_PWREN_GPIO                                      GPIO1   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_LCD_PWREN_GPIO_PIN                                     9U   /*!< GPIO pin number */
+#define BOARD_INITPINS_LCD_PWREN_GPIO_PIN_MASK                        (1U << 9U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_LCD_PWREN_PORT                                      GPIO1   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_LCD_PWREN_PIN                                          9U   /*!< PORT pin number */
+#define BOARD_INITPINS_LCD_PWREN_PIN_MASK                             (1U << 9U)   /*!< PORT pin mask */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

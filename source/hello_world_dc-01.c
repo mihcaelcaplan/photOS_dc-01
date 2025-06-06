@@ -31,6 +31,7 @@
 /* TODO: insert other include files here. */
 #include "usb_mux.h"
 #include "debug_shell.h"
+#include "display_interface.h"
 
 /* TODO: insert other definitions and declarations here. */
 
@@ -522,7 +523,7 @@ int main(void) {
     BOARD_InitBootPins();
     MUX_Init();
     BOARD_InitBootClocks();
-//    BOARD_InitBootPeripherals();
+    BOARD_InitBootPeripherals();
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
     /* Init FSL debug console. */
@@ -531,6 +532,7 @@ int main(void) {
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
     MUX_ToUSBC();
     USB_DeviceApplicationInit();
+//    DISPLAY_Init();
 
     while(1) {
 
