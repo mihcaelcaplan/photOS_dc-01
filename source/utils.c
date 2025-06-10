@@ -6,29 +6,31 @@
  */
 #include "utils.h"
 
-uint8_t g_systickCounter = 0U;
-
-extern void SysTick_Handler(void)
-{
-    if (g_systickCounter != 0U)
-    {
-        g_systickCounter--;
-    }
-}
+//uint8_t g_systickCounter = 0U;
+//
+//extern void SysTick_Handler(void)
+//{
+//   g_systickCounter++;
+//}
 
 void simpleDelay(uint8_t ms){
 
-	//config for ms
-	SysTick_Config(SystemCoreClock / 1000U);
+	uint32_t msToUs = ms*1000;
 
+	SDK_DelayAtLeastUs(msToUs, SystemCoreClock);
 
-	/* Enable Systick which might be disabled by system init */
-    if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) != 1U)
-    {
-        SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
-    }
-
-	g_systickCounter = ms;
-
-	while (g_systickCounter != 0U){}
+//	//config for ms
+//	SysTick_Config(SystemCoreClock / 1000U);
+//
+//
+//	/* Enable Systick which might be disabled by system init */
+//    if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) != 1U)
+//    {
+//        SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+//    }
+//
+//	uint8_t countNow = g_systickCounter;
+//
+//
+//	while (g_systickCounter < (countNow + ms)){}
 }

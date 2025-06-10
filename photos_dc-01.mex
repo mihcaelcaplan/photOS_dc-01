@@ -109,7 +109,7 @@
                <pin_label pin_num="G14" pin_signal="GPIO_AD_B0_05" label="CAN_STBY/BOOT_MODE[1]/Flash_RST/U12[8]" identifier="CAN_STBY"/>
                <pin_label pin_num="E14" pin_signal="GPIO_AD_B0_06" label="JTAG_TMS/J21[7]/SWD_DIO"/>
                <pin_label pin_num="F12" pin_signal="GPIO_AD_B0_07" label="JTAG_TCK/J21[9]/SWD_CLK"/>
-               <pin_label pin_num="F13" pin_signal="GPIO_AD_B0_08" label="JTAG_MOD"/>
+               <pin_label pin_num="F13" pin_signal="GPIO_AD_B0_08" label="LCD_RESET" identifier="LCD_RESET"/>
                <pin_label pin_num="F14" pin_signal="GPIO_AD_B0_09" label="LCD_PWREN" identifier="LCD_PWREN"/>
                <pin_label pin_num="G13" pin_signal="GPIO_AD_B0_10" label="JTAG_TDO/J21[13]/INT1_COMBO/ENET_INT/J22[6]/U32[11]" identifier="INT1_COMBO"/>
                <pin_label pin_num="G10" pin_signal="GPIO_AD_B0_11" label="JTAG_nTRST/J21[3]/INT2_COMBO/LCD_TOUCH_INT/J22[3]/U32[9]" identifier="INT2_COMBO"/>
@@ -266,6 +266,11 @@
                   <pin peripheral="LPSPI3" signal="PCS0" pin_num="G11" pin_signal="GPIO_AD_B0_03"/>
                   <pin peripheral="USDHC1" signal="usdhc_cd_b" pin_num="D13" pin_signal="GPIO_B1_12"/>
                   <pin peripheral="GPIO1" signal="gpio_io, 09" pin_num="F14" pin_signal="GPIO_AD_B0_09"/>
+                  <pin peripheral="GPIO1" signal="gpio_io, 08" pin_num="F13" pin_signal="GPIO_AD_B0_08">
+                     <pin_features>
+                        <pin_feature name="identifier" value=""/>
+                     </pin_features>
+                  </pin>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">
@@ -745,29 +750,45 @@
                <instances>
                   <instance name="NVIC" uuid="1f20cc6a-30ee-4046-8f51-23d0619ee0a4" type="nvic" type_id="nvic" mode="general" peripheral="NVIC" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="nvic">
-                        <array name="interrupt_table"/>
+                        <array name="interrupt_table">
+                           <struct name="0"/>
+                        </array>
                         <array name="interrupts"/>
                      </config_set>
                   </instance>
-                  <instance name="LPSPI3" uuid="ad0e9aea-8af4-483c-8749-6d54365656ec" type="lpspi" type_id="lpspi_2.6.0" mode="polling" peripheral="LPSPI3" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                  <instance name="LPSPI3" uuid="ad0e9aea-8af4-483c-8749-6d54365656ec" type="lpspi" type_id="lpspi_2.6.0" mode="interrupt" peripheral="LPSPI3" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="interrupt">
+                        <set name="interrupt_sources">
+                           <selected>
+                              <id>kLPSPI_WordCompleteInterruptEnable</id>
+                           </selected>
+                        </set>
+                        <struct name="interrupt">
+                           <setting name="IRQn" value="LPSPI3_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                     </config_set>
                      <config_set name="main">
                         <setting name="mode" value="kLPSPI_Master"/>
                         <setting name="clockSource" value="LpspiClock"/>
                         <setting name="clockSourceFreq" value="ClocksTool_DefaultInit"/>
                         <struct name="master">
-                           <setting name="baudRate" value="500000"/>
-                           <setting name="bitsPerFrame" value="8"/>
+                           <setting name="baudRate" value="115200"/>
+                           <setting name="bitsPerFrame" value="9"/>
                            <setting name="cpol" value="kLPSPI_ClockPolarityActiveHigh"/>
                            <setting name="cpha" value="kLPSPI_ClockPhaseFirstEdge"/>
                            <setting name="direction" value="kLPSPI_MsbFirst"/>
                            <setting name="pcsToSckDelayInNanoSec" value="1000"/>
                            <setting name="lastSckToPcsDelayInNanoSec" value="1000"/>
-                           <setting name="betweenTransferDelayInNanoSec" value="1000"/>
+                           <setting name="betweenTransferDelayInNanoSec" value="10000"/>
                            <setting name="whichPcs" value="kLPSPI_Pcs0"/>
                            <setting name="pcsActiveHighOrLow" value="kLPSPI_PcsActiveLow"/>
                            <setting name="pinCfg" value="kLPSPI_SdiInSdiOut"/>
                            <setting name="pcsFunc" value="kLPSPI_PcsAsCs"/>
-                           <setting name="dataOutConfig" value="kLpspiDataOutRetained"/>
+                           <setting name="dataOutConfig" value="kLpspiDataOutTristate"/>
                            <setting name="enableInputDelay" value="false"/>
                         </struct>
                         <setting name="set_FifoWaterMarks" value="false"/>

@@ -20,9 +20,9 @@ typedef enum {
 
 // internal prototypes
 void ST7701_Init(void);
-uint32_t ST7701_SPIReadReg(uint32_t address);
+uint32_t ST7701_SPIRead(uint32_t value);
 void ST7701_SPIWriteReg(uint8_t address, uint32_t data);
 void ST7701_SPIWrite(uint32_t data, transmission_t type);
-
+uint32_t ST7701_SPIRead_SDK(uint32_t command);
 
 #endif /* LCD_ST7701_H_ */

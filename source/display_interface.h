@@ -13,6 +13,6 @@
 
 void DISPLAY_Init(void);
 void DISPLAY_Run(void);
-
+void DISPLAY_Stop(void);
 
 #endif /* DISPLAY_INTERFACE_H_ */

@@ -98,7 +98,7 @@ pin_labels:
 - {pin_num: G14, pin_signal: GPIO_AD_B0_05, label: 'CAN_STBY/BOOT_MODE[1]/Flash_RST/U12[8]', identifier: CAN_STBY}
 - {pin_num: E14, pin_signal: GPIO_AD_B0_06, label: 'JTAG_TMS/J21[7]/SWD_DIO'}
 - {pin_num: F12, pin_signal: GPIO_AD_B0_07, label: 'JTAG_TCK/J21[9]/SWD_CLK'}
-- {pin_num: F13, pin_signal: GPIO_AD_B0_08, label: JTAG_MOD}
+- {pin_num: F13, pin_signal: GPIO_AD_B0_08, label: LCD_RESET, identifier: LCD_RESET}
 - {pin_num: F14, pin_signal: GPIO_AD_B0_09, label: LCD_PWREN, identifier: LCD_PWREN}
 - {pin_num: G13, pin_signal: GPIO_AD_B0_10, label: 'JTAG_TDO/J21[13]/INT1_COMBO/ENET_INT/J22[6]/U32[11]', identifier: INT1_COMBO}
 - {pin_num: G10, pin_signal: GPIO_AD_B0_11, label: 'JTAG_nTRST/J21[3]/INT2_COMBO/LCD_TOUCH_INT/J22[3]/U32[9]', identifier: INT2_COMBO}
@@ -242,6 +242,7 @@ BOARD_InitPins:
   - {pin_num: G11, peripheral: LPSPI3, signal: PCS0, pin_signal: GPIO_AD_B0_03}
   - {pin_num: D13, peripheral: USDHC1, signal: usdhc_cd_b, pin_signal: GPIO_B1_12}
   - {pin_num: F14, peripheral: GPIO1, signal: 'gpio_io, 09', pin_signal: GPIO_AD_B0_09}
+  - {pin_num: F13, peripheral: GPIO1, signal: 'gpio_io, 08', pin_signal: GPIO_AD_B0_08, identifier: ''}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -258,6 +259,7 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_01_LPSPI3_SDO, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_02_LPSPI3_SDI, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_LPSPI3_PCS0, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_08_GPIO1_IO08, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_09_GPIO1_IO09, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_12_USDHC1_CD_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_GPIO2_IO30, 0U); 

@@ -68,7 +68,8 @@ instance:
 - peripheral: 'NVIC'
 - config_sets:
   - nvic:
-    - interrupt_table: []
+    - interrupt_table:
+      - 0: []
     - interrupts: []
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -85,30 +86,38 @@ static void NVIC_init(void) {
 instance:
 - name: 'LPSPI3'
 - type: 'lpspi'
-- mode: 'polling'
+- mode: 'interrupt'
 - custom_name_enabled: 'false'
 - type_id: 'lpspi_2.6.0'
 - functional_group: 'BOARD_InitPeripherals'
 - peripheral: 'LPSPI3'
 - config_sets:
+  - interrupt:
+    - interrupt_sources: 'kLPSPI_WordCompleteInterruptEnable'
+    - interrupt:
+      - IRQn: 'LPSPI3_IRQn'
+      - enable_interrrupt: 'enabled'
+      - enable_priority: 'false'
+      - priority: '0'
+      - enable_custom_name: 'false'
   - main:
     - mode: 'kLPSPI_Master'
     - clockSource: 'LpspiClock'
     - clockSourceFreq: 'ClocksTool_DefaultInit'
     - master:
-      - baudRate: '500000'
-      - bitsPerFrame: '8'
+      - baudRate: '115200'
+      - bitsPerFrame: '9'
       - cpol: 'kLPSPI_ClockPolarityActiveHigh'
       - cpha: 'kLPSPI_ClockPhaseFirstEdge'
       - direction: 'kLPSPI_MsbFirst'
       - pcsToSckDelayInNanoSec: '1000'
       - lastSckToPcsDelayInNanoSec: '1000'
-      - betweenTransferDelayInNanoSec: '1000'
+      - betweenTransferDelayInNanoSec: '10000'
       - whichPcs: 'kLPSPI_Pcs0'
       - pcsActiveHighOrLow: 'kLPSPI_PcsActiveLow'
       - pinCfg: 'kLPSPI_SdiInSdiOut'
       - pcsFunc: 'kLPSPI_PcsAsCs'
-      - dataOutConfig: 'kLpspiDataOutRetained'
+      - dataOutConfig: 'kLpspiDataOutTristate'
       - enableInputDelay: 'false'
     - set_FifoWaterMarks: 'false'
     - fifoWaterMarks:
@@ -122,24 +131,28 @@ instance:
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 const lpspi_master_config_t LPSPI3_config = {
-  .baudRate = 500000UL,
-  .bitsPerFrame = 8UL,
+  .baudRate = 115200UL,
+  .bitsPerFrame = 9UL,
   .cpol = kLPSPI_ClockPolarityActiveHigh,
   .cpha = kLPSPI_ClockPhaseFirstEdge,
   .direction = kLPSPI_MsbFirst,
   .pcsToSckDelayInNanoSec = 1000UL,
   .lastSckToPcsDelayInNanoSec = 1000UL,
-  .betweenTransferDelayInNanoSec = 1000UL,
+  .betweenTransferDelayInNanoSec = 10000UL,
   .whichPcs = kLPSPI_Pcs0,
   .pcsActiveHighOrLow = kLPSPI_PcsActiveLow,
   .pinCfg = kLPSPI_SdiInSdiOut,
   .pcsFunc = kLPSPI_PcsAsCs,
-  .dataOutConfig = kLpspiDataOutRetained,
+  .dataOutConfig = kLpspiDataOutTristate,
   .enableInputDelay = false
 };
 
 static void LPSPI3_init(void) {
   LPSPI_MasterInit(LPSPI3_PERIPHERAL, &LPSPI3_config, LPSPI3_CLOCK_FREQ);
+  /* Enable interrupt sources */
+  LPSPI_EnableInterrupts(LPSPI3_PERIPHERAL, (kLPSPI_WordCompleteInterruptEnable));
+  /* Enable interrupt LPSPI3_IRQN request in the NVIC */
+  EnableIRQ(LPSPI3_IRQN);
 }
 
 /***********************************************************************************************************************

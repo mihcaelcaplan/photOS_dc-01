@@ -117,16 +117,19 @@ int hist_len  = 0;
 	 else if (commandEquals("screen")) {
 	 		 if( argEquals("on") ){
 	 			 PRINTF("initializing screen");
-	 			 DISPLAY_Init();
+	 			 DISPLAY_Run();
 	 		 }
 	 		 else if( argEquals("off") ){
-//	 			 PRINTF("stopping MSC device");
-//	 			 USB_DeviceAppStop();
+	 			 PRINTF("stopping screen");
+	 			 DISPLAY_Stop();
 	 		 }
 	 		 else{
 	 			 PRINTF("usage: screen {on | off}");
 	 		 }
 	 	 }
+	 else if (commandEquals("reboot")) {
+
+	 }
 	 else {
 		 PRINTF("received input %s, nothing to do", input.inputString);
 	 }

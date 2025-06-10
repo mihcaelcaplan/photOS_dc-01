@@ -490,7 +490,7 @@ void USB_DeviceApplicationInit(void)
     USB_DeviceIsrEnable();
 
     /*Add one delay here to make the DP pull down long enough to allow host to detect the previous disconnection.*/
-//    SDK_DelayAtLeastUs(5000, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
+    SDK_DelayAtLeastUs(5000, SDK_DEVICE_MAXIMUM_CPU_CLOCK_FREQUENCY);
 //    USB_DeviceRun(g_msc.deviceHandle);
 }
 
@@ -536,7 +536,7 @@ int main(void) {
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
     MUX_ToUSBC();
     USB_DeviceApplicationInit();
-//    DISPLAY_Init();
+    DISPLAY_Init();
 
     while(1) {
 

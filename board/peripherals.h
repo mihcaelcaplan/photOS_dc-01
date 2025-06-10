@@ -26,6 +26,10 @@ extern "C" {
 #define LPSPI3_PERIPHERAL LPSPI3
 /* Definition of clock source */
 #define LPSPI3_CLOCK_FREQ 105600000UL
+/* LPSPI3 interrupt vector ID (number). */
+#define LPSPI3_IRQN LPSPI3_IRQn
+/* LPSPI3 interrupt handler identifier. */
+#define LPSPI3_IRQHANDLER LPSPI3_IRQHandler
 
 /***********************************************************************************************************************
  * Global variables
