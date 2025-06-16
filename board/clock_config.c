@@ -20,6 +20,7 @@ processor: MIMXRT1062xxxxB
 package_id: MIMXRT1062DVJ6B
 mcu_data: ksdk2_0
 processor_version: 24.12.10
+board: MIMXRT1060-EVKB
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 
 #include "clock_config.h"

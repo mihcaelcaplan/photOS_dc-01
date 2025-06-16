@@ -13,6 +13,8 @@
 #include"lcd_st7701.h"
 #include "utils.h"
 
+#include "elcdif_rgb.h"
+
 
 uint32_t txCount = 0;
 
@@ -598,7 +600,11 @@ void DISPLAY_Run(void){
 
 	ST7701_SPIWrite(0x13, COMMAND);
 	simpleDelay(1);
-	ST7701_SPIWrite(0x22, COMMAND);
+//	ST7701_SPIWrite(0x22, COMMAND);
+//	simpleDelay(1);
+
+	LCDIF_Run();
+
 }
 
 void DISPLAY_Stop(void){

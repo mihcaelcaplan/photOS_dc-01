@@ -11,131 +11,138 @@ processor: MIMXRT1062xxxxB
 package_id: MIMXRT1062DVJ6B
 mcu_data: ksdk2_0
 processor_version: 24.12.10
-external_user_signals: {}
+board: MIMXRT1060-EVKB
 pin_labels:
-- {pin_num: E3, pin_signal: GPIO_EMC_00, label: SEMC_D0, identifier: SEMC_D0}
-- {pin_num: F3, pin_signal: GPIO_EMC_01, label: SEMC_D1, identifier: SEMC_D1}
-- {pin_num: F4, pin_signal: GPIO_EMC_02, label: SEMC_D2, identifier: SEMC_D2}
-- {pin_num: F2, pin_signal: GPIO_EMC_04, label: SEMC_D4, identifier: SEMC_D4}
-- {pin_num: G4, pin_signal: GPIO_EMC_03, label: SEMC_D3, identifier: SEMC_D3}
-- {pin_num: G5, pin_signal: GPIO_EMC_05, label: SEMC_D5, identifier: SEMC_D5}
-- {pin_num: H5, pin_signal: GPIO_EMC_06, label: SEMC_D6, identifier: SEMC_D6}
-- {pin_num: H4, pin_signal: GPIO_EMC_07, label: SEMC_D7, identifier: SEMC_D7}
-- {pin_num: H3, pin_signal: GPIO_EMC_08, label: SEMC_DM0, identifier: SEMC_DM0}
-- {pin_num: C2, pin_signal: GPIO_EMC_09, label: SEMC_A0, identifier: SEMC_A0}
-- {pin_num: G1, pin_signal: GPIO_EMC_10, label: SEMC_A1, identifier: SEMC_A1}
-- {pin_num: G3, pin_signal: GPIO_EMC_11, label: SEMC_A2, identifier: SEMC_A2}
-- {pin_num: H1, pin_signal: GPIO_EMC_12, label: SEMC_A3, identifier: SEMC_A3}
-- {pin_num: A6, pin_signal: GPIO_EMC_13, label: SEMC_A4, identifier: SEMC_A4}
-- {pin_num: B6, pin_signal: GPIO_EMC_14, label: SEMC_A5, identifier: SEMC_A5}
-- {pin_num: B1, pin_signal: GPIO_EMC_15, label: SEMC_A6, identifier: SEMC_A6}
-- {pin_num: A5, pin_signal: GPIO_EMC_16, label: SEMC_A7, identifier: SEMC_A7}
-- {pin_num: A4, pin_signal: GPIO_EMC_17, label: SEMC_A8, identifier: SEMC_A8}
-- {pin_num: B2, pin_signal: GPIO_EMC_18, label: SEMC_A9, identifier: SEMC_A9}
-- {pin_num: B4, pin_signal: GPIO_EMC_19, label: SEMC_A11, identifier: SEMC_A11}
-- {pin_num: G2, pin_signal: GPIO_EMC_23, label: SEMC_A10, identifier: SEMC_A10}
-- {pin_num: A3, pin_signal: GPIO_EMC_20, label: SEMC_A12, identifier: SEMC_A12}
-- {pin_num: C1, pin_signal: GPIO_EMC_21, label: SEMC_BA0, identifier: SEMC_BA0}
-- {pin_num: F1, pin_signal: GPIO_EMC_22, label: SEMC_BA1, identifier: SEMC_BA1}
-- {pin_num: D3, pin_signal: GPIO_EMC_24, label: SEMC_CAS, identifier: SEMC_CAS}
-- {pin_num: D2, pin_signal: GPIO_EMC_25, label: SEMC_RAS, identifier: SEMC_RAS}
-- {pin_num: B3, pin_signal: GPIO_EMC_26, label: SEMC_CLK, identifier: SEMC_CLK}
-- {pin_num: A2, pin_signal: GPIO_EMC_27, label: SEMC_CKE, identifier: SEMC_CKE}
-- {pin_num: D1, pin_signal: GPIO_EMC_28, label: SEMC_WE, identifier: SEMC_WE}
-- {pin_num: E1, pin_signal: GPIO_EMC_29, label: SEMC_CS0, identifier: SEMC_CS0}
-- {pin_num: C6, pin_signal: GPIO_EMC_30, label: SEMC_D8, identifier: SEMC_D8}
-- {pin_num: C5, pin_signal: GPIO_EMC_31, label: SEMC_D9, identifier: SEMC_D9}
-- {pin_num: D5, pin_signal: GPIO_EMC_32, label: SEMC_D10, identifier: SEMC_D10}
-- {pin_num: C4, pin_signal: GPIO_EMC_33, label: SEMC_D11, identifier: SEMC_D11}
-- {pin_num: D4, pin_signal: GPIO_EMC_34, label: SEMC_D12, identifier: SEMC_D12}
-- {pin_num: E5, pin_signal: GPIO_EMC_35, label: SEMC_D13, identifier: SEMC_D13}
-- {pin_num: C3, pin_signal: GPIO_EMC_36, label: SEMC_D14, identifier: SEMC_D14}
-- {pin_num: E4, pin_signal: GPIO_EMC_37, label: SEMC_D15, identifier: SEMC_D15}
-- {pin_num: D6, pin_signal: GPIO_EMC_38, label: SEMC_DM1, identifier: SEMC_DM1}
+- {pin_num: E3, pin_signal: GPIO_EMC_00, label: 'SEMC_D0/SEMC_D0/U16[A8]', identifier: SEMC_D0}
+- {pin_num: F3, pin_signal: GPIO_EMC_01, label: 'SEMC_D1/SEMC_D1/U16[B9]', identifier: SEMC_D1}
+- {pin_num: F4, pin_signal: GPIO_EMC_02, label: 'SEMC_D2/SEMC_D2/U16[B8]', identifier: SEMC_D2}
+- {pin_num: F2, pin_signal: GPIO_EMC_04, label: 'SEMC_D4/SEMC_D4/U16[C8]', identifier: SEMC_D4}
+- {pin_num: G4, pin_signal: GPIO_EMC_03, label: 'SEMC_D3/SEMC_D3/U16[C9]', identifier: SEMC_D3}
+- {pin_num: G5, pin_signal: GPIO_EMC_05, label: 'SEMC_D5/SEMC_D5/U16[D9]', identifier: SEMC_D5}
+- {pin_num: H5, pin_signal: GPIO_EMC_06, label: 'SEMC_D6/SEMC_D6/U16[D8]', identifier: SEMC_D6}
+- {pin_num: H4, pin_signal: GPIO_EMC_07, label: 'SEMC_D7/SEMC_D7/U16[E9]', identifier: SEMC_D7}
+- {pin_num: H3, pin_signal: GPIO_EMC_08, label: 'SEMC_DM0/SEMC_DM0/U16[E8]', identifier: SEMC_DM0}
+- {pin_num: C2, pin_signal: GPIO_EMC_09, label: 'SEMC_A0/SEMC_A0/U16[H7]', identifier: SEMC_A0}
+- {pin_num: G1, pin_signal: GPIO_EMC_10, label: 'SEMC_A1/SEMC_A1/U16[H8]', identifier: SEMC_A1}
+- {pin_num: G3, pin_signal: GPIO_EMC_11, label: 'SEMC_A2/SEMC_A2/U16[J8]', identifier: SEMC_A2}
+- {pin_num: H1, pin_signal: GPIO_EMC_12, label: 'SEMC_A3/SEMC_A3/U16[J7]', identifier: SEMC_A3}
+- {pin_num: A6, pin_signal: GPIO_EMC_13, label: 'SEMC_A4/SEMC_A4/U16[J3]', identifier: SEMC_A4}
+- {pin_num: B6, pin_signal: GPIO_EMC_14, label: 'SEMC_A5/SEMC_A5/U16[J2]', identifier: SEMC_A5}
+- {pin_num: B1, pin_signal: GPIO_EMC_15, label: 'SEMC_A6/SEMC_A6/U16[H3]', identifier: SEMC_A6}
+- {pin_num: A5, pin_signal: GPIO_EMC_16, label: 'SEMC_A7/SEMC_A7/U6[H2]', identifier: SEMC_A7}
+- {pin_num: A4, pin_signal: GPIO_EMC_17, label: 'SEMC_A8/SEMC_A8/U16[H1]', identifier: SEMC_A8}
+- {pin_num: B2, pin_signal: GPIO_EMC_18, label: 'SEMC_A9/SEMC_A9/U16[G3]', identifier: SEMC_A9}
+- {pin_num: B4, pin_signal: GPIO_EMC_19, label: 'SEMC_A11/SEMC_A11/U6[G2]', identifier: SEMC_A11}
+- {pin_num: G2, pin_signal: GPIO_EMC_23, label: 'SEMC_A10/SEMC_A10/U16[H9]', identifier: SEMC_A10}
+- {pin_num: A3, pin_signal: GPIO_EMC_20, label: 'SEMC_A12/SEMC_A12/U16[G1]', identifier: SEMC_A12}
+- {pin_num: C1, pin_signal: GPIO_EMC_21, label: 'SEMC_BA0/SEMC_BA0/U16[G7]', identifier: SEMC_BA0}
+- {pin_num: F1, pin_signal: GPIO_EMC_22, label: 'SEMC_BA1/SEMC_BA1/U16[G8]', identifier: SEMC_BA1}
+- {pin_num: D3, pin_signal: GPIO_EMC_24, label: 'SEMC_CAS/SEMC_CAS/U16[F7]', identifier: SEMC_CAS}
+- {pin_num: D2, pin_signal: GPIO_EMC_25, label: 'SEMC_RAS/SEMC_RAS/U16[F8]', identifier: SEMC_RAS}
+- {pin_num: B3, pin_signal: GPIO_EMC_26, label: 'SEMC_CLK/SEMC_CLK/U16[F2]', identifier: SEMC_CLK}
+- {pin_num: A2, pin_signal: GPIO_EMC_27, label: 'SEMC_CKE/SEMC_CKE/U16[F3]', identifier: SEMC_CKE}
+- {pin_num: D1, pin_signal: GPIO_EMC_28, label: 'SEMC_WE/SEMC_WE/U16[F9]', identifier: SEMC_WE}
+- {pin_num: E1, pin_signal: GPIO_EMC_29, label: 'SEMC_CS0/SEMC_CS0/U16[G9]', identifier: SEMC_CS0}
+- {pin_num: C6, pin_signal: GPIO_EMC_30, label: 'SEMC_D8/SEMC_D8/U16[E1]', identifier: SEMC_D8}
+- {pin_num: C5, pin_signal: GPIO_EMC_31, label: 'SEMC_D9/SEMC_D9/U16[D2]', identifier: SEMC_D9}
+- {pin_num: D5, pin_signal: GPIO_EMC_32, label: 'SEMC_D10/SEMC_D10/U16[D1]', identifier: SEMC_D10}
+- {pin_num: C4, pin_signal: GPIO_EMC_33, label: 'SEMC_D11/SEMC_D11/U16[C2]', identifier: SEMC_D11}
+- {pin_num: D4, pin_signal: GPIO_EMC_34, label: 'SEMC_D12/SEMC_D12/U16[C1]', identifier: SEMC_D12}
+- {pin_num: E5, pin_signal: GPIO_EMC_35, label: 'SEMC_D13/SEMC_D13/U16[B2]', identifier: SEMC_D13}
+- {pin_num: C3, pin_signal: GPIO_EMC_36, label: 'SEMC_D14/SEMC_D14/U16[B1]', identifier: SEMC_D14}
+- {pin_num: E4, pin_signal: GPIO_EMC_37, label: 'SEMC_D15/SEMC_D15/U16[A2]', identifier: SEMC_D15}
+- {pin_num: D6, pin_signal: GPIO_EMC_38, label: 'SEMC_DM1/SEMC_DM1/U16[F1]', identifier: SEMC_DM1}
 - {pin_num: B7, pin_signal: GPIO_EMC_39, label: SEMC_DQS, identifier: SEMC_DQS}
-- {pin_num: A7, pin_signal: GPIO_EMC_40, label: ENET_MDC, identifier: ENET_MDC}
-- {pin_num: C7, pin_signal: GPIO_EMC_41, label: ENET_MDIO, identifier: ENET_MDIO}
-- {pin_num: D7, pin_signal: GPIO_B0_00, label: LCDIF_CLK, identifier: LCDIF_CLK}
-- {pin_num: E7, pin_signal: GPIO_B0_01, label: LCDIF_ENABLE, identifier: LCDIF_ENABLE}
-- {pin_num: E8, pin_signal: GPIO_B0_02, label: LCDIF_HSYNC, identifier: LCDIF_HSYNC}
-- {pin_num: D8, pin_signal: GPIO_B0_03, label: LCDIF_VSYNC, identifier: LCDIF_VSYNC}
-- {pin_num: C8, pin_signal: GPIO_B0_04, label: 'LCDIF_D0/BT_CFG[0]', identifier: LCDIF_D0}
-- {pin_num: B8, pin_signal: GPIO_B0_05, label: 'LCDIF_D1/BT_CFG[1]', identifier: LCDIF_D1}
-- {pin_num: A8, pin_signal: GPIO_B0_06, label: 'LCDIF_D2/BT_CFG[2]', identifier: LCDIF_D2}
-- {pin_num: A9, pin_signal: GPIO_B0_07, label: 'LCDIF_D3/BT_CFG[3]', identifier: LCDIF_D3}
-- {pin_num: B9, pin_signal: GPIO_B0_08, label: 'LCDIF_D4/BT_CFG[4]', identifier: LCDIF_D4}
-- {pin_num: C9, pin_signal: GPIO_B0_09, label: 'LCDIF_D5/BT_CFG[5]', identifier: LCDIF_D5}
-- {pin_num: D9, pin_signal: GPIO_B0_10, label: 'LCDIF_D6/BT_CFG[6]', identifier: LCDIF_D6}
-- {pin_num: A10, pin_signal: GPIO_B0_11, label: 'LCDIF_D7/BT_CFG[7]', identifier: LCDIF_D7}
-- {pin_num: C10, pin_signal: GPIO_B0_12, label: 'LCDIF_D8/BT_CFG[8]', identifier: LCDIF_D8}
-- {pin_num: D10, pin_signal: GPIO_B0_13, label: 'LCDIF_D9/BT_CFG[9]', identifier: LCDIF_D9}
-- {pin_num: E10, pin_signal: GPIO_B0_14, label: 'LCDIF_D10/BT_CFG[10]', identifier: LCDIF_D10}
-- {pin_num: E11, pin_signal: GPIO_B0_15, label: 'LCDIF_D11/BT_CFG[11]', identifier: LCDIF_D11}
-- {pin_num: A11, pin_signal: GPIO_B1_00, label: LCDIF_D12, identifier: LCDIF_D12}
-- {pin_num: B11, pin_signal: GPIO_B1_01, label: LCDIF_D13, identifier: LCDIF_D13}
-- {pin_num: C11, pin_signal: GPIO_B1_02, label: LCDIF_D14, identifier: LCDIF_D14}
-- {pin_num: D11, pin_signal: GPIO_B1_03, label: LCDIF_D15, identifier: LCDIF_D15}
-- {pin_num: E12, pin_signal: GPIO_B1_04, label: ENET_RXD0, identifier: ENET_RXD0}
-- {pin_num: D12, pin_signal: GPIO_B1_05, label: ENET_RXD1, identifier: ENET_RXD1}
-- {pin_num: C12, pin_signal: GPIO_B1_06, label: ENET_CRS_DV, identifier: ENET_CRS_DV}
-- {pin_num: B12, pin_signal: GPIO_B1_07, label: ENET_TXD0, identifier: ENET_TXD0}
-- {pin_num: A12, pin_signal: GPIO_B1_08, label: ENET_TXD1, identifier: ENET_TXD1}
-- {pin_num: A13, pin_signal: GPIO_B1_09, label: ENET_TXEN, identifier: ENET_TXEN}
-- {pin_num: B13, pin_signal: GPIO_B1_10, label: ENET_TX_CLK, identifier: ENET_TX_CLK}
-- {pin_num: C13, pin_signal: GPIO_B1_11, label: ENET_RXER, identifier: ENET_RXER}
-- {pin_num: D13, pin_signal: GPIO_B1_12, label: SD_CD_SW, identifier: SD_CD_SW}
-- {pin_num: D14, pin_signal: GPIO_B1_13, label: WDOG_B, identifier: WDOG_B}
-- {pin_num: C14, pin_signal: GPIO_B1_14, label: MUX_S, identifier: MUX_S}
-- {pin_num: B14, pin_signal: GPIO_B1_15, label: USB_HOST_PWR/BACKLIGHT_CTL, identifier: BACKLIGHT_CTL}
+- {pin_num: A7, pin_signal: GPIO_EMC_40, label: 'ENET_MDC/ENET_MDC/U18[12]', identifier: ENET_MDC}
+- {pin_num: C7, pin_signal: GPIO_EMC_41, label: 'ENET_MDIO/ENET_MDIO/U18[11]', identifier: ENET_MDIO}
+- {pin_num: D7, pin_signal: GPIO_B0_00, label: 'LCDIF_CLK/LCDIF_CLK/J49[A30]', identifier: LCDIF_CLK}
+- {pin_num: E7, pin_signal: GPIO_B0_01, label: 'LCDIF_ENABLE/LCDIF_ENABLE/J49[A34]', identifier: LCDIF_ENABLE}
+- {pin_num: E8, pin_signal: GPIO_B0_02, label: 'LCDIF_HSYNC/LCDIF_HSYNC/J49[A32]', identifier: LCDIF_HSYNC}
+- {pin_num: D8, pin_signal: GPIO_B0_03, label: 'LCDIF_VSYNC/LCDIF_VSYNC/J49[A33]', identifier: LCDIF_VSYNC}
+- {pin_num: C8, pin_signal: GPIO_B0_04, label: 'LCDIF_D0/BT_CFG[0]/LCDIF_D0/BT_CFG[0]/J49[A24]', identifier: LCDIF_D0}
+- {pin_num: B8, pin_signal: GPIO_B0_05, label: 'LCDIF_D1/BT_CFG[1]/LCDIF_D1/BT_CFG[1]/J49[A25]', identifier: LCDIF_D1}
+- {pin_num: A8, pin_signal: GPIO_B0_06, label: 'LCDIF_D2/BT_CFG[2]/LCDIF_D2/BT_CFG[2]/J49[A26]', identifier: LCDIF_D2}
+- {pin_num: A9, pin_signal: GPIO_B0_07, label: 'LCDIF_D3/BT_CFG[3]/LCDIF_D3/BT_CFG[3]/J49[A27]', identifier: LCDIF_D3}
+- {pin_num: B9, pin_signal: GPIO_B0_08, label: 'LCDIF_D4/BT_CFG[4]/LCDIF_D4/BT_CFG[4]/J49[A28]', identifier: LCDIF_D4}
+- {pin_num: C9, pin_signal: GPIO_B0_09, label: 'LCDIF_D5/BT_CFG[5]/LCDIF_D5/BT_CFG[5]/J49[A15]', identifier: LCDIF_D5}
+- {pin_num: D9, pin_signal: GPIO_B0_10, label: 'LCDIF_D6/BT_CFG[6]/LCDIF_D6/BT_CFG[6]/J49[A16]', identifier: LCDIF_D6}
+- {pin_num: A10, pin_signal: GPIO_B0_11, label: 'LCDIF_D7/BT_CFG[7]/LCDIF_D7/BT_CFG[7]/J49[A17]', identifier: LCDIF_D7}
+- {pin_num: C10, pin_signal: GPIO_B0_12, label: 'LCDIF_D8/BT_CFG[8]/LCDIF_D8/BT_CFG[8]/J49[A18]', identifier: LCDIF_D8}
+- {pin_num: D10, pin_signal: GPIO_B0_13, label: 'LCDIF_D9/BT_CFG[9]/LCDIF_D9/BT_CFG[9]/J49[A19]', identifier: LCDIF_D9}
+- {pin_num: E10, pin_signal: GPIO_B0_14, label: 'LCDIF_D10/BT_CFG[10]/LCDIF_D10/BT_CFG[10]/J49[A20]', identifier: LCDIF_D10}
+- {pin_num: E11, pin_signal: GPIO_B0_15, label: 'LCDIF_D11/BT_CFG[11]/LCDIF_D11/BT_CFG[11]J49[A8]', identifier: LCDIF_D11}
+- {pin_num: A11, pin_signal: GPIO_B1_00, label: 'LCDIF_D12/LCDIF_D12/J49[A9]', identifier: LCDIF_D12}
+- {pin_num: B11, pin_signal: GPIO_B1_01, label: 'LCDIF_D13/LCDIF_D13/J49[A10]', identifier: LCDIF_D13}
+- {pin_num: C11, pin_signal: GPIO_B1_02, label: 'LCDIF_D14/LCDIF_D14/J49[A11]', identifier: LCDIF_D14}
+- {pin_num: D11, pin_signal: GPIO_B1_03, label: 'LCDIF_D15/LCDIF_D15/J49[A12]', identifier: LCDIF_D15}
+- {pin_num: E12, pin_signal: GPIO_B1_04, label: 'ENET_RXD0/ENET_RXD0/U18[16]', identifier: ENET_RXD0}
+- {pin_num: D12, pin_signal: GPIO_B1_05, label: 'ENET_RXD1/ENET_RXD1/U18[15]', identifier: ENET_RXD1}
+- {pin_num: C12, pin_signal: GPIO_B1_06, label: 'ENET_CRS_DV/ENET_CRS_DV/U18[18]', identifier: ENET_CRS_DV}
+- {pin_num: B12, pin_signal: GPIO_B1_07, label: 'ENET_TXD0/ENET_TXD0/U18[24]', identifier: ENET_TXD0}
+- {pin_num: A12, pin_signal: GPIO_B1_08, label: 'ENET_TXD1/ENET_TXD1/U18[25]', identifier: ENET_TXD1}
+- {pin_num: A13, pin_signal: GPIO_B1_09, label: 'ENET_TXEN/ENET_TXEN/U18[23]', identifier: ENET_TXEN}
+- {pin_num: B13, pin_signal: GPIO_B1_10, label: 'ENET_TX_CLK/ENET_TX_REF_CLK/U18[9]', identifier: ENET_TX_CLK;ENET_TX_REF_CLK}
+- {pin_num: C13, pin_signal: GPIO_B1_11, label: 'ENET_RXER/ENET_RXER/U18[20]', identifier: ENET_RXER}
+- {pin_num: D13, pin_signal: GPIO_B1_12, label: 'SD_CD_SW/SD_CD_SW/J22[9]', identifier: SD_CD_SW}
+- {pin_num: D14, pin_signal: GPIO_B1_13, label: 'WDOG_B/WDOG_B/U27[3]', identifier: WDOG_B}
+- {pin_num: C14, pin_signal: GPIO_B1_14, label: MUX_S/SD0_VSELECT, identifier: MUX_S;SD0_VSELECT}
+- {pin_num: B14, pin_signal: GPIO_B1_15, label: 'USB_HOST_PWR/BACKLIGHT_CTL/USB_HOST_PWR/U28[A1]/BACKLIGHT_CTL/U14[4]', identifier: BACKLIGHT_CTL}
 - {pin_num: E9, pin_signal: NVCC_GPIO0, label: DCDC_3V3/NVCC_GPIO_3V3}
 - {pin_num: F10, pin_signal: NVCC_GPIO1, label: DCDC_3V3/NVCC_GPIO_3V3}
 - {pin_num: J10, pin_signal: NVCC_GPIO2, label: DCDC_3V3/NVCC_GPIO_3V3}
-- {pin_num: M14, pin_signal: GPIO_AD_B0_00, label: 'USB_HOST_OC/J24[10]'}
-- {pin_num: H10, pin_signal: GPIO_AD_B0_01, label: 'USB_OTG1_ID/J24[9]'}
-- {pin_num: M11, pin_signal: GPIO_AD_B0_02, label: 'USB_OTG1_PWR/J24[2]'}
-- {pin_num: G11, pin_signal: GPIO_AD_B0_03, label: 'USB_OTG1_OC/J24[1]'}
-- {pin_num: F11, pin_signal: GPIO_AD_B0_04, label: 'CSI_PWDN/J35[17]/BOOT_MODE[0]', identifier: CSI_PWDN}
-- {pin_num: G14, pin_signal: GPIO_AD_B0_05, label: 'CAN_STBY/BOOT_MODE[1]/Flash_RST/U12[8]', identifier: CAN_STBY}
-- {pin_num: E14, pin_signal: GPIO_AD_B0_06, label: 'JTAG_TMS/J21[7]/SWD_DIO'}
-- {pin_num: F12, pin_signal: GPIO_AD_B0_07, label: 'JTAG_TCK/J21[9]/SWD_CLK'}
-- {pin_num: F13, pin_signal: GPIO_AD_B0_08, label: LCD_RESET, identifier: LCD_RESET}
-- {pin_num: F14, pin_signal: GPIO_AD_B0_09, label: LCD_PWREN, identifier: LCD_PWREN}
-- {pin_num: G13, pin_signal: GPIO_AD_B0_10, label: 'JTAG_TDO/J21[13]/INT1_COMBO/ENET_INT/J22[6]/U32[11]', identifier: INT1_COMBO}
-- {pin_num: G10, pin_signal: GPIO_AD_B0_11, label: 'JTAG_nTRST/J21[3]/INT2_COMBO/LCD_TOUCH_INT/J22[3]/U32[9]', identifier: INT2_COMBO}
-- {pin_num: K14, pin_signal: GPIO_AD_B0_12, label: UART1_TXD, identifier: UART1_TXD}
-- {pin_num: L14, pin_signal: GPIO_AD_B0_13, label: UART1_RXD, identifier: UART1_RXD}
-- {pin_num: H14, pin_signal: GPIO_AD_B0_14, label: 'CAN2_TX/U12[1]', identifier: CAN2_TX}
-- {pin_num: L10, pin_signal: GPIO_AD_B0_15, label: 'CAN2_RX/U12[4]', identifier: CAN2_RX}
-- {pin_num: J11, pin_signal: GPIO_AD_B1_00, label: 'I2C1_SCL/CSI_I2C_SCL/J35[20]/J23[6]/U13[17]/U32[4]', identifier: I2C_SCL_FXOS8700CQ;CSI_I2C_SCL}
-- {pin_num: K11, pin_signal: GPIO_AD_B1_01, label: 'I2C1_SDA/CSI_I2C_SDA/J35[22]/J23[5]/U13[18]/U32[6]', identifier: I2C_SDA_FXOS8700CQ;CSI_I2C_SDA}
-- {pin_num: L11, pin_signal: GPIO_AD_B1_02, label: 'SPDIF_OUT/J22[7]', identifier: SPDIF_OUT}
-- {pin_num: M12, pin_signal: GPIO_AD_B1_03, label: 'SPDIF_IN/J22[8]', identifier: SPDIF_IN}
-- {pin_num: H13, pin_signal: GPIO_AD_B1_08, label: 'AUD_INT/CSI_D9//J35[13]/J22[4]', identifier: CSI_D9}
-- {pin_num: M13, pin_signal: GPIO_AD_B1_09, label: 'SAI1_MCLK/CSI_D8/J35[11]', identifier: CSI_D8}
-- {pin_num: L13, pin_signal: GPIO_AD_B1_10, label: 'SAI1_RX_SYNC/CSI_D7/J35[9]/J23[1]', identifier: CSI_D7}
-- {pin_num: J13, pin_signal: GPIO_AD_B1_11, label: 'SAI1_RX_BCLK/CSI_D6/J35[7]/J23[2]', identifier: CSI_D6}
-- {pin_num: H12, pin_signal: GPIO_AD_B1_12, label: 'SAI1_RXD/CSI_D5/J35[5]/U13[16]', identifier: CSI_D5}
-- {pin_num: H11, pin_signal: GPIO_AD_B1_13, label: 'SAI1_TXD/CSI_D4/J35[3]/U13[14]', identifier: CSI_D4}
-- {pin_num: G12, pin_signal: GPIO_AD_B1_14, label: 'SAI1_TX_BCLK/CSI_D3/J35[4]/U13[12]', identifier: CSI_D3}
-- {pin_num: J14, pin_signal: GPIO_AD_B1_15, label: 'SAI1_TX_SYNC/CSI_D2/J35[6]/U13[13]', identifier: CSI_D2}
-- {pin_num: J4, pin_signal: GPIO_SD_B0_00, label: 'SD1_CMD/J24[6]', identifier: SD1_CMD}
-- {pin_num: J3, pin_signal: GPIO_SD_B0_01, label: 'SD1_CLK/J24[3]', identifier: SD1_CLK}
-- {pin_num: J1, pin_signal: GPIO_SD_B0_02, label: 'SD1_D0/J24[4]/SPI_MOSI/PWM', identifier: SD1_D0}
-- {pin_num: K1, pin_signal: GPIO_SD_B0_03, label: 'SD1_D1/J24[5]/SPI_MISO', identifier: SD1_D1}
-- {pin_num: H2, pin_signal: GPIO_SD_B0_04, label: SD1_D2, identifier: SD1_D2}
-- {pin_num: J2, pin_signal: GPIO_SD_B0_05, label: SD1_D3, identifier: SD1_D3}
-- {pin_num: L5, pin_signal: GPIO_SD_B1_00, label: FlexSPI_D3_B, identifier: FlexSPI_D3_B}
-- {pin_num: M5, pin_signal: GPIO_SD_B1_01, label: FlexSPI_D2_B, identifier: FlexSPI_D2_B}
-- {pin_num: M3, pin_signal: GPIO_SD_B1_02, label: FlexSPI_D1_B, identifier: FlexSPI_D1_B}
-- {pin_num: M4, pin_signal: GPIO_SD_B1_03, label: FlexSPI_D0_B, identifier: FlexSPI_D0_B}
-- {pin_num: P2, pin_signal: GPIO_SD_B1_04, label: FlexSPI_CLK_B, identifier: FlexSPI_CLK_B}
-- {pin_num: N3, pin_signal: GPIO_SD_B1_05, label: FlexSPI_DQS, identifier: FlexSPI_DQS}
-- {pin_num: L3, pin_signal: GPIO_SD_B1_06, label: FlexSPI_SS0, identifier: FlexSPI_SS0}
-- {pin_num: L4, pin_signal: GPIO_SD_B1_07, label: FlexSPI_CLK, identifier: FlexSPI_CLK}
-- {pin_num: P3, pin_signal: GPIO_SD_B1_08, label: FlexSPI_D0_A, identifier: FlexSPI_D0_A}
-- {pin_num: N4, pin_signal: GPIO_SD_B1_09, label: FlexSPI_D1_A, identifier: FlexSPI_D1_A}
-- {pin_num: P4, pin_signal: GPIO_SD_B1_10, label: FlexSPI_D2_A, identifier: FlexSPI_D2_A}
-- {pin_num: P5, pin_signal: GPIO_SD_B1_11, label: FlexSPI_D3_A, identifier: FlexSPI_D3_A}
+- {pin_num: M14, pin_signal: GPIO_AD_B0_00, label: 'USB_HOST_OC/J24[10]/USB_HOST_OC/U28[A2]/WIFI_WAKE_B_3V3/U10[B1]/DC_GPIO1/J23[21]'}
+- {pin_num: H10, pin_signal: GPIO_AD_B0_01, label: 'USB_OTG1_ID/J24[9]/USB_OTG1_ID/J48[4]/BT_WAKE_B_3V3/J8[20]/DC_INT/J23[3]'}
+- {pin_num: M11, pin_signal: GPIO_AD_B0_02, label: 'USB_OTG1_PWR/J24[2]/USB_OTG1_PWR/J17[2]/U30[A1]/LCD_RST/J49[B2]/DC_RESET/J23[7]/BT_UART_RTS/U9[5]'}
+- {pin_num: G11, pin_signal: GPIO_AD_B0_03, label: 'USB_OTG1_OC/J24[1]/USB_OTG1_OC/J17[1]/U30[A2]/DC_GPIO2/J23[22]/BT_UART_CTS/U10[19]'}
+- {pin_num: F11, pin_signal: GPIO_AD_B0_04, label: 'CSI_PWDN/J35[17]/BOOT_MODE[0]/DC_I2S2_TX_SYNC/J19[9]/BOOT_MODE[0]', identifier: CSI_PWDN;DC_I2S2_TX_SYNC}
+- {pin_num: G14, pin_signal: GPIO_AD_B0_05, label: 'CAN_STBY/BOOT_MODE[1]/Flash_RST/U12[8]/CAN_STBY/U23[8]/Flash_RST/U20[A4]/DC_I2S2_TX_BCLK/J19[3]/BOOT_MODE[1]',
+  identifier: CAN_STBY}
+- {pin_num: E14, pin_signal: GPIO_AD_B0_06, label: 'JTAG_TMS/J21[7]/SWD_DIO/JTAG_TMS/J2[7]/SWD_DIO/J10[2]/DC_I2S2_RX_BCLK/J19[5]'}
+- {pin_num: F12, pin_signal: GPIO_AD_B0_07, label: 'JTAG_TCK/J21[9]/SWD_CLK/JTAG_TCK/J2[9]/SWD_CLK/J9[2]/DC_I2S2_RX_SYNC/J19[7]'}
+- {pin_num: F13, pin_signal: GPIO_AD_B0_08, label: 'LCD_RESET/JTAG_MOD/USER_LED/DC_I2S2_RX_D0/J19[8]', identifier: LCD_RESET}
+- {pin_num: F14, pin_signal: GPIO_AD_B0_09, label: 'LCD_PWREN/JTAG_TDI/J2[5]/J4[2]/ENET_RST/U18[32]/DC_I2S2_TX_D0/J19[10]/J16[5]', identifier: LCD_PWREN}
+- {pin_num: G13, pin_signal: GPIO_AD_B0_10, label: 'JTAG_TDO/J21[13]/INT1_COMBO/ENET_INT/J22[6]/U32[11]/JTAG_TDO/J2[13]/J3[2]/ENET_INT/U18[21]/INT1_COMBO/U12[11]/DC_I2S2_MCLK/J19[1]/J16[6]',
+  identifier: INT1_COMBO}
+- {pin_num: G10, pin_signal: GPIO_AD_B0_11, label: 'JTAG_nTRST/J21[3]/INT2_COMBO/LCD_TOUCH_INT/J22[3]/U32[9]/JTAG_nTRST/J2[3]/INT2_COMBO/U12[9]/LCD_TOUCH_INT/J49[B3]/J16[3]',
+  identifier: INT2_COMBO}
+- {pin_num: K14, pin_signal: GPIO_AD_B0_12, label: 'UART1_TXD/UART1_TXD/J13[2]', identifier: UART1_TXD}
+- {pin_num: L14, pin_signal: GPIO_AD_B0_13, label: 'UART1_RXD/UART1_RXD/J11[2]', identifier: UART1_RXD}
+- {pin_num: H14, pin_signal: GPIO_AD_B0_14, label: CSI_PWREN, identifier: CSI_PWREN}
+- {pin_num: L10, pin_signal: GPIO_AD_B0_15, label: 'CAN2_RX/U12[4]/CAN2_RX/U23[4]', identifier: CAN2_RX}
+- {pin_num: J11, pin_signal: GPIO_AD_B1_00, label: 'I2C1_SCL/CSI_I2C_SCL/J35[20]/J23[6]/U13[17]/U32[4]/I2C1_SCL/J49[B4]/U25[17]/U12[4]/J33[6]/J17[10]/CSI_I2C_SCL/J46[20]',
+  identifier: I2C_SCL_FXOS8700CQ;CSI_I2C_SCL}
+- {pin_num: K11, pin_signal: GPIO_AD_B1_01, label: 'I2C1_SDA/CSI_I2C_SDA/J35[22]/J23[5]/U13[18]/U32[6]/I2C1_SDA/J49[B5]/U25[18]/U12[6]/J33[5]/J17[9]/CSI_I2C_SDA/J46[22]',
+  identifier: I2C_SDA_FXOS8700CQ;CSI_I2C_SDA}
+- {pin_num: L11, pin_signal: GPIO_AD_B1_02, label: 'SPDIF_OUT/J22[7]/SPDIF_OUT/J18[2]/BT_RST#/J8[54]/CSI_PWDN/PWDN/J46[17]/J16[7]', identifier: SPDIF_OUT}
+- {pin_num: M12, pin_signal: GPIO_AD_B1_03, label: 'SPDIF_IN/J22[8]/SPDIF_IN/U15[4]/WL_RST#/J8[56]/SD_PWREN/Q5[1]/J16[8]', identifier: SPDIF_IN}
+- {pin_num: H13, pin_signal: GPIO_AD_B1_08, label: 'AUD_INT/CSI_D9//J35[13]/J22[4]/AUD_INT/J34[5]/U25[15]/WIFI_RST_B/U9[3]/CSI_D9/J46[13]/J16[4]', identifier: CSI_D9}
+- {pin_num: M13, pin_signal: GPIO_AD_B1_09, label: 'SAI1_MCLK/CSI_D8/J35[11]/SAI1_MCLK/U25[11]/DC_I2S1_MCLK/J23[1]/CSI_D8/J46[11]', identifier: CSI_D8}
+- {pin_num: L13, pin_signal: GPIO_AD_B1_10, label: 'SAI1_RX_SYNC/CSI_D7/J35[9]/J23[1]/SAI1_RX_SYNC/J23[9]/CSI_D7/J46[9]/J33[1]', identifier: CSI_D7}
+- {pin_num: J13, pin_signal: GPIO_AD_B1_11, label: 'SAI1_RX_BCLK/CSI_D6/J35[7]/J23[2]/DC_I2S1_RX_BCLK/J23[5]/CSI_D6/J46[7]/J33[2]', identifier: CSI_D6}
+- {pin_num: H12, pin_signal: GPIO_AD_B1_12, label: 'SAI1_RXD/CSI_D5/J35[5]/U13[16]/SAI1_RXD/J41[1]/DC_I2S1_RX_D0/J23[11]/BT_PCM_RXD/U10[18]/CSI_D5/J46[5]', identifier: CSI_D5}
+- {pin_num: H11, pin_signal: GPIO_AD_B1_13, label: 'SAI1_TXD/CSI_D4/J35[3]/U13[14]/SAI1_TXD/J37[1]/DC_I2S1_TX_D0/J23[17]/BT_PCM_TXD/U9[6]/CSI_D4/J46[3]', identifier: CSI_D4}
+- {pin_num: G12, pin_signal: GPIO_AD_B1_14, label: 'SAI1_TX_BCLK/CSI_D3/J35[4]/U13[12]/SAI1_TX_BCLK/J35[1]/DC_I2S1_TX_BCLK/U23[23]/BT_PCM_BCLK/U9[7]/U10[17]/CSI_D3/J46[4]',
+  identifier: CSI_D3}
+- {pin_num: J14, pin_signal: GPIO_AD_B1_15, label: 'SAI1_TX_SYNC/CSI_D2/J35[6]/U13[13]/SAI1_TX_SYNC/J36[1]/DC_I2S1_TX_SYNC/U23[16]/BT_PCM_SYNC/U9[8]/U10[16]/CSI_D2/J46[6]',
+  identifier: CSI_D2}
+- {pin_num: J4, pin_signal: GPIO_SD_B0_00, label: 'SD1_CMD/J24[6]/SD1_CMD/J22[3]/J17[6]', identifier: SD1_CMD}
+- {pin_num: J3, pin_signal: GPIO_SD_B0_01, label: 'SD1_CLK/J24[3]/SD1_CLK/J22[5]/J17[3]', identifier: SD1_CLK}
+- {pin_num: J1, pin_signal: GPIO_SD_B0_02, label: 'SD1_D0/J24[4]/SPI_MOSI/PWM/SD1_D0/J22[7]/J17[4]', identifier: SD1_D0}
+- {pin_num: K1, pin_signal: GPIO_SD_B0_03, label: 'SD1_D1/J24[5]/SPI_MISO/SD1_D1/J22[8]/J17[5]', identifier: SD1_D1}
+- {pin_num: H2, pin_signal: GPIO_SD_B0_04, label: 'SD1_D2/SD1_D2/J22[1]', identifier: SD1_D2}
+- {pin_num: J2, pin_signal: GPIO_SD_B0_05, label: 'SD1_D3/SD1_D3/J22[2]', identifier: SD1_D3}
+- {pin_num: L5, pin_signal: GPIO_SD_B1_00, label: 'FlexSPI_D3_B/FlexSPI_D3_B/U20[E1]', identifier: FlexSPI_D3_B}
+- {pin_num: M5, pin_signal: GPIO_SD_B1_01, label: 'FlexSPI_D2_B/FlexSPI_D2_B/U20[E2]', identifier: FlexSPI_D2_B}
+- {pin_num: M3, pin_signal: GPIO_SD_B1_02, label: 'FlexSPI_D1_B/FlexSPI_D1_B/U20[E3]', identifier: FlexSPI_D1_B}
+- {pin_num: M4, pin_signal: GPIO_SD_B1_03, label: 'FlexSPI_D0_B/FlexSPI_D0_B/U20[D5]', identifier: FlexSPI_D0_B}
+- {pin_num: P2, pin_signal: GPIO_SD_B1_04, label: 'FlexSPI_CLK_B/FlexSPI_CLK_B/U20[B1]', identifier: FlexSPI_CLK_B}
+- {pin_num: N3, pin_signal: GPIO_SD_B1_05, label: 'FlexSPI_DQS/FlexSPI_DQS/U20[C3]', identifier: FlexSPI_DQS}
+- {pin_num: L3, pin_signal: GPIO_SD_B1_06, label: 'FlexSPI_SS0/FlexSPI_SS0/U20[C2]/U24[1]', identifier: FlexSPI_SS0}
+- {pin_num: L4, pin_signal: GPIO_SD_B1_07, label: 'FlexSPI_CLK/FlexSPI_CLK/U20[B2]/U24[6]', identifier: FlexSPI_CLK}
+- {pin_num: P3, pin_signal: GPIO_SD_B1_08, label: 'FlexSPI_D0_A/FlexSPI_D0_A/U20[D3]/U24[5]', identifier: FlexSPI_D0_A}
+- {pin_num: N4, pin_signal: GPIO_SD_B1_09, label: 'FlexSPI_D1_A/FlexSPI_D1_A/U20[D2]/U24[2]', identifier: FlexSPI_D1_A}
+- {pin_num: P4, pin_signal: GPIO_SD_B1_10, label: 'FlexSPI_D2_A/FlexSPI_D2_A/U20[C4]/U24[3]', identifier: FlexSPI_D2_A}
+- {pin_num: P5, pin_signal: GPIO_SD_B1_11, label: 'FlexSPI_D3_A/FlexSPI_D3_A/U20[D4]/U24[7]', identifier: FlexSPI_D3_A}
 - {pin_num: M8, pin_signal: USB_OTG1_DN, label: OTG1_DN, identifier: OTG1_DN}
 - {pin_num: L8, pin_signal: USB_OTG1_DP, label: OTG1_DP, identifier: OTG1_DP}
 - {pin_num: N7, pin_signal: USB_OTG2_DN, label: OTG2_DN, identifier: OTG2_DN}
@@ -143,11 +150,11 @@ pin_labels:
 - {pin_num: K8, pin_signal: VDD_USB_CAP, label: VDD_USB_3V}
 - {pin_num: N6, pin_signal: USB_OTG1_VBUS, label: 5V_USB_OTG}
 - {pin_num: P6, pin_signal: USB_OTG2_VBUS, label: 5V_USB_HS}
-- {pin_num: L12, pin_signal: GPIO_AD_B1_04, label: 'CSI_PIXCLK/J35[8]/J23[3]', identifier: CSI_PIXCLK}
-- {pin_num: K12, pin_signal: GPIO_AD_B1_05, label: 'CSI_MCLK/J35[12]/J23[4]', identifier: CSI_MCLK}
-- {pin_num: J12, pin_signal: GPIO_AD_B1_06, label: 'CSI_VSYNC/J35[18]/J22[2]/UART_TX', identifier: CSI_VSYNC}
-- {pin_num: K10, pin_signal: GPIO_AD_B1_07, label: 'CSI_HSYNC/J35[16]/J22[1]/UART_RX', identifier: CSI_HSYNC}
-- {pin_num: M7, pin_signal: POR_B, label: 'RST_TGTMCU_B/POR_B/J21[15]', identifier: RST_TGTMCU_B;POR_B}
+- {pin_num: L12, pin_signal: GPIO_AD_B1_04, label: 'CSI_PIXCLK/J35[8]/J23[3]/CSI_PIXCLK/J46[8]/BT_DEV_WAKE/U9[9]/J33[3]', identifier: CSI_PIXCLK}
+- {pin_num: K12, pin_signal: GPIO_AD_B1_05, label: 'CSI_MCLK/J35[12]/J23[4]/CSI_MCLK/J46[12]/WL_DEV_WAKE/U9[10]/J33[4]', identifier: CSI_MCLK}
+- {pin_num: J12, pin_signal: GPIO_AD_B1_06, label: 'CSI_VSYNC/J35[18]/J22[2]/UART_TX/CSI_VSYNC/J46[18]/BT_UART_TXD/U9[4]/I2C3_SCL/J24[3]/J23[13]/J16[2]', identifier: CSI_VSYNC}
+- {pin_num: K10, pin_signal: GPIO_AD_B1_07, label: 'CSI_HSYNC/J35[16]/J22[1]/UART_RX/CSI_HSYNC/J46[16]/BT_UART_RXD/U10[20]/I2C3_SDA/J24[5]/J23[15]/J16[1]', identifier: CSI_HSYNC}
+- {pin_num: M7, pin_signal: POR_B, label: 'RST_TGTMCU_B/POR_B/J21[15]/POR_B/J28[1]/J2[15]/RST_TGTMCU_B', identifier: RST_TGTMCU_B;POR_B}
 - {pin_num: N14, pin_signal: VDDA_ADC_3P3, label: VDDA_ADC_3P3_MCU}
 - {pin_num: P12, pin_signal: VDD_HIGH_IN, label: VDD_HIGH_IN_MCU}
 - {pin_num: M9, pin_signal: VDD_SNVS_IN, label: VDD_SNVS_IN}
@@ -183,12 +190,12 @@ pin_labels:
 - {pin_num: K5, pin_signal: NVCC_SD1, label: FLASH_VCC, identifier: FLASH_VCC}
 - {pin_num: F5, pin_signal: NVCC_EMC0, label: DCDC_3V3}
 - {pin_num: E6, pin_signal: NVCC_EMC1, label: DCDC_3V3}
-- {pin_num: L6, pin_signal: WAKEUP, label: SD_PWREN, identifier: SD_PWREN}
-- {pin_num: L1, pin_signal: DCDC_IN0, label: MCU_DCDC_IN_3V3}
-- {pin_num: L2, pin_signal: DCDC_IN1, label: MCU_DCDC_IN_3V3}
-- {pin_num: K4, pin_signal: DCDC_IN_Q, label: MCU_DCDC_IN_3V3}
-- {pin_num: M1, pin_signal: DCDC_LP0, label: VDD_SOC_IN}
-- {pin_num: M2, pin_signal: DCDC_LP1, label: VDD_SOC_IN}
+- {pin_num: L6, pin_signal: WAKEUP, label: SD_PWREN/USER_BUTTON/SW5, identifier: SD_PWREN;USER_BUTTON}
+- {pin_num: L1, pin_signal: DCDC_IN0, label: 'MCU_DCDC_IN_3V3/MCU_DCDC_IN/J27[1]'}
+- {pin_num: L2, pin_signal: DCDC_IN1, label: 'MCU_DCDC_IN_3V3/MCU_DCDC_IN/J27[1]'}
+- {pin_num: K4, pin_signal: DCDC_IN_Q, label: 'MCU_DCDC_IN_3V3/MCU_DCDC_IN/J27[1]'}
+- {pin_num: M1, pin_signal: DCDC_LP0, label: VDD_SOC_IN/DCDC_OUT}
+- {pin_num: M2, pin_signal: DCDC_LP1, label: VDD_SOC_IN/DCDC_OUT}
 - {pin_num: P11, pin_signal: XTALI, label: XTALI, identifier: XTALI}
 - {pin_num: N11, pin_signal: XTALO, label: XTALO, identifier: XTALO}
 - {pin_num: N9, pin_signal: RTC_XTALI, label: RTC_XTALI, identifier: RTC_XTALI}
@@ -196,8 +203,8 @@ pin_labels:
 - {pin_num: N1, pin_signal: DCDC_GND0, label: GND}
 - {pin_num: N2, pin_signal: DCDC_GND1, label: GND}
 - {pin_num: J5, pin_signal: DCDC_SENSE, label: VDD_SOC_IN}
-- {pin_num: K3, pin_signal: DCDC_PSWITCH, label: MCU_DCDC_IN_3V3}
-- {pin_num: K7, pin_signal: PMIC_ON_REQ, label: PMIC_ON_REQ, identifier: PMIC_ON_REQ}
+- {pin_num: K3, pin_signal: DCDC_PSWITCH, label: 'MCU_DCDC_IN_3V3/DCDC_PSWITCH/U17B[K3]'}
+- {pin_num: K7, pin_signal: PMIC_ON_REQ, label: 'PMIC_ON_REQ/PMIC_ON_REQ/U17B[K7]/U29[8]', identifier: PMIC_ON_REQ}
 - {pin_num: L7, pin_signal: PMIC_STBY_REQ, label: PERI_PWREN, identifier: PERI_PWREN}
 - {pin_num: M6, pin_signal: ONOFF, label: ONOFF, identifier: ONOFF}
 - {pin_num: K6, pin_signal: TEST_MODE, label: GND}
@@ -243,6 +250,31 @@ BOARD_InitPins:
   - {pin_num: D13, peripheral: USDHC1, signal: usdhc_cd_b, pin_signal: GPIO_B1_12}
   - {pin_num: F14, peripheral: GPIO1, signal: 'gpio_io, 09', pin_signal: GPIO_AD_B0_09}
   - {pin_num: F13, peripheral: GPIO1, signal: 'gpio_io, 08', pin_signal: GPIO_AD_B0_08, identifier: ''}
+  - {pin_num: D7, peripheral: LCDIF, signal: lcdif_clk, pin_signal: GPIO_B0_00}
+  - {pin_num: C8, peripheral: LCDIF, signal: 'lcdif_data, 00', pin_signal: GPIO_B0_04}
+  - {pin_num: B8, peripheral: LCDIF, signal: 'lcdif_data, 01', pin_signal: GPIO_B0_05}
+  - {pin_num: A8, peripheral: LCDIF, signal: 'lcdif_data, 02', pin_signal: GPIO_B0_06}
+  - {pin_num: A9, peripheral: LCDIF, signal: 'lcdif_data, 03', pin_signal: GPIO_B0_07}
+  - {pin_num: B9, peripheral: LCDIF, signal: 'lcdif_data, 04', pin_signal: GPIO_B0_08}
+  - {pin_num: C9, peripheral: LCDIF, signal: 'lcdif_data, 05', pin_signal: GPIO_B0_09}
+  - {pin_num: D9, peripheral: LCDIF, signal: 'lcdif_data, 06', pin_signal: GPIO_B0_10}
+  - {pin_num: A10, peripheral: LCDIF, signal: 'lcdif_data, 07', pin_signal: GPIO_B0_11}
+  - {pin_num: D10, peripheral: LCDIF, signal: 'lcdif_data, 09', pin_signal: GPIO_B0_13}
+  - {pin_num: E10, peripheral: LCDIF, signal: 'lcdif_data, 10', pin_signal: GPIO_B0_14}
+  - {pin_num: E11, peripheral: LCDIF, signal: 'lcdif_data, 11', pin_signal: GPIO_B0_15}
+  - {pin_num: A11, peripheral: LCDIF, signal: 'lcdif_data, 12', pin_signal: GPIO_B1_00}
+  - {pin_num: B11, peripheral: LCDIF, signal: 'lcdif_data, 13', pin_signal: GPIO_B1_01}
+  - {pin_num: C10, peripheral: LCDIF, signal: 'lcdif_data, 08', pin_signal: GPIO_B0_12}
+  - {pin_num: C11, peripheral: LCDIF, signal: 'lcdif_data, 14', pin_signal: GPIO_B1_02}
+  - {pin_num: D11, peripheral: LCDIF, signal: 'lcdif_data, 15', pin_signal: GPIO_B1_03}
+  - {pin_num: E12, peripheral: LCDIF, signal: 'lcdif_data, 16', pin_signal: GPIO_B1_04}
+  - {pin_num: D12, peripheral: LCDIF, signal: 'lcdif_data, 17', pin_signal: GPIO_B1_05}
+  - {pin_num: E7, peripheral: LCDIF, signal: lcdif_enable, pin_signal: GPIO_B0_01}
+  - {pin_num: E8, peripheral: LCDIF, signal: lcdif_hsync, pin_signal: GPIO_B0_02}
+  - {pin_num: D8, peripheral: LCDIF, signal: lcdif_vsync, pin_signal: GPIO_B0_03}
+  - {pin_num: J11, peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_AD_B1_00}
+  - {pin_num: K11, peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_AD_B1_01}
+  - {pin_num: H14, peripheral: GPIO1, signal: 'gpio_io, 14', pin_signal: GPIO_AD_B0_14}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -261,6 +293,31 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_LPSPI3_PCS0, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_08_GPIO1_IO08, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_09_GPIO1_IO09, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_14_GPIO1_IO14, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_00_LCD_CLK, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_01_LCD_ENABLE, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_02_LCD_HSYNC, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_03_LCD_VSYNC, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_04_LCD_DATA00, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_05_LCD_DATA01, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_06_LCD_DATA02, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_07_LCD_DATA03, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_08_LCD_DATA04, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_09_LCD_DATA05, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_10_LCD_DATA06, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_11_LCD_DATA07, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_12_LCD_DATA08, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_13_LCD_DATA09, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_14_LCD_DATA10, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_15_LCD_DATA11, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_00_LCD_DATA12, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_01_LCD_DATA13, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_02_LCD_DATA14, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_03_LCD_DATA15, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_04_LCD_DATA16, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_05_LCD_DATA17, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_12_USDHC1_CD_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_GPIO2_IO30, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, 0U); 

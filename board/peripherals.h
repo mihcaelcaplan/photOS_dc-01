@@ -12,6 +12,7 @@
 #include "fsl_common.h"
 #include "fsl_clock.h"
 #include "fsl_lpspi.h"
+#include "fsl_lpi2c.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -30,11 +31,23 @@ extern "C" {
 #define LPSPI3_IRQN LPSPI3_IRQn
 /* LPSPI3 interrupt handler identifier. */
 #define LPSPI3_IRQHANDLER LPSPI3_IRQHandler
+/* BOARD_InitPeripherals defines for LPI2C1 */
+/* Definition of peripheral ID */
+#define LPI2C1_PERIPHERAL LPI2C1
+/* Definition of clock source */
+#define LPI2C1_CLOCK_FREQ 60000000UL
+/* Definition of follower address */
+#define LPI2C1_MASTER_SLAVE_ADDRESS 0
+/* LPI2C1 interrupt vector ID (number). */
+#define LPI2C1_IRQN LPI2C1_IRQn
+/* LPI2C1 interrupt handler identifier. */
+#define LPI2C1_IRQHANDLER LPI2C1_IRQHandler
 
 /***********************************************************************************************************************
  * Global variables
  **********************************************************************************************************************/
 extern const lpspi_master_config_t LPSPI3_config;
+extern const lpi2c_master_config_t LPI2C1_masterConfig;
 
 /***********************************************************************************************************************
  * Initialization functions
