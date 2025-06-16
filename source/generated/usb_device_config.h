@@ -60,7 +60,7 @@
 
 /*! @brief MSC instance count */
 #ifndef USB_DEVICE_CONFIG_MSC
-#define USB_DEVICE_CONFIG_MSC (0U)
+#define USB_DEVICE_CONFIG_MSC (1U)
 #endif
 
 /*! @brief Audio instance count */

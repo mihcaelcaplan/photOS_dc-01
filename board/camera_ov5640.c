@@ -16,8 +16,8 @@
 
 void OV5640_Init(void){
 /* Enable the master function and disable the slave function. */
-	LPI2C_MasterEnable(base, true);
-	LPI2C_SlaveEnable(base, false);
+	LPI2C_MasterEnable(CAMERA_I2C, true);
+	LPI2C_SlaveEnable(CAMERA_I2C, false);
 
 }
 
