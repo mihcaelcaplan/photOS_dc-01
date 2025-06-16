@@ -8,14 +8,7 @@
 #ifndef DISPLAY_FILE_H_
 #define DISPLAY_FILE_H_
 
-//
-//DISPLAY_showStoredFile();
-//
-//void getStoredFile(char* filename);
-//
-//void decodeFile(FIL file);
-
-
+void DISPLAY_showStoredFile(void);
 
 
 #endif /* DISPLAY_FILE_H_ */

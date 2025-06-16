@@ -9,6 +9,7 @@
 #define ELCDIF_RGB_H_
 
 
+
 //main interface
 int LCDIF_Run(void);
 

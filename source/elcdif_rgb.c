@@ -16,6 +16,8 @@
 //#include "pin_mux.h"
 //#include "clock_config.h"
 //#include "board.h"
+
+#include "global_buffers.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -56,7 +58,7 @@ void BOARD_EnableLcdInterrupt(void);
  ******************************************************************************/
 static volatile bool s_frameDone = false;
 
-AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH], FRAME_BUFFER_ALIGN);
+//AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_frameBuffer[2][APP_IMG_HEIGHT][APP_IMG_WIDTH], FRAME_BUFFER_ALIGN);
 
 /*******************************************************************************
  * Code
@@ -78,15 +80,15 @@ void BOARD_EnableLcdInterrupt(void)
 /* Initialize the LCD_DISP. */
 void BOARD_InitLcd(void)
 {
-    gpio_pin_config_t config = {
-        kGPIO_DigitalOutput,
-        0,
-        kGPIO_NoIntmode,
-    };
-
-    /* Backlight. */
-    config.outputLogic = 1;
-    GPIO_PinInit(LCD_BL_GPIO, LCD_BL_GPIO_PIN, &config);
+//    gpio_pin_config_t config = {
+//        kGPIO_DigitalOutput,
+//        0,
+//        kGPIO_NoIntmode,
+//    };
+//
+//    /* Backlight. */
+//    config.outputLogic = 1;
+//    GPIO_PinInit(LCD_BL_GPIO, LCD_BL_GPIO_PIN, &config);
 }
 
 void BOARD_InitLcdifPixelClock(void)

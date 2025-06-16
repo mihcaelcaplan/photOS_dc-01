@@ -127,6 +127,19 @@ int hist_len  = 0;
 	 			 PRINTF("usage: screen {on | off}");
 	 		 }
 	 	 }
+	 else if (commandEquals("browse")) {
+	 	 		 if( argEquals("on") ){
+	 	 			 PRINTF("opening photo");
+	 	 			 DISPLAY_showStoredFile();
+	 	 		 }
+	 	 		 else if( argEquals("off") ){
+	 	 			 PRINTF("closing photo");
+	 	 			 DISPLAY_Stop();
+	 	 		 }
+	 	 		 else{
+	 	 			 PRINTF("usage: screen {on | off}");
+	 	 		 }
+	 	 	 }
 	 else if (commandEquals("reboot")) {
 
 	 }
