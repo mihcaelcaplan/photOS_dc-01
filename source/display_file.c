@@ -228,7 +228,7 @@ static int MOUNT_SDCard(void)
         return -3;
     }
 
-#define TEST_PHOTO _T("gradient.jpg")
+#define TEST_PHOTO _T("/DCIM/000.jpg")
 
     char cwd_buffer[256] = {0};  // Buffer to store current working directory
     // Get current working directory
@@ -253,7 +253,16 @@ static int MOUNT_SDCard(void)
     return 0;
 }
 
-
+void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int idx = (y * width + x) * 3;
+            framebuffer[idx + 0] = (uint8_t)((x * 255) / (width - 1));  // Red gradient across X
+            framebuffer[idx + 1] = (uint8_t)((y * 255) / (height - 1)); // Green gradient across Y
+            framebuffer[idx + 2] = 128;                                 // Constant blue
+        }
+    }
+}
 
 void DISPLAY_showStoredFile(){
 //	mount the filesystem
@@ -278,6 +287,8 @@ void DISPLAY_showStoredFile(){
 
 //	decode the jpeg to an empty framebuffer
 	jpeg_decode(&jpgFil, (void*)&s_frameBuffer[0]);
+
+//	fill_framebuffer_gradient((void*)&s_frameBuffer[0], APP_FB_WIDTH, APP_FB_HEIGHT);
 
 //	close the file
 	f_close(&jpgFil);

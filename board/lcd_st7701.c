@@ -22,14 +22,13 @@ uint32_t txCount = 0;
 void ST7701_Manufacturer_Init(void){
 
 
-	//PAGE1
+	//command 2 bk0
 	ST7701_SPIWrite(0xFF, COMMAND);
 	ST7701_SPIWrite(0x77, DATA);
 	ST7701_SPIWrite(0x01, DATA);
 	ST7701_SPIWrite(0x00, DATA);
 	ST7701_SPIWrite(0x00, DATA);
 	ST7701_SPIWrite(0x10, DATA);
-
 
 
 	ST7701_SPIWrite(0xC0, COMMAND);
@@ -44,8 +43,8 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x31, DATA);
 	ST7701_SPIWrite(0x05, DATA);
 
-	ST7701_SPIWrite(0xCd, COMMAND);
-	ST7701_SPIWrite(0x08, DATA);
+	ST7701_SPIWrite(0xCD, COMMAND);
+	ST7701_SPIWrite(0x68, DATA);
 
 	ST7701_SPIWrite(0xB0, COMMAND);
 	ST7701_SPIWrite(0x00, DATA); //Positive Voltage Gamma Control
@@ -84,7 +83,11 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x32, DATA);
 	ST7701_SPIWrite(0x18, DATA);
 
-	//PAGE1
+//	ST7701_SPIWrite(0xB8, COMMAND);
+//	ST7701_SPIWrite(0x00, DATA); //disable digital gamma
+
+
+	//command 2 bk1
 	ST7701_SPIWrite(0xFF, COMMAND);
 	ST7701_SPIWrite(0x77, DATA);
 	ST7701_SPIWrite(0x01, DATA);
@@ -139,7 +142,6 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x44, DATA);
 
 
-
 	ST7701_SPIWrite(0xE2, COMMAND);
 	ST7701_SPIWrite(0x11, DATA);
 	ST7701_SPIWrite(0x11, DATA);
@@ -183,8 +185,6 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0xEF, DATA);
 	ST7701_SPIWrite(0xD8, DATA);
 	ST7701_SPIWrite(0xA0, DATA);
-
-
 
 
 	ST7701_SPIWrite(0xE6, COMMAND);
@@ -250,11 +250,8 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x98, DATA);
 	ST7701_SPIWrite(0xBA, DATA);
 
-	ST7701_SPIWrite(0x36, COMMAND);
-	ST7701_SPIWrite(0x00, DATA);
 
-
-	//-----------VAP & VAN---------------
+	//-----------Cmd2 bk3 : VAP & VAN---------------
 	ST7701_SPIWrite(0xFF, COMMAND);
 	ST7701_SPIWrite(0x77, DATA);
 	ST7701_SPIWrite(0x01, DATA);
@@ -266,7 +263,7 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0xE4, DATA);
 
 
-
+// command1 page 0 again
 	ST7701_SPIWrite(0xFF, COMMAND);
 	ST7701_SPIWrite(0x77, DATA);
 	ST7701_SPIWrite(0x01, DATA);
@@ -274,10 +271,16 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x00, DATA);
 	ST7701_SPIWrite(0x00, DATA);
 
-	ST7701_SPIWrite(0x3a, COMMAND);
-	ST7701_SPIWrite(0x66, DATA);
 
-	ST7701_SPIWrite(0x21, COMMAND);
+	ST7701_SPIWrite(0x36, COMMAND);
+	ST7701_SPIWrite(0x00, DATA); // set MADCTL reg? to scan normal and rgb format BGR
+
+	ST7701_SPIWrite(0x3A, COMMAND);
+	ST7701_SPIWrite(0x66, DATA); //18 bit data format
+
+	ST7701_SPIWrite(0x38, COMMAND); // idle mode off
+
+	ST7701_SPIWrite(0x21, COMMAND); //inverted display
 	simpleDelay(1U);
 
 	ST7701_SPIWrite(0x11, COMMAND);
