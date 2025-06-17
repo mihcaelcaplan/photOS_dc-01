@@ -141,28 +141,35 @@ void jpeg_decode(FIL *file, uint8_t *buffer)
 
     // Step 4: set parameters for decompression
     cinfo.dct_method = JDCT_FLOAT;
-//    cinfo.out_color_space = ;
+    cinfo.output_gamma = 1;
+    cinfo.dither_mode = JDITHER_NONE;
+    cinfo.do_fancy_upsampling = FALSE;   // Simpler processing
+    cinfo.do_block_smoothing = FALSE;    // No smoothing
+
+
+
+    //    cinfo.out_color_space = ;
     /*
      * Resize to fit the screen, the actual resize rate is:
      * cinfo.scale_num / 8, the cinfo.scale_num must be in the range of 1 ~ 16
      */
-    if ((cinfo.image_width * APP_FB_HEIGHT) > (cinfo.image_height * APP_FB_WIDTH))
-    {
-        cinfo.scale_num = APP_FB_WIDTH * 8 / cinfo.image_width;
-    }
-    else
-    {
-        cinfo.scale_num = APP_FB_HEIGHT * 8 / cinfo.image_height;
-    }
-
-    if (cinfo.scale_num < 1)
-    {
-        cinfo.scale_num = 1;
-    }
-    else if (cinfo.scale_num > 16)
-    {
-        cinfo.scale_num = 16;
-    }
+//    if ((cinfo.image_width * APP_FB_HEIGHT) > (cinfo.image_height * APP_FB_WIDTH))
+//    {
+//        cinfo.scale_num = APP_FB_WIDTH * 8 / cinfo.image_width;
+//    }
+//    else
+//    {
+//        cinfo.scale_num = APP_FB_HEIGHT * 8 / cinfo.image_height;
+//    }
+//
+//    if (cinfo.scale_num < 1)
+//    {
+//        cinfo.scale_num = 1;
+//    }
+//    else if (cinfo.scale_num > 16)
+//    {
+//        cinfo.scale_num = 16;
+//    }
 
     // Step 5: start decompressor
     jpeg_start_decompress(&cinfo);
@@ -221,7 +228,7 @@ static int MOUNT_SDCard(void)
         return -3;
     }
 
-#define TEST_PHOTO _T("/DCIM/000.jpg")
+#define TEST_PHOTO _T("gradient.jpg")
 
     char cwd_buffer[256] = {0};  // Buffer to store current working directory
     // Get current working directory
