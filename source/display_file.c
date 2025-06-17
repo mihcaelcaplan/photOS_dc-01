@@ -28,6 +28,7 @@
 #include "fsl_elcdif.h"
 #include "global_buffers.h"
 #include "storage_sd_device.h"
+#include "fsl_elcdif.h"
 
 
 
@@ -59,6 +60,31 @@ static struct jpeg_error_mgr jerr;
 
 /*Helpers*/
 
+void Browse_ELCDIF_Init(void)
+{
+    const elcdif_rgb_mode_config_t config = {
+        .panelWidth    = APP_IMG_WIDTH,
+        .panelHeight   = APP_IMG_HEIGHT,
+        .hsw           = APP_HSW,
+        .hfp           = APP_HFP,
+        .hbp           = APP_HBP,
+        .vsw           = APP_VSW,
+        .vfp           = APP_VFP,
+        .vbp           = APP_VBP,
+        .polarityFlags = APP_POL_FLAGS,
+        .bufferAddr    = (uint32_t)s_frameBuffer[0],
+        .pixelFormat   = kELCDIF_PixelFormatRGB888,
+        .dataBus       = kELCDIF_DataBus18Bit,
+    };
+
+#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
+    BOARD_InitDisplayInterface();
+#endif
+    ELCDIF_RgbModeInit(LCDIF, &config);
+
+}
+
+
 //need to decode a jpeg
 void jpeg_decode(FIL *file, uint8_t *buffer)
 {
@@ -79,39 +105,43 @@ void jpeg_decode(FIL *file, uint8_t *buffer)
     // Step 2: Initialize the JPEG decompression object
     jpeg_create_decompress(&cinfo);
 
+//    // Step 3: Set up file input source (reads directly from file)
+//	jpeg_stdio_src(&cinfo, &file);
+
     jpg_size = f_size(file);
 
-    jpg_buffer = (unsigned char *)malloc(jpg_size + 2 * APP_CACHE_LINE_SIZE);
-    if (jpg_buffer == NULL)
-    {
-        PRINTF("Error: memory allocation error\r\n");
-        assert(false);
-    }
-#if APP_CACHE_LINE_SIZE
-    jpg_buffer_aligned = (void *)(SDK_SIZEALIGN((uint32_t)jpg_buffer, APP_CACHE_LINE_SIZE));
-#else
-    jpg_buffer_aligned = jpg_buffer;
-#endif
+        jpg_buffer = (unsigned char *)malloc(jpg_size + 2 * APP_CACHE_LINE_SIZE);
+        if (jpg_buffer == NULL)
+        {
+            PRINTF("Error: memory allocation error\r\n");
+            assert(false);
+        }
+    #if APP_CACHE_LINE_SIZE
+        jpg_buffer_aligned = (void *)(SDK_SIZEALIGN((uint32_t)jpg_buffer, APP_CACHE_LINE_SIZE));
+    #else
+        jpg_buffer_aligned = jpg_buffer;
+    #endif
 
-    bytesRemain = jpg_size;
-    read_pos    = jpg_buffer_aligned;
+        bytesRemain = jpg_size;
+        read_pos    = jpg_buffer_aligned;
 
-    DCACHE_CleanInvalidateByRange((uint32_t)jpg_buffer_aligned, jpg_size);
+        DCACHE_CleanInvalidateByRange((uint32_t)jpg_buffer_aligned, jpg_size);
 
-    while (bytesRemain > 0)
-    {
-        f_read(file, read_pos, bytesRemain, &bytesRead);
-        bytesRemain -= bytesRead;
-        read_pos += bytesRead;
-    }
+        while (bytesRemain > 0)
+        {
+            f_read(file, read_pos, bytesRemain, &bytesRead);
+            bytesRemain -= bytesRead;
+            read_pos += bytesRead;
+        }
 
-    jpeg_mem_src(&cinfo, jpg_buffer_aligned, jpg_size);
+        jpeg_mem_src(&cinfo, jpg_buffer_aligned, jpg_size);
 
-    // Step 3: read image parameters with jpeg_read_header()
-    jpeg_read_header(&cinfo, true);
+	// Step 4: read image parameters with jpeg_read_header()
+	jpeg_read_header(&cinfo, true);
 
     // Step 4: set parameters for decompression
     cinfo.dct_method = JDCT_FLOAT;
+//    cinfo.out_color_space = ;
     /*
      * Resize to fit the screen, the actual resize rate is:
      * cinfo.scale_num / 8, the cinfo.scale_num must be in the range of 1 ~ 16
@@ -154,8 +184,6 @@ void jpeg_decode(FIL *file, uint8_t *buffer)
 
     // Step 7: Release JPEG decompression object
     jpeg_destroy_decompress(&cinfo);
-
-    free(jpg_buffer);
 }
 
 
@@ -193,9 +221,9 @@ static int MOUNT_SDCard(void)
         return -3;
     }
 
-#define TEST_PHOTO _T("DCIM/000.jpg")
+#define TEST_PHOTO _T("/DCIM/000.jpg")
 
-    char cwd_buffer[256];  // Buffer to store current working directory
+    char cwd_buffer[256] = {0};  // Buffer to store current working directory
     // Get current working directory
     error = f_getcwd(cwd_buffer, sizeof(cwd_buffer));
     if (error == FR_OK) {
@@ -232,7 +260,7 @@ void DISPLAY_showStoredFile(){
 
 
 //	open the jpeg to somewhere
-	error = f_open(&jpgFil, TEST_PHOTO, FA_OPEN_EXISTING);
+	error = f_open(&jpgFil, TEST_PHOTO, FA_READ);
 	    if (error != FR_OK)
 	    {
 	        PRINTF("FILE OPEN FAILLLLL");
@@ -249,11 +277,18 @@ void DISPLAY_showStoredFile(){
 
 // make sure to set up the lcd if
 	BOARD_InitLcdifPixelClock();
-	BOARD_InitLcd();
+//	BOARD_InitLcd();
+
+//	and the display drivers
+	GPIO_PinWrite(GPIO1, 9U, 1U);
+
+//	???
+	ST7701_SPIWrite(0x13, COMMAND);
+	simpleDelay(1);
 
 	PRINTF("LCDIF PHOTO DISPLAY start...\r\n");
 
-	APP_ELCDIF_Init();
+	Browse_ELCDIF_Init();
 
 	BOARD_EnableLcdInterrupt();
 

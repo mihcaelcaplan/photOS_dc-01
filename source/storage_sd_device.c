@@ -7,11 +7,12 @@
 
 #include "storage_sd_device.h"
 #include "fsl_debug_console.h"
+#include "fsl_sd_disk.h"
 
 
 
 /* State in Disk driver. */
-sd_card_t g_sd;
+//sd_card_t g_sd;
 sd_card_t *usbDeviceMscSdcard;
 
 void BOARD_USB_Disk_Config(uint8_t usbPriorty)

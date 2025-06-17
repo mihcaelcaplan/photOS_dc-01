@@ -23,7 +23,19 @@
 #define APP_FB_STRIDE_BYTE (APP_FB_WIDTH * APP_FB_BPP)
 #define FRAME_BUFFER_ALIGN 64
 
-AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_frameBuffer[1][APP_IMG_HEIGHT][APP_IMG_WIDTH], FRAME_BUFFER_ALIGN);
+
+//for display specifically (move somewhere nicer)
+#define APP_HSW        41
+#define APP_HFP        4
+#define APP_HBP        8
+#define APP_VSW        10
+#define APP_VFP        4
+#define APP_VBP        2
+#define APP_POL_FLAGS \
+    (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnRisingClkEdge)
+
+
+AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_frameBuffer[1][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP], FRAME_BUFFER_ALIGN);
 
 
 

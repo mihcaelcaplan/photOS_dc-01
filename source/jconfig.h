@@ -23,19 +23,45 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "fsl_common.h"
+#include "ff.h"
 
-/* File operation, redefine to your file system. */
-
+/* File operation map to FATFS. */
+#define FILE       FIL
+#define fflush(fp) f_sync(fp)
 #undef ferror
 #define ferror(fp) 0
 
-#define JFREAD(file, buf, sizeofbuf) fread(buf, 1, sizeofbuf, file)
-#define JFWRITE(file, buf, sizeofbuf) fwrite(buf, 1, sizeofbuf, file)
+static __INLINE size_t read_file(FIL *file, uint8_t *buf, uint32_t sizeofbuf)
+{
+    static size_t BytesReadfile;
+
+    if ((f_read(file, buf, sizeofbuf, &BytesReadfile) == FR_OK) && (BytesReadfile == sizeofbuf))
+    {
+        return BytesReadfile;
+    }
+
+    return 0;
+}
+
+static __INLINE size_t write_file(FIL *file, uint8_t *buf, uint32_t sizeofbuf)
+{
+    static size_t BytesWritefile;
+
+    if ((f_write(file, buf, sizeofbuf, &BytesWritefile) == FR_OK) && (BytesWritefile == sizeofbuf))
+    {
+        return BytesWritefile;
+    }
+
+    return 0;
+}
+
+#define JFREAD(file, buf, sizeofbuf) read_file(file, buf, sizeofbuf)
+
+#define JFWRITE(file, buf, sizeofbuf) write_file(file, buf, sizeofbuf)
 
 /* Macros for IO. */
-#ifndef fprintf
-#define fprintf(s, ...)
-#endif
+#define fprintf(s, ...) printf(__VA_ARGS__)
 
 /* Macros for the memory allocation. */
 #define JMALLOC malloc
