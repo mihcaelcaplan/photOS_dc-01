@@ -136,8 +136,12 @@ int hist_len  = 0;
 	 	 			 PRINTF("closing photo");
 	 	 			 DISPLAY_Stop();
 	 	 		 }
+	 	 		 else if ( argEquals("store") ){
+	 	 			PRINTF("storing gradient test as gradient.jpg");
+				    BROWSE_storeFile();
+	 	 		 }
 	 	 		 else{
-	 	 			 PRINTF("usage: screen {on | off}");
+	 	 			 PRINTF("usage: browse {on | off | store}");
 	 	 		 }
 	 	 	 }
 	 else if (commandEquals("reboot")) {

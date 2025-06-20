@@ -28,7 +28,7 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x01, DATA);
 	ST7701_SPIWrite(0x00, DATA);
 	ST7701_SPIWrite(0x00, DATA);
-	ST7701_SPIWrite(0x10, DATA);
+	ST7701_SPIWrite(0x10, DATA); //command 2 bit high, page 0
 
 
 	ST7701_SPIWrite(0xC0, COMMAND);

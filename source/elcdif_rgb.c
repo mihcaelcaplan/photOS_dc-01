@@ -22,17 +22,17 @@
  * Definitions
  ******************************************************************************/
 #define APP_ELCDIF LCDIF
-
-#define APP_IMG_HEIGHT 480
-#define APP_IMG_WIDTH  480
-#define APP_HSW        41
-#define APP_HFP        4
-#define APP_HBP        8
-#define APP_VSW        10
-#define APP_VFP        4
-#define APP_VBP        2
-#define APP_POL_FLAGS \
-    (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnRisingClkEdge)
+//
+//#define APP_IMG_HEIGHT 480
+//#define APP_IMG_WIDTH  480
+//#define APP_HSW        41
+//#define APP_HFP        4
+//#define APP_HBP        8
+//#define APP_VSW        10
+//#define APP_VFP        4
+//#define APP_VBP        2
+//#define APP_POL_FLAGS \
+//    (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnRisingClkEdge)
 
 /* Display. */
 #define LCD_DISP_GPIO     GPIO1

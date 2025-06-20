@@ -64,8 +64,11 @@ static __INLINE size_t write_file(FIL *file, uint8_t *buf, uint32_t sizeofbuf)
 #define fprintf(s, ...) printf(__VA_ARGS__)
 
 /* Macros for the memory allocation. */
-#define JMALLOC malloc
-#define JFREE   free
+//#define JMALLOC malloc
+//#define JFREE   free
+
+#define JMALLOC SDK_Malloc
+#define JFREE SDK_Free
 
 /*
  * These symbols indicate the properties of your machine or compiler.

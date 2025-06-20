@@ -821,8 +821,8 @@
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_ITC" location="0x0" size="0x20000"/&gt;
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_OC2" location="0x20200000" size="0x80000"/&gt;
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_OC" location="0x20280000" size="0x40000"/&gt;
-&lt;memoryInstance derived_from="RAM" edited="true" id="BOARD_SDRAM" location="0x80000000" size="0x1e00000"/&gt;
-&lt;memoryInstance derived_from="RAM" edited="true" id="NCACHE_REGION" location="0x81e00000" size="0x200000"/&gt;
+&lt;memoryInstance derived_from="RAM" edited="true" id="BOARD_SDRAM" location="0x80000000" size="0x1800000"/&gt;
+&lt;memoryInstance derived_from="RAM" edited="true" id="NCACHE_REGION" location="0x81800000" size="0x800000"/&gt;
 &lt;/chip&gt;
 &lt;processor&gt;
 &lt;name gcc_name="cortex-m7"&gt;Cortex-M7&lt;/name&gt;

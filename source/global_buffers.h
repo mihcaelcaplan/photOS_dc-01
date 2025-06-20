@@ -24,7 +24,7 @@
 #define FRAME_BUFFER_ALIGN 64
 
 
-//for display specifically (move somewhere nicer)
+//for display specifically TODO: move?
 #define APP_HSW        41
 #define APP_HFP        4
 #define APP_HBP        8
