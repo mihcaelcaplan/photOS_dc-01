@@ -16,6 +16,7 @@
 #define OV5460_I2C_ADDRESS_READ 0x3C
 #define RESET_GPIO 14U
 
+
 // all the addresses are 16 bit
 uint32_t OV5640_I2CRead8(uint16_t regAddr){
 
@@ -195,6 +196,9 @@ void OV5640_Init(void){
 
 
 void CAMERA_Init(void){
+
+//	init the CSI receiver
+
 
 	OV5640_Init();
 

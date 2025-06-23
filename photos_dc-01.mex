@@ -252,6 +252,11 @@
                         <data>true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="Peripheral" resourceId="CSI" description="Peripheral CSI signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
@@ -317,6 +322,18 @@
                      </pin_features>
                   </pin>
                   <pin peripheral="GPIO1" signal="gpio_io, 14" pin_num="H14" pin_signal="GPIO_AD_B0_14"/>
+                  <pin peripheral="CSI" signal="csi_pixclk" pin_num="L12" pin_signal="GPIO_AD_B1_04"/>
+                  <pin peripheral="CSI" signal="csi_mclk" pin_num="K12" pin_signal="GPIO_AD_B1_05"/>
+                  <pin peripheral="CSI" signal="csi_hsync" pin_num="K10" pin_signal="GPIO_AD_B1_07"/>
+                  <pin peripheral="CSI" signal="csi_data, 09" pin_num="H13" pin_signal="GPIO_AD_B1_08"/>
+                  <pin peripheral="CSI" signal="csi_data, 08" pin_num="M13" pin_signal="GPIO_AD_B1_09"/>
+                  <pin peripheral="CSI" signal="csi_data, 07" pin_num="L13" pin_signal="GPIO_AD_B1_10"/>
+                  <pin peripheral="CSI" signal="csi_data, 06" pin_num="J13" pin_signal="GPIO_AD_B1_11"/>
+                  <pin peripheral="CSI" signal="csi_data, 05" pin_num="H12" pin_signal="GPIO_AD_B1_12"/>
+                  <pin peripheral="CSI" signal="csi_data, 03" pin_num="G12" pin_signal="GPIO_AD_B1_14"/>
+                  <pin peripheral="CSI" signal="csi_data, 04" pin_num="H11" pin_signal="GPIO_AD_B1_13"/>
+                  <pin peripheral="CSI" signal="csi_data, 02" pin_num="J14" pin_signal="GPIO_AD_B1_15"/>
+                  <pin peripheral="CSI" signal="csi_vsync" pin_num="D14" pin_signal="GPIO_B1_13"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">

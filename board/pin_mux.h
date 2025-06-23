@@ -235,6 +235,74 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_CSI_PWREN_PIN                                         14U   /*!< PORT pin number */
 #define BOARD_INITPINS_CSI_PWREN_PIN_MASK                            (1U << 14U)   /*!< PORT pin mask */
 
+/* GPIO_AD_B1_04 (coord L12), CSI_PIXCLK/J35[8]/J23[3]/CSI_PIXCLK/J46[8]/BT_DEV_WAKE/U9[9]/J33[3] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_PIXCLK_PERIPHERAL                                 CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_PIXCLK_SIGNAL                              csi_pixclk   /*!< Signal name */
+
+/* GPIO_AD_B1_05 (coord K12), CSI_MCLK/J35[12]/J23[4]/CSI_MCLK/J46[12]/WL_DEV_WAKE/U9[10]/J33[4] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_MCLK_PERIPHERAL                                   CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_MCLK_SIGNAL                                  csi_mclk   /*!< Signal name */
+
+/* GPIO_AD_B1_07 (coord K10), CSI_HSYNC/J35[16]/J22[1]/UART_RX/CSI_HSYNC/J46[16]/BT_UART_RXD/U10[20]/I2C3_SDA/J24[5]/J23[15]/J16[1] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_HSYNC_PERIPHERAL                                  CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_HSYNC_SIGNAL                                csi_hsync   /*!< Signal name */
+
+/* GPIO_AD_B1_08 (coord H13), AUD_INT/CSI_D9//J35[13]/J22[4]/AUD_INT/J34[5]/U25[15]/WIFI_RST_B/U9[3]/CSI_D9/J46[13]/J16[4] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D9_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D9_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D9_CHANNEL                                         9U   /*!< Signal channel */
+
+/* GPIO_AD_B1_09 (coord M13), SAI1_MCLK/CSI_D8/J35[11]/SAI1_MCLK/U25[11]/DC_I2S1_MCLK/J23[1]/CSI_D8/J46[11] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D8_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D8_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D8_CHANNEL                                         8U   /*!< Signal channel */
+
+/* GPIO_AD_B1_10 (coord L13), SAI1_RX_SYNC/CSI_D7/J35[9]/J23[1]/SAI1_RX_SYNC/J23[9]/CSI_D7/J46[9]/J33[1] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D7_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D7_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D7_CHANNEL                                         7U   /*!< Signal channel */
+
+/* GPIO_AD_B1_11 (coord J13), SAI1_RX_BCLK/CSI_D6/J35[7]/J23[2]/DC_I2S1_RX_BCLK/J23[5]/CSI_D6/J46[7]/J33[2] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D6_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D6_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D6_CHANNEL                                         6U   /*!< Signal channel */
+
+/* GPIO_AD_B1_12 (coord H12), SAI1_RXD/CSI_D5/J35[5]/U13[16]/SAI1_RXD/J41[1]/DC_I2S1_RX_D0/J23[11]/BT_PCM_RXD/U10[18]/CSI_D5/J46[5] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D5_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D5_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D5_CHANNEL                                         5U   /*!< Signal channel */
+
+/* GPIO_AD_B1_14 (coord G12), SAI1_TX_BCLK/CSI_D3/J35[4]/U13[12]/SAI1_TX_BCLK/J35[1]/DC_I2S1_TX_BCLK/U23[23]/BT_PCM_BCLK/U9[7]/U10[17]/CSI_D3/J46[4] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D3_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D3_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D3_CHANNEL                                         3U   /*!< Signal channel */
+
+/* GPIO_AD_B1_13 (coord H11), SAI1_TXD/CSI_D4/J35[3]/U13[14]/SAI1_TXD/J37[1]/DC_I2S1_TX_D0/J23[17]/BT_PCM_TXD/U9[6]/CSI_D4/J46[3] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D4_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D4_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D4_CHANNEL                                         4U   /*!< Signal channel */
+
+/* GPIO_AD_B1_15 (coord J14), SAI1_TX_SYNC/CSI_D2/J35[6]/U13[13]/SAI1_TX_SYNC/J36[1]/DC_I2S1_TX_SYNC/U23[16]/BT_PCM_SYNC/U9[8]/U10[16]/CSI_D2/J46[6] */
+/* Routed pin properties */
+#define BOARD_INITPINS_CSI_D2_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_CSI_D2_SIGNAL                                    csi_data   /*!< Signal name */
+#define BOARD_INITPINS_CSI_D2_CHANNEL                                         2U   /*!< Signal channel */
+
+/* GPIO_B1_13 (coord D14), WDOG_B/WDOG_B/U27[3] */
+/* Routed pin properties */
+#define BOARD_INITPINS_WDOG_B_PERIPHERAL                                     CSI   /*!< Peripheral name */
+#define BOARD_INITPINS_WDOG_B_SIGNAL                                   csi_vsync   /*!< Signal name */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *
