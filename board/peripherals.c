@@ -71,7 +71,6 @@ instance:
   - nvic:
     - interrupt_table:
       - 0: []
-      - 1: []
     - interrupts: []
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -174,16 +173,9 @@ instance:
   - main:
     - clockSource: 'Lpi2cClock'
     - clockSourceFreq: 'ClocksTool_DefaultInit'
-  - interrupt_vector:
-    - enable_irq: 'true'
-    - interrupt:
-      - IRQn: 'LPI2C1_IRQn'
-      - enable_interrrupt: 'enabled'
-      - enable_priority: 'false'
-      - priority: '0'
-      - enable_custom_name: 'false'
+  - interrupt_vector: []
   - master:
-    - mode: 'interrupts'
+    - mode: 'polling'
     - config:
       - enableMaster: 'true'
       - enableDoze: 'true'
@@ -200,8 +192,6 @@ instance:
         - source: 'kLPI2C_HostRequestExternalPin'
         - polarity: 'kLPI2C_HostRequestPinActiveHigh'
       - edmaRequestSources: ''
-    - interrupts:
-      - flags: ''
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 const lpi2c_master_config_t LPI2C1_masterConfig = {
@@ -224,8 +214,6 @@ const lpi2c_master_config_t LPI2C1_masterConfig = {
 
 static void LPI2C1_init(void) {
   LPI2C_MasterInit(LPI2C1_PERIPHERAL, &LPI2C1_masterConfig, LPI2C1_CLOCK_FREQ);
-  /* Enable interrupt LPI2C1_IRQN request in the NVIC */
-  EnableIRQ(LPI2C1_IRQN);
 }
 
 /***********************************************************************************************************************

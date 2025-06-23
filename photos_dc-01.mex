@@ -218,6 +218,9 @@
                <pin_label pin_num="K9" pin_signal="NGND_KEL0" label="GND"/>
                <pin_label pin_num="M10" pin_signal="VDD_SNVS_CAP" label="GND"/>
             </pin_labels>
+            <external_user_signals>
+               <properties/>
+            </external_user_signals>
             <power_domains/>
          </pins_profile>
          <functions_list>
@@ -301,8 +304,18 @@
                   <pin peripheral="LCDIF" signal="lcdif_enable" pin_num="E7" pin_signal="GPIO_B0_01"/>
                   <pin peripheral="LCDIF" signal="lcdif_hsync" pin_num="E8" pin_signal="GPIO_B0_02"/>
                   <pin peripheral="LCDIF" signal="lcdif_vsync" pin_num="D8" pin_signal="GPIO_B0_03"/>
-                  <pin peripheral="LPI2C1" signal="SCL" pin_num="J11" pin_signal="GPIO_AD_B1_00"/>
-                  <pin peripheral="LPI2C1" signal="SDA" pin_num="K11" pin_signal="GPIO_AD_B1_01"/>
+                  <pin peripheral="LPI2C1" signal="SCL" pin_num="J11" pin_signal="GPIO_AD_B1_00">
+                     <pin_features>
+                        <pin_feature name="software_input_on" value="Enable"/>
+                        <pin_feature name="open_drain" value="Enable"/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="LPI2C1" signal="SDA" pin_num="K11" pin_signal="GPIO_AD_B1_01">
+                     <pin_features>
+                        <pin_feature name="software_input_on" value="Enable"/>
+                        <pin_feature name="open_drain" value="Enable"/>
+                     </pin_features>
+                  </pin>
                   <pin peripheral="GPIO1" signal="gpio_io, 14" pin_num="H14" pin_signal="GPIO_AD_B0_14"/>
                </pins>
             </function>
@@ -950,7 +963,6 @@
                      <config_set name="nvic">
                         <array name="interrupt_table">
                            <struct name="0"/>
-                           <struct name="1"/>
                         </array>
                         <array name="interrupts"/>
                      </config_set>
@@ -1008,18 +1020,9 @@
                         <setting name="clockSource" value="Lpi2cClock"/>
                         <setting name="clockSourceFreq" value="ClocksTool_DefaultInit"/>
                      </config_set>
-                     <config_set name="interrupt_vector">
-                        <setting name="enable_irq" value="true"/>
-                        <struct name="interrupt">
-                           <setting name="IRQn" value="LPI2C1_IRQn"/>
-                           <setting name="enable_interrrupt" value="enabled"/>
-                           <setting name="enable_priority" value="false"/>
-                           <setting name="priority" value="0"/>
-                           <setting name="enable_custom_name" value="false"/>
-                        </struct>
-                     </config_set>
+                     <config_set name="interrupt_vector"/>
                      <config_set name="master">
-                        <setting name="mode" value="interrupts"/>
+                        <setting name="mode" value="polling"/>
                         <struct name="config">
                            <setting name="enableMaster" value="true"/>
                            <setting name="enableDoze" value="true"/>
@@ -1037,11 +1040,6 @@
                               <setting name="polarity" value="kLPI2C_HostRequestPinActiveHigh"/>
                            </struct>
                            <set name="edmaRequestSources">
-                              <selected/>
-                           </set>
-                        </struct>
-                        <struct name="interrupts">
-                           <set name="flags">
                               <selected/>
                            </set>
                         </struct>

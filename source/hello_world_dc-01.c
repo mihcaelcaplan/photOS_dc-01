@@ -34,6 +34,7 @@
 #include "debug_shell.h"
 #include "display_interface.h"
 #include "utils.h"
+#include "camera_interface.h"
 
 ///*SD Card related */
 //#define USB_DEVICE_DISK_BLOCK_SIZE_POWER (9U)
@@ -532,11 +533,12 @@ int main(void) {
     MUX_ToUSBC();
     USB_DeviceApplicationInit();
     DISPLAY_Init();
+    CAMERA_Init();
 
-    while(1) {
+    // while(1) {
 
-    	SHELL_WaitForInput();
+    // 	SHELL_WaitForInput();
 
-    }
+    // }
     return 0 ;
 }

@@ -12,15 +12,12 @@
 
 #include "fsl_common.h"
 
-
-
 // internal prototypes
 void OV5640_Init(void);
 
 uint32_t OV5640_I2CRead(uint32_t value);
 
 void OV5640_I2CWrite(uint32_t data);
-
 
 void CAMERA_Init(void);
 void CAMERA_Run(void);

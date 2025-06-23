@@ -38,10 +38,6 @@ extern "C" {
 #define LPI2C1_CLOCK_FREQ 60000000UL
 /* Definition of follower address */
 #define LPI2C1_MASTER_SLAVE_ADDRESS 0
-/* LPI2C1 interrupt vector ID (number). */
-#define LPI2C1_IRQN LPI2C1_IRQn
-/* LPI2C1 interrupt handler identifier. */
-#define LPI2C1_IRQHANDLER LPI2C1_IRQHandler
 
 /***********************************************************************************************************************
  * Global variables
