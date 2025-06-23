@@ -10,6 +10,7 @@
 #include "fsl_gpio.h"
 #include "fsl_common.h"
 #include "global_buffers.h"
+#include "fsl_csi.h"
 
 #define CAMERA_I2C LPI2C1
 #define OV5460_I2C_ADDRESS_WRITE 0x3C
@@ -197,7 +198,44 @@ void OV5640_Init(void){
 
 void CAMERA_Init(void){
 
-//	init the CSI receiver
+//	init the CSI clock
+	/* CSI MCLK select 24M. */
+	    /*
+	     * CSI clock source:
+	     *
+	     * 00 derive clock from osc_clk (24M)
+	     * 01 derive clock from PLL2 PFD2
+	     * 10 derive clock from pll3_120M
+	     * 11 derive clock from PLL3 PFD1
+	     */
+	    CLOCK_SetMux(kCLOCK_CsiMux, 0);
+	    /*
+	     * CSI clock divider:
+	     *
+	     * 000 divide by 1
+	     * 001 divide by 2
+	     * 010 divide by 3
+	     * 011 divide by 4
+	     * 100 divide by 5
+	     * 101 divide by 6
+	     * 110 divide by 7
+	     * 111 divide by 8
+	     */
+	    CLOCK_SetDiv(kCLOCK_CsiDiv, 0);
+
+//	init csi which will ungate the clock
+csi_config_t ov5640_config  = {
+	480, //width
+	480, //height
+	kCSI_HsyncActiveLow | kCSI_DataLatchOnFallingEdge | kCSI_VsyncActiveHigh,
+	1, // byte per pixel (raw 8 bits per pixel)
+	480*1, //linepitch in bytes
+	kCSI_GatedClockMode, // use hsync
+	kCSI_DataBus8Bit, //data bus width
+};
+
+
+CSI_Init(CSI, ov5640_config);
 
 
 	OV5640_Init();
