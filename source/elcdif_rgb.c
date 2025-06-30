@@ -65,11 +65,11 @@ static volatile bool s_frameDone = false;
  ******************************************************************************/
 extern void APP_LCDIF_IRQHandler(void);
 
-void LCDIF_IRQHandler(void)
-{
-    APP_LCDIF_IRQHandler();
-    __DSB();
-}
+//void LCDIF_IRQHandler(void)
+//{
+//    APP_LCDIF_IRQHandler();
+//    __DSB();
+//}
 
 /* Enable interrupt. */
 void BOARD_EnableLcdInterrupt(void)

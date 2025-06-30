@@ -66,7 +66,7 @@ outputs:
 - {id: GPT1_ipg_clk_highfreq.outFreq, value: 75 MHz}
 - {id: GPT2_ipg_clk_highfreq.outFreq, value: 75 MHz}
 - {id: IPG_CLK_ROOT.outFreq, value: 150 MHz}
-- {id: LCDIF_CLK_ROOT.outFreq, value: 67.5 MHz}
+- {id: LCDIF_CLK_ROOT.outFreq, value: 11 MHz}
 - {id: LPI2C_CLK_ROOT.outFreq, value: 60 MHz}
 - {id: LPSPI_CLK_ROOT.outFreq, value: 105.6 MHz}
 - {id: LVDS1_CLK.outFreq, value: 1.2 GHz}
@@ -96,8 +96,9 @@ settings:
 - {id: CCM.FLEXSPI2_SEL.sel, value: CCM_ANALOG.PLL3_PFD0_CLK}
 - {id: CCM.FLEXSPI_PODF.scale, value: '2', locked: true}
 - {id: CCM.FLEXSPI_SEL.sel, value: CCM_ANALOG.PLL3_PFD0_CLK}
-- {id: CCM.LCDIF_PODF.scale, value: '4', locked: true}
-- {id: CCM.LCDIF_PRED.scale, value: '2', locked: true}
+- {id: CCM.LCDIF_PODF.scale, value: '8', locked: true}
+- {id: CCM.LCDIF_PRED.scale, value: '4', locked: true}
+- {id: CCM.LCDIF_PRE_CLK_SEL.sel, value: CCM_ANALOG.PLL2_PFD0_CLK}
 - {id: CCM.LPSPI_PODF.scale, value: '5', locked: true}
 - {id: CCM.PERCLK_PODF.scale, value: '2', locked: true}
 - {id: CCM.SEMC_PODF.scale, value: '8'}
@@ -337,11 +338,11 @@ void BOARD_BootClockRUN(void)
     /* Disable LCDIF clock gate. */
     CLOCK_DisableClock(kCLOCK_LcdPixel);
     /* Set LCDIF_PRED. */
-    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 3);
     /* Set LCDIF_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);
+    CLOCK_SetDiv(kCLOCK_LcdifDiv, 7);
     /* Set Lcdif pre clock source. */
-    CLOCK_SetMux(kCLOCK_LcdifPreMux, 5);
+    CLOCK_SetMux(kCLOCK_LcdifPreMux, 3);
     /* Disable SPDIF clock gate. */
     CLOCK_DisableClock(kCLOCK_Spdif);
     /* Set SPDIF0_CLK_PRED. */

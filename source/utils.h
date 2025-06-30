@@ -13,7 +13,7 @@
 // redefine the entry vector for the on tick interrupt to make g_systickCounter* 1 ms resolution timer
 //void SysTick_Handler(void);
 
-void simpleDelay(uint8_t ms);
+void simpleDelay(uint32_t ms);
 
 
 #endif /* UTILS_H_ */

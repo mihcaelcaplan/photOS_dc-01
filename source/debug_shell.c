@@ -144,6 +144,19 @@ int hist_len  = 0;
 	 	 			 PRINTF("usage: browse {on | off | store}");
 	 	 		 }
 	 	 	 }
+	 else if (commandEquals("camera")) {
+	 	 	 		 if( argEquals("on") ){
+	 	 	 			 PRINTF("camera on");
+	 	 	 			 CAMERA_Run();
+	 	 	 		 }
+	 	 	 		 else if( argEquals("off") ){
+	 	 	 			 PRINTF("camera off");
+//	 	 	 			 CAMERA_Stop();
+	 	 	 		 }
+	 	 	 		 else{
+	 	 	 			 PRINTF("usage: camera {on | off}");
+	 	 	 		 }
+	 	 	 	 }
 	 else if (commandEquals("reboot")) {
 
 	 }

@@ -9,7 +9,7 @@
 
 // working on an event driven loop with WFI in between processing
 
-// maybe i want to OR them together so i space out the bits
+// maybe i want to OR them together so i space out the bits (lmao I don't they're non overlapping state )
 typedef enum _state {
     // MAIN UX LOOP
     COMPOSE = 0x01,

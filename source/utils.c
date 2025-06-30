@@ -13,7 +13,7 @@
 //   g_systickCounter++;
 //}
 
-void simpleDelay(uint8_t ms){
+void simpleDelay(uint32_t ms){
 
 	uint32_t msToUs = ms*1000;
 

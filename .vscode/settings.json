@@ -7,6 +7,9 @@
         "string_view": "c",
         "vector": "c",
         "iterator": "c",
-        "camera_ov5640.h": "c"
+        "camera_ov5640.h": "c",
+        "fsl_csi.h": "c",
+        "ios": "c",
+        "global_buffers.h": "c"
     }
 }

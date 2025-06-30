@@ -14,6 +14,8 @@
 #include "utils.h"
 
 #include "elcdif_rgb.h"
+#include "global_buffers.h"
+#include "fsl_elcdif.h"
 
 
 uint32_t txCount = 0;
@@ -609,6 +611,35 @@ void DISPLAY_Run(void){
 	LCDIF_Run();
 
 }
+
+void DISPLAY_On(void){
+	// make sure to set up the lcd if
+//		BOARD_InitLcdifPixelClock();
+////		BOARD_InitLcd();
+//
+//	//	and the display drivers
+		GPIO_PinWrite(GPIO1, 9U, 1U);
+
+	//	???
+		ST7701_SPIWrite(0x13, COMMAND);
+		simpleDelay(1);
+//
+//		PRINTF("LCDIF camera DISPLAY start...\r\n");
+//
+		Browse_ELCDIF_Init();
+//
+//		BOARD_EnableLcdInterrupt();
+//
+//		ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
+//		ELCDIF_RgbModeStart(LCDIF);
+//
+//	// set the lcdif next frame buf to pick up the decoded jpeg
+//		simpleDelay(1000);
+//		ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)s_frameBuffer[1]);
+//
+//
+}
+
 
 void DISPLAY_Stop(void){
 	ST7701_SPIWrite(0x23, COMMAND);

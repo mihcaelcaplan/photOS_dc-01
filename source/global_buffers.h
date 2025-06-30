@@ -25,18 +25,19 @@
 
 
 //for display specifically TODO: move?
-#define APP_HSW        41
-#define APP_HFP        4
-#define APP_HBP        8
-#define APP_VSW        10
-#define APP_VFP        4
-#define APP_VBP        2
+#define APP_HSW        4
+#define APP_HFP        40
+#define APP_HBP        80
+#define APP_VSW        4
+#define APP_VFP        40
+#define APP_VBP        20
 #define APP_POL_FLAGS \
     (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnFallingClkEdge)
 
 
-AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_frameBuffer[1][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP], FRAME_BUFFER_ALIGN);
-
+//declare
+extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP];
+extern uint32_t c_frameBuffer[2][APP_IMG_HEIGHT*APP_IMG_WIDTH];
 
 
 #endif /* GLOBAL_BUFFERS_H_ */
