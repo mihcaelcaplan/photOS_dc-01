@@ -20,89 +20,114 @@
 #define RESET_GPIO 14U
 
 // Global flags - must be volatile since they're modified in interrupt context
-volatile bool csi_buffer0_ready = false;
-volatile bool csi_buffer1_ready = false;
-volatile bool lcd_frame_done = true;  // Start true so first frame can begin
+//volatile bool csi_buffer0_ready = false;
+//volatile bool csi_buffer1_ready = false;
+//volatile bool lcd_frame_done = true;  // Start true so first frame can begin
 
 // Add buffer overflow tracking
-volatile uint32_t csi_overflow_count = 0;
-volatile uint32_t last_processed_buffer = 0;
+//volatile uint32_t csi_overflow_count = 0;
+//volatile uint32_t last_processed_buffer = 0;
 
 int lcdirqc = 0;
 int csiirqc = 0;
 uint32_t csi_framecount = 0;
 
+uint32_t* full_buffer;
+uint32_t* empty_buffer;
+
+uint32_t* full_display_buffer;
+uint32_t* empty_display_buffer;
+
+
+
+//typedef struct _buffer {
+//	uint32_t* address;
+//	uint8_t full;
+//	uint8_t processing;
+//	uint8_t holdout;
+//} buffer_t;
+//
+//buffer_t rfb0 = {
+//	.address = c_frameBuffer[0],
+//	.full = 0,
+//	.processing = 0,
+//	.holdout = 0,
+//};
+//buffer_t rfb1 = {
+//	.address = c_frameBuffer[1],
+//	.full = 0,
+//	.processing = 0,
+//	.holdout = 0,
+//};
+//buffer_t rfb2 = {
+//	.address = c_frameBuffer[2],
+//	.full = 0,
+//	.processing = 0,
+//	.holdout = 0,
+//};
+//
+////triple buffrr
+//typedef struct _buffer_mgr {
+//	buffer_t fb1;
+//	buffer_t fb2;
+//	buffer_t fb3;
+//} buffer_mgr_t;
+//
+//
+////set up receiver buffer manager
+//buffer_mgr_t receive_mgr = {
+//		.fb1 = rfb1,
+//		.fb2 = rfb2,
+//		.fb3 = rfb3,
+//};
 
 
 void LCDIF_IRQHandler(void){
     lcdirqc++;
+
 //
-//    uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
-//
+    uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
 ////    	clear all ints
-//    LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK;
-//    __DSB();
+    LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK;
 //
-//    if (flags & kELCDIF_CurFrameDone)
-//    {
-//        lcd_frame_done = true;
-//    }
+    if (flags & kELCDIF_CurFrameDone)
+    {
+        full_display_buffer = 0;
+//        LCDIF->CTRL_CLR = LCDIF_CTRL_RUN_MASK; // turn off lcdif until next frame processed
+    }
     __DSB();
 }
 //
 //// FIXED: CSI IRQ handler with proper buffer management
 void CSI_IRQHandler(void){
 
-	//	mask the interrupts
+//	//	mask the interrupts
 	uint32_t status = CSI_GetStatusFlags(CSI);
+	if(status & kCSI_EndOfFrameFlag){
+
+	}
 	if(status & kCSI_RxBuffer0DmaDoneFlag){
-		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB1_MASK; //clear by writing 1
-//		CSI->CR1 &= ~CSI_CR1_FB1_DMA_DONE_INTEN_MASK;
+		if(full_buffer == 0){ //cleared after processing complete
+//			store address and redirect csi dma
+			full_buffer = (void*)CSI->DMASA_FB1;
+
+			CSI->DMASA_FB1 = (uint32_t)empty_buffer; // processing rotates the full to empty
+		}
+
+		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB1_MASK; //clear flag by writing 1
 	}
 	else if(status & kCSI_RxBuffer1DmaDoneFlag){
-		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB2_MASK; //clear by writing 1
-//		CSI->CR1 &= ~CSI_CR1_FB2_DMA_DONE_INTEN_MASK;
+		if(full_buffer == 0){ //cleared after processing complete
+//			store address and redirect csi dma
+			full_buffer = (void*)CSI->DMASA_FB2;
+
+			CSI->DMASA_FB2 = (uint32_t)empty_buffer; // processing rotates the full to empty
+		}
+		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB2_MASK; //clear flag by writing 1
 	}
 
-//	shut down receive
-//	csi_framecount = (CSI->CR3 & CSI_CR3_FRMCNT_MASK) >> CSI_CR3_FRMCNT_SHIFT;
-//	if (csi_framecount > 2){
-//		CSI->CR3 &= ~CSI_CR3_DMA_REQ_EN_RFF_MASK;
-//		CSI->CR18 &= ~CSI_CR18_CSI_ENABLE_MASK;
-//
-//	}
-
-//    CSI->CR3 &= ~CSI_CR3_DMA_REQ_EN_RFF_MASK;
-////    enable csi block
-//    CSI->CR18 &= ~CSI_CR18_CSI_ENABLE_MASK;
-    __DSB();
-
-    csiirqc++;
-//
-//    // Get status and clear ALL flags immediately to prevent re-entry
-//    uint32_t status = CSI_GetStatusFlags(CSI);
-//    CSI_ClearStatusFlags(CSI, kCSI_RxBuffer0DmaDoneFlag | kCSI_RxBuffer1DmaDoneFlag);
-//    __DSB();
-//
-//    // Handle buffer 0 completion
-//    if(status & kCSI_RxBuffer0DmaDoneFlag) {
-//        if(csi_buffer0_ready) {
-//            // Buffer 0 was already ready and not processed - overflow!
-//            csi_overflow_count++;
-//        }
-//        csi_buffer0_ready = true;
-//    }
-//
-//    // Handle buffer 1 completion
-//    if(status & kCSI_RxBuffer1DmaDoneFlag) {
-//        if(csi_buffer1_ready) {
-//            // Buffer 1 was already ready and not processed - overflow!
-//            csi_overflow_count++;
-//        }
-//        csi_buffer1_ready = true;
-//    }
-//
-    __DSB();
+	csiirqc++;
+	__DSB();
 }
 
 // all the addresses are 16 bit
@@ -367,7 +392,6 @@ csi_config_t ov5640_config  = {
 
 
 	NVIC_ClearPendingIRQ(CSI_IRQn);
-//	NVIC_SetPriority(CSI_IRQn, 3);
 	EnableIRQ(CSI_IRQn);
 //
 //	CSI_EnableInterrupts(CSI, kCSI_RxBuffer1DmaDoneInterruptEnable | kCSI_RxBuffer0DmaDoneInterruptEnable);
@@ -451,17 +475,17 @@ uint32_t videoPllFreq;
 		};
 
 	ELCDIF_RgbModeInit(LCDIF, &config);
+	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
 //
 ////	disable the block
 //	LCDIF->CTRL_CLR = LCDIF_CTRL_DOTCLK_MODE_MASK;
 //
-	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
 	NVIC_ClearPendingIRQ(LCDIF_IRQn);
 	NVIC_SetPriority(LCDIF_IRQn, 3);
 	EnableIRQ(LCDIF_IRQn);
 //
 //	//add recover on underflow
-//	LCDIF->CTRL1_SET = LCDIF_CTRL1_RECOVER_ON_UNDERFLOW_MASK;
+	LCDIF->CTRL1_SET = LCDIF_CTRL1_RECOVER_ON_UNDERFLOW_MASK;
 //
 //	NVIC_ClearPendingIRQ(LCDIF_IRQn);
 //	NVIC_SetPriority(LCDIF_IRQn, 3);
@@ -469,7 +493,7 @@ uint32_t videoPllFreq;
 //
 }
 
-void processForDisplay(int processBuffer){
+void processForDisplay(uint32_t* source_buffer, uint32_t* dest_buffer){
     // 3 byte per pixel packed format, 24 bpp
     // set processing flag with buffer num
     uint8_t r = 0;
@@ -483,7 +507,7 @@ void processForDisplay(int processBuffer){
             int src_i = i*480 + j; // line number* line width + column number
             int dst_i = i*480*3 + 3*j; // line number* line width*3 + column number*3
 
-            uint8_t pixel_value = c_frameBuffer[processBuffer][src_i];
+            uint32_t pixel_value = source_buffer[src_i];
 
             // Reset RGB for each pixel
             r = 0;
@@ -504,60 +528,15 @@ void processForDisplay(int processBuffer){
                 }
             }
 
-            s_frameBuffer[processBuffer][dst_i + 0] = r;
-            s_frameBuffer[processBuffer][dst_i + 1] = g;
-            s_frameBuffer[processBuffer][dst_i + 2] = b;
+            dest_buffer[dst_i + 0] = r;
+            dest_buffer[dst_i + 1] = g;
+            dest_buffer[dst_i + 2] = b;
         }
     }
 }
 
-
-//void CAMERA_Run(void){
-//
-//	int current_buffer = 0;  // Track which CSI buffer to process
-//	DISPLAY_On();
-//	CSI_Start(CSI);
-//	ELCDIF_RgbModeStart(LCDIF);
-//
-////	memset(s_frameBuffer, 0, sizeof(s_frameBuffer));
-//
-//	int c = 0;
-//
-//	while(c < 10) {
-////
-//		while(!(csi_buffer0_ready || csi_buffer1_ready)) {
-//			__WFI();
-//		}
-////		reset
-//		csi_buffer0_ready = false;
-//		csi_buffer1_ready = false;
-//
-//		while(!lcd_frame_done){
-//			__WFI();
-//		}
-//		lcd_frame_done = false;  // Clear flag
-//
-////		CSI_Stop(CSI);
-//		processForDisplay(current_buffer);
-////		sdk_delay?
-////		Wait for LCD to finish previous frame transfer
-////		ELCDIF_RgbModeStart(LCDIF);
-//
-//		current_buffer = (current_buffer == 0) ? 1 : 0;
-//
-//		ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)s_frameBuffer[current_buffer]);
-//
-//// 		Switch to other buffer for next iteration
-//
-////		EnableIRQ(CSI_IRQn); // rrestartCSI after processing
-//		CSI_Start(CSI);
-//		c++;
-//	}
-//}
-
-
 void LCDtest(void){
-lcd_frame_done  = false; // set flag to force a frame out
+//lcd_frame_done  = false; // set flag to force a frame out
 
 
 DISPLAY_On();
@@ -576,152 +555,66 @@ ELCDIF_RgbModeStart(LCDIF);
 }
 
 void CAMERA_Run(void){
-    uint32_t current_display_buffer = 0;  // Which display buffer to show
 
-    DISPLAY_On();
-//    CSI_Start(CSI);
+	bool run = true;
 
-//    CSI_EnableInterrupts(CSI, kCSI_RxBuffer1DmaDoneInterruptEnable | kCSI_RxBuffer0DmaDoneInterruptEnable);
+//    set up buffers
+	CSI->DMASA_FB1 = 	(uint32_t)&c_frameBuffer[0];
+	CSI->DMASA_FB2 = 	(uint32_t)&c_frameBuffer[1];
+	empty_buffer = 		(uint32_t)&c_frameBuffer[2];
+	full_buffer = 		(void*)NULL;
 
-	CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK;
-	CSI->CR1 |= CSI_CR1_FB2_DMA_DONE_INTEN_MASK;
+	CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK; // enable interrupt fb1 full
+	CSI->CR1 |= CSI_CR1_FB2_DMA_DONE_INTEN_MASK; // enable interrupt fb2 full
+    CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
+    CSI->CR18 |= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
 
+//	full_display_buffer = s_frameBuffer[0]; // starting value
+	empty_display_buffer = s_frameBuffer[1];
+	LCDIF->CUR_BUF = s_frameBuffer[0];
 
-
-
-
-//    dma request on
-    CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK;
-//    enable csi block
-    CSI->CR18 |= CSI_CR18_CSI_ENABLE_MASK;
-
-
-//    int frame_count = 0;
-//
-//    while(frame_count < 2) {
-
-        // FIXED: Wait for ANY CSI buffer to be ready
-//        while(!(csi_buffer0_ready || csi_buffer1_ready)) {
-//            __WFI();
-//        }
-
-        // FIXED: Determine which buffer to process and clear ONLY that flag
-//        uint32_t csi_buffer_to_process;
-
-        // Disable interrupts briefly to avoid race conditions
-
-//        if(csi_buffer0_ready) {
-//            csi_buffer_to_process = 0;
-//            csi_buffer0_ready = false;  // Clear only the buffer we're processing
-//        }
-//        else if(csi_buffer1_ready) {
-//            csi_buffer_to_process = 1;
-//            csi_buffer1_ready = false;  // Clear only the buffer we're processing
-//        }
+//	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
+//	LCDIF->CTRL1_SET = LCDIF_CTRL1_SET_CUR_FRAME_DONE_IRQ_EN_MASK;
 
 
-        // Process the CSI buffer that's ready
-    	simpleDelay(800);
-        processForDisplay(0);
+	DISPLAY_On();
+    while (run){
 
-        // Wait for LCD to finish previous frame before starting new one
-//        while(!lcd_frame_done){
-//            __WFI();
-//        }
+//    	wait for a buffer to become full
+    	while(full_buffer == 0){
+    		__NOP();
+    	}
 
-//        lcd_frame_done = false;  // Clear flag
+//    	send receive buffer to empty display buffer
+    	if(empty_display_buffer != 0){
+    		processForDisplay(full_buffer, empty_display_buffer);
+    	}
+    	else {
+    		PRINTF("no available display buffer\r\n");
+    	}
 
-        // Set the next display buffer (ping-pong between display buffers)
-        //        will be empty on first trip through
-//        simpleDelay(1000);
-        ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)s_frameBuffer[0]);
-		ELCDIF_RgbModeStart(LCDIF);
+    	full_display_buffer = empty_display_buffer; // tag that buffer has been filled
 
-        // Toggle display buffer for next frame
-//        current_display_buffer = (current_display_buffer == 0) ? 1 : 0;
+//    	send processed buffer address to lcd if
+    	empty_display_buffer = LCDIF->CUR_BUF; // the current one marked to be filled next time
+    	LCDIF->NEXT_BUF = full_display_buffer;
+		LCDIF->CTRL1_SET = LCDIF_CTRL1_SET_CUR_FRAME_DONE_IRQ_EN_MASK;
+    	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
 
-//        frame_count++;
+//    	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
 
-        // Debug: Print overflow count periodically
-//        if(frame_count % 10 == 0 && csi_overflow_count > 0) {
-//            PRINTF("CSI Buffer overflows: %lu\r\n", csi_overflow_count);
-//        }
-//    }
+    	NVIC_SetPriority(CSI_IRQn, 4); // make lower than lcdif interrupt
+
+    	while(!(full_display_buffer == 0)){ // clear in the lcd interrupt
+    		__NOP();
+    	}
+
+//		reset the buffer availability
+    	empty_buffer = full_buffer;
+    	full_buffer = (void*)NULL;
+    }
+
+
 }
 
-//// IMPROVED: Add timeout protection
-//typedef enum {
-//    CAMERA_OK,
-//    CAMERA_TIMEOUT,
-//    CAMERA_OVERFLOW
-//} camera_status_t;
-//
-//camera_status_t CAMERA_RunWithTimeout(uint32_t timeout_ms) {
-//    uint32_t current_display_buffer = 0;
-//    uint32_t start_time = SystemCoreClock / 1000 * timeout_ms; // Simple timeout counter
-//    uint32_t timeout_counter = 0;
-//
-//    DISPLAY_On();
-//    CSI_Start(CSI);
-//    ELCDIF_RgbModeStart(LCDIF);
-//
-//    int frame_count = 0;
-//
-//    while(frame_count < 10) {
-//
-//        // Wait for CSI buffer with timeout
-//        timeout_counter = start_time;
-//        while(!(csi_buffer0_ready || csi_buffer1_ready) && timeout_counter > 0) {
-//            __WFI();
-//            timeout_counter--;
-//        }
-//
-//        if(timeout_counter == 0) {
-//            return CAMERA_TIMEOUT;  // CSI stopped generating interrupts
-//        }
-//
-//        // Check for overflow condition
-//        if(csi_overflow_count > 10) {
-//            return CAMERA_OVERFLOW;  // Too many missed frames
-//        }
-//
-//        // Process buffer (same logic as above)
-//        uint32_t csi_buffer_to_process;
-//
-//        __disable_irq();
-//        if(csi_buffer0_ready) {
-//            csi_buffer_to_process = 0;
-//            csi_buffer0_ready = false;
-//        }
-//        else if(csi_buffer1_ready) {
-//            csi_buffer_to_process = 1;
-//            csi_buffer1_ready = false;
-//        }
-//        __enable_irq();
-//
-//        processForDisplay(csi_buffer_to_process);
-//        ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)s_frameBuffer[current_display_buffer]);
-//
-//        // Wait for LCD with timeout
-//        timeout_counter = start_time;
-//        while(!lcd_frame_done && timeout_counter > 0){
-//            __WFI();
-//            timeout_counter--;
-//        }
-//        lcd_frame_done = false;
-//
-//        if(timeout_counter == 0) {
-//            return CAMERA_TIMEOUT;  // LCD stopped generating interrupts
-//        }
-//
-//        current_display_buffer = (current_display_buffer == 0) ? 1 : 0;
-//
-//        frame_count++;
-//    }
-//
-//    return CAMERA_OK;
-//}
-
-
-
-void CAMERA_Stop(void){return;}
+//void CAMERA_Stop(void){}

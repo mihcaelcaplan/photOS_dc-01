@@ -25,8 +25,8 @@
 
 
 //for display specifically TODO: move?
-#define APP_HSW        4
-#define APP_HFP        40
+#define APP_HSW        100
+#define APP_HFP        100
 #define APP_HBP        80
 #define APP_VSW        4
 #define APP_VFP        40
@@ -36,8 +36,8 @@
 
 
 //declare
-extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP];
-extern uint32_t c_frameBuffer[2][APP_IMG_HEIGHT*APP_IMG_WIDTH];
+extern uint32_t s_frameBuffer[3][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP];
+extern uint32_t c_frameBuffer[3][APP_IMG_HEIGHT*APP_IMG_WIDTH];
 
 
 #endif /* GLOBAL_BUFFERS_H_ */
