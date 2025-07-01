@@ -53,13 +53,16 @@ int main(void) {
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
     MUX_ToUSBC();
     USB_DeviceApplicationInit();
-    DISPLAY_Init();
+    DISPLAY_Init(); // very minimal display function, basically reset pulse
 
-    CAMERA_Init();
+    
+    CAMERA_Init(); // right now doing the display control for camera live view
+
+//    GLOBAL_buffersInit();
 
 //    LCDtest();
 
-//    simpleDelay(1000);
+    simpleDelay(1);
     CAMERA_Run();
 
 //    DISPLAY_Run_Once();

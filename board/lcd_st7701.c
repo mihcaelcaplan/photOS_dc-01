@@ -626,7 +626,7 @@ void DISPLAY_On(void){
 //
 //		PRINTF("LCDIF camera DISPLAY start...\r\n");
 //
-		Browse_ELCDIF_Init();
+//		Browse_ELCDIF_Init();
 //
 //		BOARD_EnableLcdInterrupt();
 //

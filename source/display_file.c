@@ -121,16 +121,16 @@ static int MOUNT_SDCard(void)
     return 0;
 }
 
-void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int idx = (y * width + x) * 3;
-            framebuffer[idx + 0] = (uint8_t)((x * 255) / (width - 1));  // Red gradient across X
-            framebuffer[idx + 1] = (uint8_t)((y * 255) / (height - 1)); // Green gradient across Y
-            framebuffer[idx + 2] = 128;                                 // Constant blue
-        }
-    }
-}
+//void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
+////    for (int y = 0; y < height; ++y) {
+////        for (int x = 0; x < width; ++x) {
+////            int idx = (y * width + x) * 3;
+////            framebuffer[idx + 0] = (uint8_t)((x * 255) / (width - 1));  // Red gradient across X
+////            framebuffer[idx + 1] = (uint8_t)((y * 255) / (height - 1)); // Green gradient across Y
+////            framebuffer[idx + 2] = 128;                                 // Constant blue
+////        }
+////    }
+//}
 
 void DISPLAY_showStoredFile(){
 //	mount the filesystem

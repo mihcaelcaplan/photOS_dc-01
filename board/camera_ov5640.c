@@ -13,119 +13,96 @@
 #include "fsl_csi.h"
 #include "fsl_debug_console.h"
 #include "fsl_elcdif.h"
+#include "lcd_st7701.h"
 
 #define CAMERA_I2C LPI2C1
 #define OV5460_I2C_ADDRESS_WRITE 0x3C
 #define OV5460_I2C_ADDRESS_READ 0x3C
 #define RESET_GPIO 14U
 
-// Global flags - must be volatile since they're modified in interrupt context
-//volatile bool csi_buffer0_ready = false;
-//volatile bool csi_buffer1_ready = false;
-//volatile bool lcd_frame_done = true;  // Start true so first frame can begin
-
-// Add buffer overflow tracking
-//volatile uint32_t csi_overflow_count = 0;
-//volatile uint32_t last_processed_buffer = 0;
 
 int lcdirqc = 0;
 int csiirqc = 0;
-uint32_t csi_framecount = 0;
 
-uint32_t* full_buffer;
-uint32_t* empty_buffer;
+// buffer_t* buffer_to_display = NULL; // variable to use inside the irq
+// //buffer_t* last_buffer = NULL; // variable to use inside the irq
+// uint32_t last_buffer_addr;
 
-uint32_t* full_display_buffer;
-uint32_t* empty_display_buffer;
-
-
-
-//typedef struct _buffer {
-//	uint32_t* address;
-//	uint8_t full;
-//	uint8_t processing;
-//	uint8_t holdout;
-//} buffer_t;
-//
-//buffer_t rfb0 = {
-//	.address = c_frameBuffer[0],
-//	.full = 0,
-//	.processing = 0,
-//	.holdout = 0,
-//};
-//buffer_t rfb1 = {
-//	.address = c_frameBuffer[1],
-//	.full = 0,
-//	.processing = 0,
-//	.holdout = 0,
-//};
-//buffer_t rfb2 = {
-//	.address = c_frameBuffer[2],
-//	.full = 0,
-//	.processing = 0,
-//	.holdout = 0,
-//};
-//
-////triple buffrr
-//typedef struct _buffer_mgr {
-//	buffer_t fb1;
-//	buffer_t fb2;
-//	buffer_t fb3;
-//} buffer_mgr_t;
-//
-//
-////set up receiver buffer manager
-//buffer_mgr_t receive_mgr = {
-//		.fb1 = rfb1,
-//		.fb2 = rfb2,
-//		.fb3 = rfb3,
-//};
+// flags/buffer pointers
+volatile uint32_t* camera_dirty_buffer0;
+volatile uint32_t* camera_dirty_buffer1;
+volatile uint32_t* camera_empty_buffer;
+volatile uint32_t* camera_clean_buffer;
+volatile uint32_t* display_fresh_buffer;
+volatile uint32_t* display_stale_buffer;
+volatile uint32_t* display_empty_buffer;
 
 
 void LCDIF_IRQHandler(void){
-    lcdirqc++;
-
-//
-    uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
-////    	clear all ints
+	uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
+	//  clear all ints
     LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK;
-//
+	//
+    if (flags & kELCDIF_VsyncEdge)
+	{
+		if(display_fresh_buffer != NULL){
+			//    		switch the dma
+			LCDIF->NEXT_BUF = (uint32_t)display_fresh_buffer;
+		}
+	}
     if (flags & kELCDIF_CurFrameDone)
     {
-        full_display_buffer = 0;
-//        LCDIF->CTRL_CLR = LCDIF_CTRL_RUN_MASK; // turn off lcdif until next frame processed
-    }
+		if(display_fresh_buffer == LCDIF->CUR_BUF && display_fresh_buffer != NULL){
+			// stale frame empty, make fresh frame stale
+			display_empty_buffer = display_stale_buffer; // empty <- stale | -> NULL in routine
+			display_stale_buffer = display_fresh_buffer; // stale <- fresh | emptied next around 
+		}
+	}
+	
+	lcdirqc++;
     __DSB();
 }
-//
-//// FIXED: CSI IRQ handler with proper buffer management
+
+volatile uint32_t* last_fb_done = c_frameBuffer[0];
+volatile uint32_t* last_fb_done_i = 0;
+
 void CSI_IRQHandler(void){
-
-//	//	mask the interrupts
+	// only do anything if we need a clean frame to process
 	uint32_t status = CSI_GetStatusFlags(CSI);
-	if(status & kCSI_EndOfFrameFlag){
+	if(status & kCSI_StartOfFrameFlag){
+		CSI->SR |= CSI_SR_SOF_INT_MASK; //clear flag by writing 1
+
+		if(camera_clean_buffer ==NULL){
+			if (camera_empty_buffer != NULL && last_fb_done != NULL){
+				// create a clean buffer by repointing the dma address			
+				if (last_fb_done_i == 0){
+					CSI->DMASA_FB1 = camera_empty_buffer;
+					camera_dirty_buffer0 = camera_empty_buffer;
+				}
+				else{
+					CSI->DMASA_FB2 = camera_empty_buffer;
+					camera_dirty_buffer1 = camera_empty_buffer;
+				}
+				
+				camera_clean_buffer = last_fb_done;
+				camera_empty_buffer = NULL;
+			}
+		}
 
 	}
+
 	if(status & kCSI_RxBuffer0DmaDoneFlag){
-		if(full_buffer == 0){ //cleared after processing complete
-//			store address and redirect csi dma
-			full_buffer = (void*)CSI->DMASA_FB1;
-
-			CSI->DMASA_FB1 = (uint32_t)empty_buffer; // processing rotates the full to empty
-		}
-
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB1_MASK; //clear flag by writing 1
-	}
-	else if(status & kCSI_RxBuffer1DmaDoneFlag){
-		if(full_buffer == 0){ //cleared after processing complete
-//			store address and redirect csi dma
-			full_buffer = (void*)CSI->DMASA_FB2;
 
-			CSI->DMASA_FB2 = (uint32_t)empty_buffer; // processing rotates the full to empty
-		}
+		last_fb_done = CSI->DMASA_FB1;
+		last_fb_done_i = 0;
+	}
+	if(status & kCSI_RxBuffer1DmaDoneFlag){
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB2_MASK; //clear flag by writing 1
+		last_fb_done = 	CSI->DMASA_FB2;
+		last_fb_done_i = 1;
 	}
-
+	
 	csiirqc++;
 	__DSB();
 }
@@ -394,8 +371,6 @@ csi_config_t ov5640_config  = {
 	NVIC_ClearPendingIRQ(CSI_IRQn);
 	EnableIRQ(CSI_IRQn);
 //
-//	CSI_EnableInterrupts(CSI, kCSI_RxBuffer1DmaDoneInterruptEnable | kCSI_RxBuffer0DmaDoneInterruptEnable);
-
 	//	//	configure the control regs once mclk up from csi init (24 MHz)
 	OV5640_Init();
 
@@ -475,7 +450,6 @@ uint32_t videoPllFreq;
 		};
 
 	ELCDIF_RgbModeInit(LCDIF, &config);
-	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
 //
 ////	disable the block
 //	LCDIF->CTRL_CLR = LCDIF_CTRL_DOTCLK_MODE_MASK;
@@ -535,86 +509,112 @@ void processForDisplay(uint32_t* source_buffer, uint32_t* dest_buffer){
     }
 }
 
+void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int idx = (y * width + x) * 3;
+            framebuffer[idx + 0] = (uint8_t)((x * 255) / (width - 1));  // Red gradient across X
+            framebuffer[idx + 1] = (uint8_t)((y * 255) / (height - 1)); // Green gradient across Y
+            framebuffer[idx + 2] = 128;                                 // Constant blue
+        }
+    }
+}
+
 void LCDtest(void){
-//lcd_frame_done  = false; // set flag to force a frame out
+
+//	enable lcdif and interrupts
+	ELCDIF_RgbModeStart(LCDIF);
+	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable);
+
+//	display on
+	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
 
 
-DISPLAY_On();
+	// fill a display framebuffer with test pattern
 
-fill_framebuffer_gradient(s_frameBuffer[1], 480, 480);
+//	"wait" for a stale buffer (maybe a
+	while(pool_empty(&stale_screen_buffers)){
+		pool_put(&stale_screen_buffers, &screen_buffers[0]);
+	}
+//
+//	// get a stale buffer and add data to it
+	buffer_t* buffer_to_process = pool_get(&stale_screen_buffers);
+	fill_framebuffer_gradient(s_frameBuffer[0], 480, 480);
 
-ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)s_frameBuffer[1]);
-ELCDIF_RgbModeStart(LCDIF);
+	pool_put(&fresh_screen_buffers, buffer_to_process);
 
-//while(!lcd_frame_done){
-//	__WFI();
-//}
+//	wait
+	while(!pool_empty(&fresh_screen_buffers)){
+		__NOP();
+	}
 
-//ELCDIF_RgbModeStop(LCDIF);
-//LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK;
+	// when the pool is empty we can turn on the screen
+	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+
 }
 
 void CAMERA_Run(void){
+	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
 
-	bool run = true;
+//  set up buffers
+	display_fresh_buffer = NULL;
+	display_stale_buffer = s_frameBuffer[0];
+	display_empty_buffer = s_frameBuffer[1];
 
-//    set up buffers
-	CSI->DMASA_FB1 = 	(uint32_t)&c_frameBuffer[0];
-	CSI->DMASA_FB2 = 	(uint32_t)&c_frameBuffer[1];
-	empty_buffer = 		(uint32_t)&c_frameBuffer[2];
-	full_buffer = 		(void*)NULL;
+	LCDIF->CUR_BUF = display_empty_buffer; // so that display data out won't update until the stale is overwritten and made fresh
 
+	//	enable lcdif and interrupts
+	ELCDIF_RgbModeStart(LCDIF);
+	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
+
+
+// enable csi and interrupts
+//  set up buffers
+	camera_dirty_buffer0 = c_frameBuffer[0];
+	camera_dirty_buffer1 = c_frameBuffer[1];
+	camera_empty_buffer = c_frameBuffer[2];
+	camera_clean_buffer = NULL;
+
+	CSI->DMASA_FB1 = camera_dirty_buffer0;
+	CSI->DMASA_FB2 = camera_dirty_buffer1;
+
+//	csi enable base address witch on
+	CSI->CR18 |= CSI_CR18_BASEADDR_SWITCH_EN_MASK | CSI_CR18_BASEADDR_SWITCH_SEL(1);
+
+//	start csi subsystem
 	CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK; // enable interrupt fb1 full
 	CSI->CR1 |= CSI_CR1_FB2_DMA_DONE_INTEN_MASK; // enable interrupt fb2 full
-    CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
-    CSI->CR18 |= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
+	CSI->CR1 |= CSI_CR1_SOF_INTEN_MASK;; // enable interrupt fb2 full
+	CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
+	CSI->CR18|= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
 
-//	full_display_buffer = s_frameBuffer[0]; // starting value
-	empty_display_buffer = s_frameBuffer[1];
-	LCDIF->CUR_BUF = s_frameBuffer[0];
+	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+	while(1){
+		//display driven event loop
 
-//	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
-//	LCDIF->CTRL1_SET = LCDIF_CTRL1_SET_CUR_FRAME_DONE_IRQ_EN_MASK;
+	//	wait for a "clean" holdout from the triple buffer
+		while(camera_clean_buffer == NULL){
+			__NOP();
+		}
 
+		//	wait for lcd screen to have displayed something
+		while(display_empty_buffer==NULL){ // | <- filled in frame boundary 
+			__NOP();
+		}
 
-	DISPLAY_On();
-    while (run){
+	//	now i have a clean camera buffer and an stale screen buffer to be refreshed
+	//	should probably have some size guards in here
+		processForDisplay((uint32_t)camera_clean_buffer, (uint32_t)display_empty_buffer);
+		
+		
+		camera_empty_buffer = camera_clean_buffer; //  (empty <- clean) |  -> dirty on frame boundary
+		camera_clean_buffer = NULL; // clean <- NULL  | -> clean on frame boundary
 
-//    	wait for a buffer to become full
-    	while(full_buffer == 0){
-    		__NOP();
-    	}
-
-//    	send receive buffer to empty display buffer
-    	if(empty_display_buffer != 0){
-    		processForDisplay(full_buffer, empty_display_buffer);
-    	}
-    	else {
-    		PRINTF("no available display buffer\r\n");
-    	}
-
-    	full_display_buffer = empty_display_buffer; // tag that buffer has been filled
-
-//    	send processed buffer address to lcd if
-    	empty_display_buffer = LCDIF->CUR_BUF; // the current one marked to be filled next time
-    	LCDIF->NEXT_BUF = full_display_buffer;
-		LCDIF->CTRL1_SET = LCDIF_CTRL1_SET_CUR_FRAME_DONE_IRQ_EN_MASK;
-    	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
-
-//    	LCDIF->CTRL_SET = LCDIF_CTRL_RUN_MASK;
-
-    	NVIC_SetPriority(CSI_IRQn, 4); // make lower than lcdif interrupt
-
-    	while(!(full_display_buffer == 0)){ // clear in the lcd interrupt
-    		__NOP();
-    	}
-
-//		reset the buffer availability
-    	empty_buffer = full_buffer;
-    	full_buffer = (void*)NULL;
-    }
-
-
+	//	after processing, put the dest buffer on the fresh plate
+		display_fresh_buffer = display_empty_buffer; // (fresh <- empty) | -> stale on frame done
+		display_empty_buffer = NULL; // empty <- null | -> empty in frame boundary
+		// fresh goes to stale, and stale goes to empty?
+	}
 }
 
 //void CAMERA_Stop(void){}
