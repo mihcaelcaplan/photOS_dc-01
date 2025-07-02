@@ -58,14 +58,9 @@ int main(void) {
     
     CAMERA_Init(); // right now doing the display control for camera live view
 
-//    GLOBAL_buffersInit();
-
-//    LCDtest();
 
     simpleDelay(1);
-    CAMERA_Run();
-
-//    DISPLAY_Run_Once();
+    lcd_buffer_test();
 
      while(1) {
 ////    	 __asm("nop");

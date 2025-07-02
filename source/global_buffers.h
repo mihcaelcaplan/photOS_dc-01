@@ -23,95 +23,103 @@
 #define APP_FB_STRIDE_BYTE (APP_FB_WIDTH * APP_FB_BPP)
 #define FRAME_BUFFER_ALIGN 64
 
-// number of types of framebuffers
-#define s_frameBufferCount 3
-#define c_frameBufferCount 4
-
 
 //for display specifically TODO: move?
-#define APP_HSW        200
-#define APP_HFP        100
-#define APP_HBP        80
-#define APP_VSW        200
-#define APP_VFP        40
-#define APP_VBP        20
+#define APP_HSW        20
+#define APP_HFP        4
+#define APP_HBP        8
+#define APP_VSW        100
+#define APP_VFP        4
+#define APP_VBP        2
 #define APP_POL_FLAGS \
     (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnFallingClkEdge)
+    
+    //declare buffers extern so the actual memory only lives in one place =)
+    extern uint32_t c_frameBuffer[3][APP_IMG_HEIGHT*APP_IMG_WIDTH];
+    //need a camera buffer valid manager
+    typedef struct {
+        uint32_t* status;
+        uint32_t dma_buffer0_sa;
+        uint32_t dma_buffer1_sa;
+        uint32_t clean_buffer_sa;
+        uint32_t empty_buffer_sa;
+        int last_fb_i;
+        
+        // must be set before data valid status set
+        uint32_t data_valid_sa;
+        
+        
+        // hook functions for state machine advance on frame edges
+        void (*start_of_frame)(struct camera_buffer_manager_t* self); // start of frame callback
+        void (*dma_done)(struct camera_buffer_manager_t* self); // dma done callback
+        
+    } camera_buffer_manager_t;
 
-//declare buffers
-extern uint32_t s_frameBuffer[s_frameBufferCount][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP];
-extern uint32_t c_frameBuffer[c_frameBufferCount][APP_IMG_HEIGHT*APP_IMG_WIDTH];
+    
+    #define DISPLAY_BUFFER_READY 0X1
+    #define DISPLAY_BUFFER0_FULL 0X2
+    #define DISPLAY_BUFFER1_FULL 0X4
+    #define DISPLAY_BUFFER0_LOCK 0X8
+    #define DISPLAY_BUFFER1_LOCK 0X10
 
-// buffer structure and ring pool structure
+    extern uint32_t s_frameBuffer[2][APP_IMG_HEIGHT*APP_IMG_WIDTH * APP_FB_BPP];
+    //need a display buffer ready manage
+    typedef struct {
+        uint32_t* status; 
+        uint32_t buffer0_sa;
+	    uint32_t buffer1_sa;
+        
+        // must be set before ready status set
+        uint32_t ready_sa;
+        void (*fill_callback)(struct display_buffer_manager_t* self);
+
+        // hook functions for state machine advance on frame edges
+        void (*vsync_edge)(struct display_buffer_manager_t* self); // start of frame callback
+        void (*cur_frame_done)(struct display_buffer_manager_t* self); // data out done callback
+
+    } display_buffer_manager_t;
+
+// need transfer manager that watches both
 typedef struct {
-    void* data;
-    uint32_t size;    
-} buffer_t;
+    uint32_t* status;
+    void (*transfer_callback)(void);
+    uint32_t* ready_block_status; //ready bit must be [0]
+    uint32_t* data_valid_block_status; //ready bit must be [0]
+} transfer_manager_t;
 
-typedef struct {
-    buffer_t* buffers;
-    uint8_t head;
-    uint8_t tail;
-    uint8_t size;
-} pool_t;
+// declare the global managers
+extern camera_buffer_manager_t camera_buffer_manager;
+extern display_buffer_manager_t display_buffer_manager;
+extern transfer_manager_t transfer_manager;
 
-// declare public buffers
-extern buffer_t screen_buffers[s_frameBufferCount];
-extern buffer_t camera_buffers[c_frameBufferCount];
 
-static inline buffer_t* address_to_buf(pool_t* pool, void* address){
-	for(int i = 0; i<pool->size; i++){
-		buffer_t* buf = &pool->buffers[i];
-		void* bufAddress = buf->data;
-		if (bufAddress == address){
-			return buf;
-		}
-	}
-	return NULL;
-}
 
-// declare pools
-extern pool_t stale_screen_buffers;
-extern pool_t fresh_screen_buffers;
-
-// 2 possible dirty buffers, 1 possible clean one - allow triple buffering
-extern pool_t clean_camera_buffers;
-extern pool_t dirty_camera_buffers;
-extern pool_t empty_camera_buffers;
-
-// buffer get and put
-//   returns buffer pointer if there is one, otherwise NULL
-static inline buffer_t* pool_get(pool_t* pool) {
-    uint8_t tail = pool->tail;
-    if (tail == pool->head) return NULL;  // empty
+// static inline
+// all this does is check if both blocks are ready and valid and callback and set status bits
+// returns status = 0xOOOO, 0x0 = no transfer 0x1 = transfer in progress, 0x2 = ....
+static inline uint32_t manage_transfer(transfer_manager_t* mgr){
+    uint32_t ready = *mgr->ready_block_status;
+    uint32_t data_valid = *mgr->data_valid_block_status;
     
-    buffer_t* buf = &pool->buffers[tail];
-    pool->tail = (tail + 1 == pool->size+1) ? 0 : tail + 1; // 0 if at capacity otherwise increment
-    return buf;
+    if(ready == 0x1 && data_valid == 0x1){
+        // commence transfer
+        *mgr->status |= 0x01;
+        mgr->transfer_callback();
+        
+        // reset the block status
+        *mgr->ready_block_status &= ~0x1;
+        *mgr->data_valid_block_status &= ~0x1;
+
+        // transfer started
+        return *mgr->status;
+    }
+
+    return *mgr->status;
 }
 
-// returns 0 if the put is successful, -1 if no space
-static inline int pool_put(pool_t* pool, buffer_t* buf) {
-    uint8_t head = pool->head;
-    uint8_t next_head = (head + 1 == pool->size + 1) ? 0 : head + 1; // if capacity otherwise increment
-    
-    if (next_head == pool->tail) return -1;  // full
-    
-    pool->buffers[head] = *buf;
-    pool->head = next_head;
-    return 0;
-}
 
-static inline int pool_empty(pool_t* pool) {
-    return pool->head == pool->tail;
-}
 
-static inline int pool_full(pool_t* pool) {
-    uint8_t next_head = (pool->head + 1 == pool->size + 1) ? 0 : pool->head + 1;
-    return next_head == pool->tail;
-}
 
-void GLOBAL_buffersInit(void);
 
 
 #endif /* GLOBAL_BUFFERS_H_ */

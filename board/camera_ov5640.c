@@ -45,19 +45,23 @@ void LCDIF_IRQHandler(void){
 	//
     if (flags & kELCDIF_VsyncEdge)
 	{
-		if(display_fresh_buffer != NULL){
-			//    		switch the dma
-			LCDIF->NEXT_BUF = (uint32_t)display_fresh_buffer;
+		display_buffer_manager.vsync_edge(&display_buffer_manager);
+		
+		// if(display_fresh_buffer != NULL){
+			// 	//    		switch the dma
+			// 	display_stale_buffer = display_fresh_buffer; // stale <- fresh | emptied next around
+			// 	display_fresh_buffer = NULL;
+			
+			// }
 		}
-	}
-    if (flags & kELCDIF_CurFrameDone)
-    {
-		if(display_fresh_buffer == LCDIF->CUR_BUF && display_fresh_buffer != NULL){
-			// stale frame empty, make fresh frame stale
-			display_empty_buffer = display_stale_buffer; // empty <- stale | -> NULL in routine
-			display_stale_buffer = display_fresh_buffer; // stale <- fresh | emptied next around 
+		if (flags & kELCDIF_CurFrameDone)
+		{
+		display_buffer_manager.cur_frame_done(&display_buffer_manager);
+		// camera_buffer_manager.dm
+// //		if(display_fresh_buffer == LCDIF->CUR_BUF && display_fresh_buffer != NULL){
+// //			// stale frame empty, make fresh frame stale
+// 			display_empty_buffer = display_stale_buffer; // empty <- stale | -> NULL in routine
 		}
-	}
 	
 	lcdirqc++;
     __DSB();
@@ -71,36 +75,17 @@ void CSI_IRQHandler(void){
 	uint32_t status = CSI_GetStatusFlags(CSI);
 	if(status & kCSI_StartOfFrameFlag){
 		CSI->SR |= CSI_SR_SOF_INT_MASK; //clear flag by writing 1
-
-		if(camera_clean_buffer ==NULL){
-			if (camera_empty_buffer != NULL && last_fb_done != NULL){
-				// create a clean buffer by repointing the dma address			
-				if (last_fb_done_i == 0){
-					CSI->DMASA_FB1 = camera_empty_buffer;
-					camera_dirty_buffer0 = camera_empty_buffer;
-				}
-				else{
-					CSI->DMASA_FB2 = camera_empty_buffer;
-					camera_dirty_buffer1 = camera_empty_buffer;
-				}
-				
-				camera_clean_buffer = last_fb_done;
-				camera_empty_buffer = NULL;
-			}
-		}
-
+		camera_buffer_manager.start_of_frame(&camera_buffer_manager);
 	}
 
 	if(status & kCSI_RxBuffer0DmaDoneFlag){
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB1_MASK; //clear flag by writing 1
-
-		last_fb_done = CSI->DMASA_FB1;
-		last_fb_done_i = 0;
+		camera_buffer_manager.dma_done(&camera_buffer_manager);
 	}
 	if(status & kCSI_RxBuffer1DmaDoneFlag){
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB2_MASK; //clear flag by writing 1
-		last_fb_done = 	CSI->DMASA_FB2;
-		last_fb_done_i = 1;
+		camera_buffer_manager.dma_done(&camera_buffer_manager);
+		
 	}
 	
 	csiirqc++;
@@ -176,8 +161,8 @@ simpleDelay(5);
 // pixclk = mclk/root_div/pre-div)*multiply/sysclk divider
 // (24Mhz/2/4)*100/6 = 50Mhz  idek anymore
     OV5640_I2CWrite8(0x3035, 0x41);  // [7:4] sysclk divider, [3:0] mipi divider
-    OV5640_I2CWrite8(0x3036, 0x50);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
-    OV5640_I2CWrite8(0x3037, 0x13);  // [4] root divider (1 = root/2), [3:0] pre-divider (1,2,3,4,6,8)
+    OV5640_I2CWrite8(0x3036, 0xA0);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
+    OV5640_I2CWrite8(0x3037, 0x01);  // [4] root divider (1 = root/2), [3:0] pre-divider (1,2,3,4,6,8)
 
 	OV5640_I2CWrite8(0x3108, 0x01); //set system dividers
 
@@ -256,7 +241,8 @@ uint16_t height = APP_FB_HEIGHT;
 //    OV5640_I2CWrite8(0x380E, ((height+17) >> 8) &0XFF ); // total vertical size[11:8]
 //    OV5640_I2CWrite8(0x380F, (height+17) & 0xFF ); // total vertical size[ 7:0]
 
-    OV5640_I2CWrite8(0x4713, 0x02); // JPEG (compression?) mode 3
+    OV5640_I2CWrite8(0x4709, (uint8_t)50); // vsync line width 10
+    OV5640_I2CWrite8(0x4713, 0x03); // JPEG (compression?) mode 3
 
     
     // these only operate in the ISP stage, i think not if i disable it all
@@ -522,64 +508,108 @@ void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
 
 void LCDtest(void){
 
-//	enable lcdif and interrupts
-	ELCDIF_RgbModeStart(LCDIF);
-	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable);
-
-//	display on
-	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
-
-
-	// fill a display framebuffer with test pattern
-
-//	"wait" for a stale buffer (maybe a
-	while(pool_empty(&stale_screen_buffers)){
-		pool_put(&stale_screen_buffers, &screen_buffers[0]);
-	}
+////	enable lcdif and interrupts
+//	ELCDIF_RgbModeStart(LCDIF);
+//	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable);
 //
-//	// get a stale buffer and add data to it
-	buffer_t* buffer_to_process = pool_get(&stale_screen_buffers);
-	fill_framebuffer_gradient(s_frameBuffer[0], 480, 480);
-
-	pool_put(&fresh_screen_buffers, buffer_to_process);
-
-//	wait
-	while(!pool_empty(&fresh_screen_buffers)){
-		__NOP();
-	}
-
-	// when the pool is empty we can turn on the screen
-	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+////	display on
+//	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
+//
+//
+//	// fill a display framebuffer with test pattern
+//
+////	"wait" for a stale buffer (maybe a
+//	while(pool_empty(&stale_screen_buffers)){
+//		pool_put(&stale_screen_buffers, &screen_buffers[0]);
+//	}
+////
+////	// get a stale buffer and add data to it
+//	buffer_t* buffer_to_process = pool_get(&stale_screen_buffers);
+//	fill_framebuffer_gradient(s_frameBuffer[0], 480, 480);
+//
+//	pool_put(&fresh_screen_buffers, buffer_to_process);
+//
+////	wait
+//	while(!pool_empty(&fresh_screen_buffers)){
+//		__NOP();
+//	}
+//
+//	// when the pool is empty we can turn on the screen
+//	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
 
 }
 
 void CAMERA_Run(void){
-	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
+//	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
+//
+////  set up buffers
+//	display_fresh_buffer = NULL;
+//	display_stale_buffer = s_frameBuffer[0];
+//	display_empty_buffer = s_frameBuffer[1];
+//
+//	LCDIF->CUR_BUF = display_empty_buffer; // so that display data out won't update until the stale is overwritten and made fresh
+//
+//	//	enable lcdif and interrupts
+//	ELCDIF_RgbModeStart(LCDIF);
+//	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
+//
+//
+//// enable csi and interrupts
+////  set up buffers
+//	camera_dirty_buffer0 = c_frameBuffer[0];
+//	camera_dirty_buffer1 = c_frameBuffer[1];
+//	camera_empty_buffer = c_frameBuffer[2];
+//	camera_clean_buffer = NULL;
+//
+//	CSI->DMASA_FB1 = camera_dirty_buffer0;
+//	CSI->DMASA_FB2 = camera_dirty_buffer1;
+//
+////	csi enable base address witch on
+//	CSI->CR18 |= CSI_CR18_BASEADDR_SWITCH_EN_MASK | CSI_CR18_BASEADDR_SWITCH_SEL(1);
+//
+////	start csi subsystem
+//	CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK; // enable interrupt fb1 full
+//	CSI->CR1 |= CSI_CR1_FB2_DMA_DONE_INTEN_MASK; // enable interrupt fb2 full
+//	CSI->CR1 |= CSI_CR1_SOF_INTEN_MASK;; // enable interrupt fb2 full
+//	CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
+//	CSI->CR18|= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
+//
+//	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+//	while(1){
+//		//display driven event loop
+//
+//	//	wait for a "clean" holdout from the triple buffer
+//		while(camera_clean_buffer == NULL){
+//			__NOP();
+//		}
+//
+//		//	wait for lcd screen to have displayed something
+//		while(display_empty_buffer==NULL){ // | <- filled in frame boundary
+//			__NOP();
+//		}
+//
+//	//	now i have a clean camera buffer and an stale screen buffer to be refreshed
+//	//	should probably have some size guards in here
+//		processForDisplay((uint32_t)camera_clean_buffer, (uint32_t)display_empty_buffer);
+//
+//
+//		camera_empty_buffer = camera_clean_buffer; //  (empty <- clean) |  -> dirty on frame boundary
+//		camera_clean_buffer = NULL; // clean <- NULL  | -> clean on frame boundary
+//
+//	//	after processing, put the dest buffer on the fresh plate
+//		display_fresh_buffer = display_empty_buffer; // (fresh <- empty) | -> stale on frame done
+//		display_empty_buffer = NULL; // empty <- null | -> empty in frame boundary
+//		// fresh goes to stale, and stale goes to empty?
+//	}
+}
 
-//  set up buffers
-	display_fresh_buffer = NULL;
-	display_stale_buffer = s_frameBuffer[0];
-	display_empty_buffer = s_frameBuffer[1];
 
-	LCDIF->CUR_BUF = display_empty_buffer; // so that display data out won't update until the stale is overwritten and made fresh
-
-	//	enable lcdif and interrupts
-	ELCDIF_RgbModeStart(LCDIF);
-	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
-
-
-// enable csi and interrupts
-//  set up buffers
-	camera_dirty_buffer0 = c_frameBuffer[0];
-	camera_dirty_buffer1 = c_frameBuffer[1];
-	camera_empty_buffer = c_frameBuffer[2];
-	camera_clean_buffer = NULL;
-
-	CSI->DMASA_FB1 = camera_dirty_buffer0;
-	CSI->DMASA_FB2 = camera_dirty_buffer1;
+void camera_buffer_test(void){
+	CSI->DMASA_FB1 = camera_buffer_manager.dma_buffer0_sa;
+	CSI->DMASA_FB2 = camera_buffer_manager.dma_buffer1_sa;
 
 //	csi enable base address witch on
-	CSI->CR18 |= CSI_CR18_BASEADDR_SWITCH_EN_MASK | CSI_CR18_BASEADDR_SWITCH_SEL(1);
+//	CSI->CR18 |= CSI_CR18_BASEADDR_SWITCH_EN_MASK | CSI_CR18_BASEADDR_SWITCH_SEL(1);
 
 //	start csi subsystem
 	CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK; // enable interrupt fb1 full
@@ -588,33 +618,35 @@ void CAMERA_Run(void){
 	CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
 	CSI->CR18|= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
 
-	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
-	while(1){
-		//display driven event loop
-
-	//	wait for a "clean" holdout from the triple buffer
-		while(camera_clean_buffer == NULL){
-			__NOP();
-		}
-
-		//	wait for lcd screen to have displayed something
-		while(display_empty_buffer==NULL){ // | <- filled in frame boundary 
-			__NOP();
-		}
-
-	//	now i have a clean camera buffer and an stale screen buffer to be refreshed
-	//	should probably have some size guards in here
-		processForDisplay((uint32_t)camera_clean_buffer, (uint32_t)display_empty_buffer);
-		
-		
-		camera_empty_buffer = camera_clean_buffer; //  (empty <- clean) |  -> dirty on frame boundary
-		camera_clean_buffer = NULL; // clean <- NULL  | -> clean on frame boundary
-
-	//	after processing, put the dest buffer on the fresh plate
-		display_fresh_buffer = display_empty_buffer; // (fresh <- empty) | -> stale on frame done
-		display_empty_buffer = NULL; // empty <- null | -> empty in frame boundary
-		// fresh goes to stale, and stale goes to empty?
+//	wait for data valid
+	while(*camera_buffer_manager.status != 0x1){
+		__NOP();
 	}
+
+	PRINTF("camera data valid\r\n");
 }
+
+void lcd_buffer_test(void){
+	ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
+	simpleDelay(10);
+
+
+	//	enable lcdif and interrupts
+	ELCDIF_RgbModeStart(LCDIF);
+	ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
+
+//	wait for ready
+	while(*display_buffer_manager.status != 0x1){
+		__NOP();
+	}
+
+	fill_framebuffer_gradient((uint32_t*)display_buffer_manager.ready_sa, 480, 480);
+	display_buffer_manager.fill_callback(&display_buffer_manager);
+
+
+	PRINTF("display ready\r\n");
+	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+}
+
 
 //void CAMERA_Stop(void){}

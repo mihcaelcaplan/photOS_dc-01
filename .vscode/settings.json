@@ -10,6 +10,8 @@
         "camera_ov5640.h": "c",
         "fsl_csi.h": "c",
         "ios": "c",
-        "global_buffers.h": "c"
+        "global_buffers.h": "c",
+        "queue": "c",
+        "random": "c"
     }
 }
