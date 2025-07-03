@@ -47,11 +47,11 @@
         
         // must be set before data valid status set
         uint32_t data_valid_sa;
-        
+        void (*drain_callback)(struct camera_buffer_manager_t* self);
         
         // hook functions for state machine advance on frame edges
         void (*start_of_frame)(struct camera_buffer_manager_t* self); // start of frame callback
-        void (*dma_done)(struct camera_buffer_manager_t* self); // dma done callback
+        void (*dma_done)(struct camera_buffer_manager_t* self, int fb_i); // dma done callback
         
     } camera_buffer_manager_t;
 
@@ -97,7 +97,7 @@ extern transfer_manager_t transfer_manager;
 // static inline
 // all this does is check if both blocks are ready and valid and callback and set status bits
 // returns status = 0xOOOO, 0x0 = no transfer 0x1 = transfer in progress, 0x2 = ....
-static inline uint32_t manage_transfer(transfer_manager_t* mgr){
+static inline void manage_transfer(transfer_manager_t* mgr){
     uint32_t ready = *mgr->ready_block_status;
     uint32_t data_valid = *mgr->data_valid_block_status;
     
@@ -109,17 +109,8 @@ static inline uint32_t manage_transfer(transfer_manager_t* mgr){
         // reset the block status
         *mgr->ready_block_status &= ~0x1;
         *mgr->data_valid_block_status &= ~0x1;
-
-        // transfer started
-        return *mgr->status;
-    }
-
-    return *mgr->status;
 }
-
-
-
-
+}
 
 
 #endif /* GLOBAL_BUFFERS_H_ */

@@ -29,39 +29,27 @@ int csiirqc = 0;
 // uint32_t last_buffer_addr;
 
 // flags/buffer pointers
-volatile uint32_t* camera_dirty_buffer0;
-volatile uint32_t* camera_dirty_buffer1;
-volatile uint32_t* camera_empty_buffer;
-volatile uint32_t* camera_clean_buffer;
-volatile uint32_t* display_fresh_buffer;
-volatile uint32_t* display_stale_buffer;
-volatile uint32_t* display_empty_buffer;
+//volatile uint32_t* camera_dirty_buffer0;
+//volatile uint32_t* camera_dirty_buffer1;
+//volatile uint32_t* camera_empty_buffer;
+//volatile uint32_t* camera_clean_buffer;
+//volatile uint32_t* display_fresh_buffer;
+//volatile uint32_t* display_stale_buffer;
+//volatile uint32_t* display_empty_buffer;
 
 
 void LCDIF_IRQHandler(void){
 	uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
-	//  clear all ints
-    LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK;
-	//
+    LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK; //  clear all int masks
+	
     if (flags & kELCDIF_VsyncEdge)
 	{
 		display_buffer_manager.vsync_edge(&display_buffer_manager);
-		
-		// if(display_fresh_buffer != NULL){
-			// 	//    		switch the dma
-			// 	display_stale_buffer = display_fresh_buffer; // stale <- fresh | emptied next around
-			// 	display_fresh_buffer = NULL;
-			
-			// }
-		}
-		if (flags & kELCDIF_CurFrameDone)
-		{
+	}
+	if (flags & kELCDIF_CurFrameDone)
+	{
 		display_buffer_manager.cur_frame_done(&display_buffer_manager);
-		// camera_buffer_manager.dm
-// //		if(display_fresh_buffer == LCDIF->CUR_BUF && display_fresh_buffer != NULL){
-// //			// stale frame empty, make fresh frame stale
-// 			display_empty_buffer = display_stale_buffer; // empty <- stale | -> NULL in routine
-		}
+	}
 	
 	lcdirqc++;
     __DSB();
@@ -71,8 +59,8 @@ volatile uint32_t* last_fb_done = c_frameBuffer[0];
 volatile uint32_t* last_fb_done_i = 0;
 
 void CSI_IRQHandler(void){
-	// only do anything if we need a clean frame to process
 	uint32_t status = CSI_GetStatusFlags(CSI);
+
 	if(status & kCSI_StartOfFrameFlag){
 		CSI->SR |= CSI_SR_SOF_INT_MASK; //clear flag by writing 1
 		camera_buffer_manager.start_of_frame(&camera_buffer_manager);
@@ -80,11 +68,11 @@ void CSI_IRQHandler(void){
 
 	if(status & kCSI_RxBuffer0DmaDoneFlag){
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB1_MASK; //clear flag by writing 1
-		camera_buffer_manager.dma_done(&camera_buffer_manager);
+		camera_buffer_manager.dma_done(&camera_buffer_manager, 0);
 	}
 	if(status & kCSI_RxBuffer1DmaDoneFlag){
 		CSI->SR |= CSI_SR_DMA_TSF_DONE_FB2_MASK; //clear flag by writing 1
-		camera_buffer_manager.dma_done(&camera_buffer_manager);
+		camera_buffer_manager.dma_done(&camera_buffer_manager, 1);
 		
 	}
 	
@@ -619,11 +607,17 @@ void camera_buffer_test(void){
 	CSI->CR18|= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
 
 //	wait for data valid
-	while(*camera_buffer_manager.status != 0x1){
-		__NOP();
+
+	while(1){
+		while(*camera_buffer_manager.status != 0x1){
+			__NOP();
+		}
+		PRINTF("camera data valid\r\n");
+		camera_buffer_manager.empty_buffer_sa = camera_buffer_manager.clean_buffer_sa;
+		camera_buffer_manager.clean_buffer_sa = 0; //reset
+		*camera_buffer_manager.status = 0x0;
 	}
 
-	PRINTF("camera data valid\r\n");
 }
 
 void lcd_buffer_test(void){
@@ -647,6 +641,46 @@ void lcd_buffer_test(void){
 	PRINTF("display ready\r\n");
 	GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
 }
+
+void transfer_test(void){
+	CSI->DMASA_FB1 = camera_buffer_manager.dma_buffer0_sa;
+		CSI->DMASA_FB2 = camera_buffer_manager.dma_buffer1_sa;
+
+	//	csi enable base address witch on
+	//	CSI->CR18 |= CSI_CR18_BASEADDR_SWITCH_EN_MASK | CSI_CR18_BASEADDR_SWITCH_SEL(1);
+
+	//	start csi subsystem
+		CSI->CR1 |= CSI_CR1_FB1_DMA_DONE_INTEN_MASK; // enable interrupt fb1 full
+		CSI->CR1 |= CSI_CR1_FB2_DMA_DONE_INTEN_MASK; // enable interrupt fb2 full
+		CSI->CR1 |= CSI_CR1_SOF_INTEN_MASK;; // enable interrupt fb2 full
+		CSI->CR3 |= CSI_CR3_DMA_REQ_EN_RFF_MASK; 	 // enable dma reqs from receive fifo
+		CSI->CR18|= CSI_CR18_CSI_ENABLE_MASK; 		 // enable csi module
+
+		ST7701_SPIWrite(0x13, COMMAND); // normal display mode on
+		simpleDelay(10);
+
+
+		//	enable lcdif and interrupts
+		ELCDIF_RgbModeStart(LCDIF);
+		ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
+
+//		one shot run
+
+//		wait until ready & valid
+		while(!((*transfer_manager.data_valid_block_status & 0x1) && (*transfer_manager.ready_block_status & 0x1))){
+			__NOP();
+		}
+
+//		make sure data
+		processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)display_buffer_manager.ready_sa);
+		
+		camera_buffer_manager.drain_callback(&camera_buffer_manager);
+		display_buffer_manager.fill_callback(&display_buffer_manager);
+
+		GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
+
+}
+
 
 
 //void CAMERA_Stop(void){}

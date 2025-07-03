@@ -33,7 +33,7 @@ void camera_sof_callback(camera_buffer_manager_t* self){
 //	 if empty buffer,
 //	 detach
 	if(self->clean_buffer_sa== 00 && self->empty_buffer_sa != 0){
-		if(self->last_fb_i != 0xFF){
+		if(self->last_fb_i == 0){
 			CSI->DMASA_FB1 = self->empty_buffer_sa; //ideally repoint the last completed fb
 			self->clean_buffer_sa = self->dma_buffer0_sa; // clean -> dmaN
 			self->dma_buffer0_sa = self->empty_buffer_sa; // dmaN -> empty
@@ -47,18 +47,26 @@ void camera_sof_callback(camera_buffer_manager_t* self){
 		}
 		// rotate buffers
 		self->empty_buffer_sa = NULL; //no empty buffer until the clean one is drained
+		self->data_valid_sa = self->clean_buffer_sa;
 		*self->status |= 0x1;
 
 		__DSB();
 	}
 }
-void camera_dmadone_callback(camera_buffer_manager_t* self){
+void camera_dmadone_callback(camera_buffer_manager_t* self, int fb_i){
 	//swap fb done to to empty (full?)
-	if(self->last_fb_i == 0xFF){self->last_fb_i = 0;}
-	self->last_fb_i = (self->last_fb_i == 0)? 1 : 0;
-
+	self->last_fb_i = fb_i;
 	__DSB();
 }
+
+void drain_valid(camera_buffer_manager_t* self){
+	if(self->data_valid_sa != 0){
+		self->data_valid_sa = 0;
+		self->clean_buffer_sa = 0;
+		*self->status &= ~0x1;
+	}
+}
+
 // init the manager
 camera_buffer_manager_t camera_buffer_manager = {
 	.status = &camera_status,
@@ -67,6 +75,10 @@ camera_buffer_manager_t camera_buffer_manager = {
 	.clean_buffer_sa = NULL,
 	.empty_buffer_sa = &c_frameBuffer[2],
 	.last_fb_i = 0,
+
+	.data_valid_sa = NULL,
+	.drain_callback = drain_valid,
+
 	// need to put in callbacks before using
 	.start_of_frame = camera_sof_callback,
 	.dma_done = camera_dmadone_callback
@@ -80,7 +92,6 @@ void display_vsync_callback(display_buffer_manager_t* self){
 	if(status & DISPLAY_BUFFER0_FULL && !(status & DISPLAY_BUFFER0_LOCK)){
 		*self->status |= DISPLAY_BUFFER0_LOCK;
 		LCDIF->NEXT_BUF = self->buffer0_sa;
-		
 		
 	}
 	else if(status & DISPLAY_BUFFER1_FULL && !(status & DISPLAY_BUFFER1_LOCK)){
@@ -131,7 +142,6 @@ void fill_ready(display_buffer_manager_t* self){
 			self->ready_sa = 0;
 		}
 	}
-
 }
 
 // init the manager
@@ -149,6 +159,6 @@ display_buffer_manager_t display_buffer_manager = {
 transfer_manager_t transfer_manager = {
 	.status = 0,
 	.ready_block_status = &display_status,
-	.data_valid_block_status = &camera_status,
-	.transfer_callback = NULL, // add before using
+	.data_valid_block_status = &camera_status
+//	.transfer_callback = NULL, // add before using
 };
