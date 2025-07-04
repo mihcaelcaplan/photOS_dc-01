@@ -170,7 +170,7 @@ void registerInit(void){
 // pixclk = mclk/root_div/pre-div)*multiply/sysclk divider
 // (24Mhz/2/4)*100/6 = 50Mhz  idek anymore
     OV5640_I2CWrite8(0x3035, 0x41);  // [7:4] sysclk divider, [3:0] mipi divider
-    OV5640_I2CWrite8(0x3036, 0xA0);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
+    OV5640_I2CWrite8(0x3036, 0xF8);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
     OV5640_I2CWrite8(0x3037, 0x11);  // [4] root divider (1 = root/2), [3:0] pre-divider (1,2,3,4,6,8)
 
 	OV5640_I2CWrite8(0x3108, 0x01); //set system dividers
@@ -181,51 +181,6 @@ void registerInit(void){
 	OV5640_I2CWrite8(0x3004, 0xFF); // turn MCU clocks on
 	OV5640_I2CWrite8(0x3006, 0xc3); // disable clock of JPEG2x, JPEG
 	OV5640_I2CWrite8(0x300e, 0x58); //mipi off, DVP on (should be default)
-
-
-
-// Timing Generator:
-// FPS = pixclk/(line_width*total lines)
-/*
- * OV5640 Sensor Windowing Configuration
- * =====================================
- *
- * Full Sensor Array: 2624×1952 pixels
- *
- *     0                    1312                    2623
- *     ┌─────────────────────┼─────────────────────┐  0
- *     │                     │                     │
- *     │        ┌────────────┼────────────┐        │
- *     │        │  (x_st,y_st)            │        │
- *     │        │            │            │        │
- *     │        │            │            │        │
- *     ├────────┼────────────●────────────┼────────┤  976 (mid_y)
- *     │        │        (mid_x,mid_y)    │        │
- *     │        │            │            │        │
- *     │        │            │  (x_end,y_end)      │
- *     │        └────────────┼────────────┘        │
- *     │                     │                     │
- *     └─────────────────────┼─────────────────────┘  1951
- *                           │
-*                   width = x_end - x_st + 1
-*                   height = y_end - y_st + 1
- *
- * Centering Calculations:
- * ----------------------
- * mid_x = 1312           // (2624 - 1) / 2
- * mid_y = 976            // (1952 - 1) / 2
- *
- * x_st = mid_x - (width/2)
- * y_st = mid_y - (height/2)
- */
-
-uint16_t x_start = 1312 - ( APP_FB_WIDTH/2 );
-//uint16_t x_end = x_start + APP_FB_WIDTH - 1;
-uint16_t y_start = 976 -  (APP_FB_HEIGHT/2 );
-//uint16_t y_end = y_start + APP_FB_HEIGHT - 1;
-
-uint16_t width = APP_FB_WIDTH;
-uint16_t height = APP_FB_HEIGHT;
 
 //set up image window constraints
    OV5640_I2CWrite8(0x3800, 0x00 );// X start [11:8]
@@ -243,11 +198,11 @@ uint16_t height = APP_FB_HEIGHT;
     OV5640_I2CWrite8(0x3809, 0xe0); //DVP output horizontal width [7:0]
     OV5640_I2CWrite8(0x380A, 0x01); //DVP output vertical height [11:8]
     OV5640_I2CWrite8(0x380B, 0xe0); //DVP output vertical height [7:0]
-
-//    OV5640_I2CWrite8(0x380C, 0x05) ; // total horizontal size [11:8]
+//
+//    OV5640_I2CWrite8(0x380C, 0x02) ; // total horizontal size [11:8]
 //    OV5640_I2CWrite8(0x380D, 0xf8); // total horizontal size [7:0]
-//    OV5640_I2CWrite8(0x380E, 0x03); // total vertical size[11:8]
-//    OV5640_I2CWrite8(0x380F, 0x94); // total vertical size[ 7:0]
+//    OV5640_I2CWrite8(0x380E, 0x02); // total vertical size[11:8]
+//    OV5640_I2CWrite8(0x380F, 0xe0); // total vertical size[ 7:0]
 //    	0x380c, 0x0b, // HTS 		//
 //    	0x380d, 0x1c, // HTS
 //    	0x380e, 0x07, // VTS 		//
@@ -276,8 +231,8 @@ uint16_t height = APP_FB_HEIGHT;
     OV5640_I2CWrite8(0x3815,0x11);  // Y [7:4]odd subsampling increment, [3:0] even subsampling increment
 
 // Timing control (flip/mirror)
-    OV5640_I2CWrite8(0x3820,0x41);  // [2] ISP flip, [1] sensor flip
-    OV5640_I2CWrite8(0x3821, 0x02);  // [5] jpeg en, [2]isp mirror, [1] sensor mirror, [0] horizontal binning enable (vertical binning auto-enable on Y inc.)
+//    OV5640_I2CWrite8(0x3820, 0x41);  // [2] ISP flip, [1] sensor flip
+//    OV5640_I2CWrite8(0x3821, 0x02);  // [5] jpeg en, [2]isp mirror, [1] sensor mirror, [0] horizontal binning enable (vertical binning auto-enable on Y inc.)
 
 // Output Interface:
 // Raw format output (bypass ISP)
