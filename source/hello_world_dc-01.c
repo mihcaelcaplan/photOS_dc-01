@@ -60,9 +60,9 @@ int main(void) {
 
 
     simpleDelay(1);
-    camera_buffer_test();
-//    // lcd_buffer_test();
-//    transfer_test();
+//    camera_buffer_test();
+//     lcd_buffer_test();
+    transfer_test();
 
      while(1) {
 ////    	 __asm("nop");

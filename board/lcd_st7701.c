@@ -33,17 +33,20 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x10, DATA); //command 2 bit high, page 0
 
 
-	ST7701_SPIWrite(0xC0, COMMAND);
-	ST7701_SPIWrite(0x3B, DATA);
-	ST7701_SPIWrite(0x00, DATA);
+	ST7701_SPIWrite(0xC0, COMMAND); //set number of display lines
+	ST7701_SPIWrite(0x3B, DATA); //59 because nl = (59+1)*8
+	ST7701_SPIWrite(0x00, DATA); // extra line settings if you need it
 
-	ST7701_SPIWrite(0xC1, COMMAND);
-	ST7701_SPIWrite(0x0D, DATA);
-	ST7701_SPIWrite(0x02, DATA);
+	ST7701_SPIWrite(0xC1, COMMAND); // vertical back and front porch
+	ST7701_SPIWrite(0x0A, DATA); //n lines front porch
+	ST7701_SPIWrite(0x0A, DATA); // nlines back porch
 
 	ST7701_SPIWrite(0xC2, COMMAND);
 	ST7701_SPIWrite(0x31, DATA);
-	ST7701_SPIWrite(0x05, DATA);
+	ST7701_SPIWrite(0x05 , DATA);
+
+//	ST7701_SPIWrite(0xC3, COMMAND); // set RGBCTL
+//	ST7701_SPIWrite(0x80, DATA); //HV mode = 0x80 de mode = 0x00
 
 	ST7701_SPIWrite(0xCD, COMMAND);
 	ST7701_SPIWrite(0x68, DATA);

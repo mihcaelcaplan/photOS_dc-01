@@ -26,13 +26,15 @@
 
 //for display specifically TODO: move?
 #define APP_HSW        20
-#define APP_HFP        4
-#define APP_HBP        8
-#define APP_VSW        100
-#define APP_VFP        4
-#define APP_VBP        2
+#define APP_HFP        40
+#define APP_HBP        50
+ 
+#define APP_VSW        10
+#define APP_VFP        5
+#define APP_VBP        5
 #define APP_POL_FLAGS \
-    (kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnFallingClkEdge)
+(kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnFallingClkEdge)
+//    ( kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnRisingClkEdge)
     
     //declare buffers extern so the actual memory only lives in one place =)
     extern uint32_t c_frameBuffer[3][APP_IMG_HEIGHT*APP_IMG_WIDTH];

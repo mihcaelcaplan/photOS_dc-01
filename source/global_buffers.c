@@ -30,10 +30,34 @@ volatile uint32_t display_status = 0;// 0x0 = not ready, 0x1 = ready
 
 // void callbacks
 void camera_sof_callback(camera_buffer_manager_t* self){
+// //	 if empty buffer,
+// //	 detach
+// 	if(self->clean_buffer_sa== 00 && self->empty_buffer_sa != 0){
+// 		if(self->last_fb_i == 0){
+// 			CSI->DMASA_FB1 = self->empty_buffer_sa; //ideally repoint the last completed fb
+// 			self->clean_buffer_sa = self->dma_buffer0_sa; // clean -> dmaN
+// 			self->dma_buffer0_sa = self->empty_buffer_sa; // dmaN -> empty
+
+// 		}
+// 		else{
+// 			CSI->DMASA_FB2 = self->empty_buffer_sa; //ideally repoint the last completed fb
+// 			self->clean_buffer_sa = self->dma_buffer1_sa; // clean -> dmaN
+// 			self->dma_buffer1_sa = self->empty_buffer_sa; // dmaN -> empty
+
+// 		}
+// 		// rotate buffers
+// 		self->empty_buffer_sa = NULL; //no empty buffer until the clean one is drained
+// 		self->data_valid_sa = self->clean_buffer_sa;
+// 		*self->status |= 0x1;
+
+// 		__DSB();
+//	}
+}
+void camera_dmadone_callback(camera_buffer_manager_t* self, int fb_i){
 //	 if empty buffer,
 //	 detach
 	if(self->clean_buffer_sa== 00 && self->empty_buffer_sa != 0){
-		if(self->last_fb_i == 0){
+		if(self->last_fb_i == 1){
 			CSI->DMASA_FB1 = self->empty_buffer_sa; //ideally repoint the last completed fb
 			self->clean_buffer_sa = self->dma_buffer0_sa; // clean -> dmaN
 			self->dma_buffer0_sa = self->empty_buffer_sa; // dmaN -> empty
@@ -49,20 +73,18 @@ void camera_sof_callback(camera_buffer_manager_t* self){
 		self->empty_buffer_sa = NULL; //no empty buffer until the clean one is drained
 		self->data_valid_sa = self->clean_buffer_sa;
 		*self->status |= 0x1;
-
-		__DSB();
 	}
-}
-void camera_dmadone_callback(camera_buffer_manager_t* self, int fb_i){
-	//swap fb done to to empty (full?)
+	
+		//swap fb done to to empty (full?)
 	self->last_fb_i = fb_i;
 	__DSB();
 }
 
 void drain_valid(camera_buffer_manager_t* self){
 	if(self->data_valid_sa != 0){
-		self->data_valid_sa = 0;
+		self->empty_buffer_sa = self->clean_buffer_sa;
 		self->clean_buffer_sa = 0;
+		self->data_valid_sa = 0;
 		*self->status &= ~0x1;
 	}
 }
@@ -86,48 +108,49 @@ camera_buffer_manager_t camera_buffer_manager = {
 
 // define callbacks
 void display_vsync_callback(display_buffer_manager_t* self){
-	// if full unlocked buffer, send it to the display and lock it
-	uint32_t status = *self->status;
-
-	if(status & DISPLAY_BUFFER0_FULL && !(status & DISPLAY_BUFFER0_LOCK)){
-		*self->status |= DISPLAY_BUFFER0_LOCK;
-		LCDIF->NEXT_BUF = self->buffer0_sa;
-		
-	}
-	else if(status & DISPLAY_BUFFER1_FULL && !(status & DISPLAY_BUFFER1_LOCK)){
-		*self->status |= DISPLAY_BUFFER1_LOCK;
-		LCDIF->NEXT_BUF = self->buffer1_sa;
-	}
-
+//	// if full unlocked buffer, send it to the display and lock it
+//	uint32_t status = *self->status;
+//
+//	// try to unlock buffers
+//	if((LCDIF->CUR_BUF == self->buffer0_sa) && (status & DISPLAY_BUFFER0_LOCK)){
+//		*self->status &= ~DISPLAY_BUFFER0_LOCK;
+//		*self->status &= ~DISPLAY_BUFFER0_FULL;
+//	}
+//	else if((LCDIF->CUR_BUF == self->buffer1_sa) && (status & DISPLAY_BUFFER1_LOCK)){
+//		*self->status &= ~DISPLAY_BUFFER1_LOCK;
+//		*self->status &= ~DISPLAY_BUFFER1_FULL;
+//	}
+//
+//	// if empty buffer, make ready
+//	if(!(status & DISPLAY_BUFFER0_FULL)){
+//		// set framebuf ready for transfer address
+//		self->ready_sa = self->buffer0_sa;
+//
+//		// set ready for transfer
+//		*self->status |= 0x1;
+//	}
+//	else if(!(status & DISPLAY_BUFFER1_FULL)){
+//		self->ready_sa = self->buffer1_sa;
+//		*self->status |= 0x1;
+//	}
+//	else{
+//		*self->status &= ~0x1;
+//		self->ready_sa = NULL;
+//	}
 }
 void display_framedone_callback(display_buffer_manager_t* self){
-	 uint32_t status = *self->status;
-	// try to unlock buffers
-	if(LCDIF->CUR_BUF == self->buffer0_sa && status & DISPLAY_BUFFER0_LOCK){
-		status &= ~(DISPLAY_BUFFER0_LOCK);
-		status &= ~(DISPLAY_BUFFER0_FULL);
-	}
-	else if(LCDIF->CUR_BUF == self->buffer1_sa && status & DISPLAY_BUFFER1_LOCK){
-		status &= ~DISPLAY_BUFFER1_LOCK;
-		status &= ~DISPLAY_BUFFER1_FULL;
-	}
-	
-	// if empty buffer, make ready
-	if(!(status & DISPLAY_BUFFER0_FULL)){
-		// set framebuf ready for transfer address
-		self->ready_sa = self->buffer0_sa;
+//	 uint32_t status = *self->status;
+//
+//	if(status & DISPLAY_BUFFER0_FULL && !(status & DISPLAY_BUFFER0_LOCK)){
+//		*self->status |= DISPLAY_BUFFER0_LOCK;
+//		LCDIF->NEXT_BUF = self->buffer0_sa;
+//
+//	}
+//	else if(status & DISPLAY_BUFFER1_FULL && !(status & DISPLAY_BUFFER1_LOCK)){
+//		*self->status |= DISPLAY_BUFFER1_LOCK;
+//		LCDIF->NEXT_BUF = self->buffer1_sa;
+//	}
 
-		// set ready for transfer
-		*self->status |= 0x1;
-	}
-	else if(!(status & DISPLAY_BUFFER1_FULL)){
-		*self->status |= 0x1;
-		self->ready_sa = self->buffer1_sa;
-	}
-	else{
-		*self->status &= ~0x1;
-		self->ready_sa = NULL;
-	}
 }
 
 void fill_ready(display_buffer_manager_t* self){
@@ -136,10 +159,11 @@ void fill_ready(display_buffer_manager_t* self){
 		if(self->ready_sa == self->buffer0_sa){
 			*self->status |= DISPLAY_BUFFER0_FULL;
 			self->ready_sa = 0;
+			*self->status &= ~0x1;
 		}
 		else{
 			*self->status |= DISPLAY_BUFFER1_FULL;
-			self->ready_sa = 0;
+			*self->status &= ~0x1;
 		}
 	}
 }
