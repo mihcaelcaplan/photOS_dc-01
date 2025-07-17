@@ -183,15 +183,15 @@ void registerInit(void){
 	OV5640_I2CWrite8(0x300e, 0x58); //mipi off, DVP on (should be default)
 
 //set up image window constraints
-   OV5640_I2CWrite8(0x3800, 0x00 );// X start [11:8]
-   OV5640_I2CWrite8(0x3801, 0x00 );// X start [7:0]
-   OV5640_I2CWrite8(0x3802, 0x00 );// Y start [11:8]
-   OV5640_I2CWrite8(0x3803, 0x00 );// Y start [7:0]
+   OV5640_I2CWrite8(0x3800, 0x04 );// X start [11:8]
+   OV5640_I2CWrite8(0x3801, 0x2f );// X start [7:0]
+   OV5640_I2CWrite8(0x3802, 0x02 );// Y start [11:8]
+   OV5640_I2CWrite8(0x3803, 0xe0 );// Y start [7:0]
 
-   OV5640_I2CWrite8(0x3804, 0x02);// X end [11:8]
-   OV5640_I2CWrite8(0x3805, 0x00);// X end [7:0]
-   OV5640_I2CWrite8(0x3806, 0x1);// Y end [11:8]
-   OV5640_I2CWrite8(0x3807, 0xf0);// Y end [7:0]
+   OV5640_I2CWrite8(0x3804, 0x06);// X end [11:8] (start + width +offset)
+   OV5640_I2CWrite8(0x3805, 0x1f);// X end [7:0]
+   OV5640_I2CWrite8(0x3806, 0x4);// Y end [11:8] (start + width +offset)
+   OV5640_I2CWrite8(0x3807, 0xc4);// Y end [7:0]
 
 //    TODO: add in DVP output settings :) probably mirror the others
     OV5640_I2CWrite8(0x3808, 0x01); //DVP output horizontal width [11:8]
@@ -419,12 +419,13 @@ uint32_t videoPllFreq;
 	EnableIRQ(LCDIF_IRQn);
 //
 //	//add recover on underflow
-//	LCDIF->CTRL1_SET = LCDIF_CTRL1_RECOVER_ON_UNDERFLOW_MASK;
+	LCDIF->CTRL1_SET = LCDIF_CTRL1_RECOVER_ON_UNDERFLOW_MASK;
 
 //	 clk delay
 //	LCDIF->VDCTRL4 |= LCDIF_VDCTRL4_DOTCLK_DLY_SEL(3);
 
-// ignore the
+// make sure to set big endian swap so that RGB becomes BGR
+	LCDIF->CTRL_SET = LCDIF_CTRL_CLR_CSC_DATA_SWIZZLE(1);
 
 
 
@@ -435,6 +436,115 @@ uint32_t videoPllFreq;
 //
 }
 
+#define R_GAIN 256
+#define G_GAIN 256
+#define B_GAIN 256
+
+// diagonal whitebalance adjust
+int16_t wb_adjust[3][3] = {
+    {256, 0, 0},
+    {0, 0, 0},
+    {0, 0, 0}
+};
+
+int16_t blue_adjust[3][3] = {
+	{230,   0,  26},
+	{  0, 230,  26},
+	{  0,   0, 307}
+};
+
+const int16_t color_matrix[3][3] = {
+	    {256,   -12, -32},  // Red channel
+	    {  0, 200, -16},  // Green channel
+	    {  0,   -12, 205}   // Blue channel
+};
+
+
+//if 0s everwhere then its diagonal
+bool isDiagonal(int16_t matrix[3][3]) {
+    return (matrix[0][1] == 0 && matrix[0][2] == 0 &&
+            matrix[1][0] == 0 && matrix[1][2] == 0 &&
+            matrix[2][0] == 0 && matrix[2][1] == 0);
+}
+// apply a gain by right shifting, so a*b/2^8 = a*b/256 where b{1:256}, so a scaled by the fraction b/256
+void applyColorMatrix(uint8_t *r, uint8_t *g, uint8_t *b, int16_t matrix[3][3]) {
+	int16_t r_out, g_out, b_out;
+	if (isDiagonal(matrix)){
+		 r_out = (*r * matrix[0][0]) >> 8;
+		 g_out = (*g * matrix[1][1]) >> 8;
+		 b_out = (*b * matrix[2][2]) >> 8;
+	}
+	else{
+		 r_out = (matrix[0][0] * (*r) + matrix[0][1] * (*g) + matrix[0][2] * (*b)) >> 8;
+		 g_out = (matrix[1][0] * (*r) + matrix[1][1] * (*g) + matrix[1][2] * (*b)) >> 8;
+		 b_out = (matrix[2][0] * (*r) + matrix[2][1] * (*g) + matrix[2][2] * (*b)) >> 8;
+	}
+
+    *r = (r_out > 255) ? 255 : (r_out < 0) ? 0 : r_out;  // Clamp!
+    *g = (g_out > 255) ? 255 : (g_out < 0) ? 0 : g_out;
+    *b = (b_out > 255) ? 255 : (b_out < 0) ? 0 : b_out;
+}
+
+
+
+
+void interpolateForDisplay(uint8_t* source_buffer, uint8_t* dest_buffer){
+	uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+
+	for(int i=0; i < 480; i++){
+        for(int j=0; j < 480; j++){
+            int src_i = i*480 + j; // line number* line width + column number
+			
+			// border region
+			if( i == 0 || i == 480-1 || j == 0 || j == 480-1 ){
+				// leave them black haha
+			}
+			
+			// uint32_t pixel_value = source_buffer[src_i];
+			
+			// inner region
+			else if(i % 2 == 0) { // Even rows: BGBGBG...
+                if(j % 2 == 0) { // B pixel
+                    // estimate r and g
+					r = (source_buffer[src_i - 480 - 1]+ source_buffer[src_i - 480 + 1] + source_buffer[src_i + 480 - 1] + source_buffer[src_i + 480 + 1]) /4; 
+					g = (source_buffer[src_i - 480] + source_buffer[src_i + 480] + source_buffer[src_i - 1] + source_buffer[src_i + 1])/4;
+					b = source_buffer[src_i];
+                } else { // G pixel
+					// estimate r and b
+					r = (source_buffer[src_i - 480] + source_buffer[src_i + 480]) / 2;
+					b = (source_buffer[src_i - 1] + source_buffer[src_i + 1]) / 2;
+                    g = source_buffer[src_i];;
+                }
+            } else { // Odd rows: GRGRGR...
+                if(j % 2 == 0) { // G pixel
+					// estimate r and b
+					r = (source_buffer[src_i - 1] + source_buffer[src_i + 1]) / 2;
+					b = (source_buffer[src_i - 480] + source_buffer[src_i + 480]) / 2;
+                    g = source_buffer[src_i];;
+                } else { // R pixel
+					// estimate b and g
+					b = (source_buffer[src_i - 480 - 1]+ source_buffer[src_i - 480 + 1] + source_buffer[src_i + 480 - 1] + source_buffer[src_i + 480 + 1]) /4; 
+					g = (source_buffer[src_i - 480] + source_buffer[src_i + 480] + source_buffer[src_i - 1] + source_buffer[src_i + 1])/4;
+                    r = source_buffer[src_i];
+                }
+            }
+			
+			// assign out to 24bpp lcd buffer
+			int dst_i = i*480*3 + 3*j; // line number* line width*3 + column number*3
+			applyColorMatrix(&r, &g, &b, color_matrix);
+
+			dest_buffer[dst_i + 0] = r;
+            dest_buffer[dst_i + 1] = g;
+            dest_buffer[dst_i + 2] = b;
+			
+		}
+	}
+}
+
+
+// display raw data
 void processForDisplay(uint32_t* source_buffer, uint32_t* dest_buffer){
     // 3 byte per pixel packed format, 24 bpp
     // set processing flag with buffer num
@@ -677,7 +787,8 @@ void transfer_test(void){
 //			processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)display_buffer_manager.ready_sa);
 
 			int i  = c%2;
-			processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)s_frameBuffer[i]);
+			interpolateForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)s_frameBuffer[i]);
+//			processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)s_frameBuffer[i]);
 			if(pending_frame == false){
 //				LCDIF->NEXT_BUF = pending_frame_sa;
 				pending_frame_sa = (uint32_t)s_frameBuffer[i];
