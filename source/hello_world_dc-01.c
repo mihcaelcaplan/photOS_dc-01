@@ -35,6 +35,9 @@
 #include "display_interface.h"
 #include "utils.h"
 #include "camera_interface.h"
+#include "battery_interface.h"
+#include "state.h"
+
 
 /*
  * @brief   Application entry point.
@@ -54,22 +57,20 @@ int main(void) {
     MUX_ToUSBC();
     USB_DeviceApplicationInit();
     DISPLAY_Init(); // very minimal display function, basically reset pulse
+    BATTERY_Init(); // initialize battery monitoring
+    
 
     
     CAMERA_Init(); // right now doing the display control for camera live view
 
+    simpleDelay(1); //TODO: needed?
 
-    simpleDelay(1);
-//    camera_buffer_test();
-//     lcd_buffer_test();
-    transfer_test();
+//    transfer_test();
 
-     while(1) {
-////    	 __asm("nop");
-////     }
-//
-//     	SHELL_WaitForInput();
-    	 __NOP(); // don't use this in other waits, but lets debugger catch
+    STATE_Init(); //enter compose state
+
+    while(1) {
+        // enter the compose state and listen for events 
 
      }
     return 0 ;

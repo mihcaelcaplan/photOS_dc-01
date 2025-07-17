@@ -749,7 +749,7 @@ void lcd_buffer_test(void){
 }
 
 void transfer_test(void){
-	CSI->DMASA_FB1 = camera_buffer_manager.dma_buffer0_sa;
+		CSI->DMASA_FB1 = camera_buffer_manager.dma_buffer0_sa;
 		CSI->DMASA_FB2 = camera_buffer_manager.dma_buffer1_sa;
 
 	//	csi enable base address witch on

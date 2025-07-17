@@ -9,17 +9,17 @@
 #define BATTERY_INTERFACE_H_
 
 // 
-typdef enum {
-    CHARGED = 0x00,
-    CHARGING = 0x01,
-    LOW = 0x02,
-    TOO_LOW = 0x04,
+typedef enum {
+    CHARGED = 1,
+    CHARGING = 2,
+    LOW = 3,
+    TOO_LOW = 4,
 } battery_level_t;
 
 
 // these get actually defined in board/lcd_xxxx.c
 
 void BATTERY_Init(void);
-void BATTERY_Get_Level(void);
+battery_level_t BATTERY_Get_Level(void);
 
 #endif /* BATTERY_INTERFACE_H_ */
