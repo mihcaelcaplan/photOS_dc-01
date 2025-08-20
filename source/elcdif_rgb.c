@@ -143,30 +143,30 @@ void APP_LCDIF_IRQHandler(void)
     SDK_ISR_EXIT_BARRIER;
 }
 
-void APP_ELCDIF_Init(void)
-{
-    const elcdif_rgb_mode_config_t config = {
-        .panelWidth    = APP_IMG_WIDTH,
-        .panelHeight   = APP_IMG_HEIGHT,
-        .hsw           = APP_HSW,
-        .hfp           = APP_HFP,
-        .hbp           = APP_HBP,
-        .vsw           = APP_VSW,
-        .vfp           = APP_VFP,
-        .vbp           = APP_VBP,
-        .polarityFlags = APP_POL_FLAGS,
-        .bufferAddr    = (uint32_t)s_frameBuffer[0],
-        .pixelFormat   = kELCDIF_PixelFormatXRGB8888,
-        .dataBus       = APP_LCDIF_DATA_BUS,
-    };
+//void APP_ELCDIF_Init(void)
+//{
+//    const elcdif_rgb_mode_config_t config = {
+//        .panelWidth    = D_IMG_WIDTH,
+//        .panelHeight   = D_IMG_HEIGHT,
+//        .hsw           = APP_HSW,
+//        .hfp           = APP_HFP,
+//        .hbp           = APP_HBP,
+//        .vsw           = APP_VSW,
+//        .vfp           = APP_VFP,
+//        .vbp           = APP_VBP,
+//        .polarityFlags = APP_POL_FLAGS,
+//        .bufferAddr    = (uint32_t)s_frameBuffer[0],
+//        .pixelFormat   = kELCDIF_PixelFormatXRGB8888,
+//        .dataBus       = APP_LCDIF_DATA_BUS,
+//    };
+//
+//#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
+//    BOARD_InitDisplayInterface();
+//#endif
+//    ELCDIF_RgbModeInit(APP_ELCDIF, &config);
+//}
 
-#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
-    BOARD_InitDisplayInterface();
-#endif
-    ELCDIF_RgbModeInit(APP_ELCDIF, &config);
-}
-
-void APP_FillFrameBuffer(uint32_t frameBuffer[APP_IMG_HEIGHT][APP_IMG_WIDTH])
+void APP_FillFrameBuffer(uint32_t frameBuffer[D_IMG_HEIGHT][D_IMG_WIDTH])
 {
     /* Background color. */
     static const uint32_t bgColor = 0U;
@@ -179,8 +179,8 @@ void APP_FillFrameBuffer(uint32_t frameBuffer[APP_IMG_HEIGHT][APP_IMG_WIDTH])
     /* Position of the foreground rectangle. */
     static uint16_t upperLeftX  = 0U;
     static uint16_t upperLeftY  = 0U;
-    static uint16_t lowerRightX = (APP_IMG_WIDTH - 1U) / 2U;
-    static uint16_t lowerRightY = (APP_IMG_HEIGHT - 1U) / 2U;
+    static uint16_t lowerRightX = (D_IMG_WIDTH - 1U) / 2U;
+    static uint16_t lowerRightY = (D_IMG_HEIGHT - 1U) / 2U;
 
     static int8_t incX = 1;
     static int8_t incY = 1;
@@ -191,9 +191,9 @@ void APP_FillFrameBuffer(uint32_t frameBuffer[APP_IMG_HEIGHT][APP_IMG_WIDTH])
     uint32_t i, j;
 
     /* Background color. */
-    for (i = 0; i < APP_IMG_HEIGHT; i++)
+    for (i = 0; i < D_IMG_HEIGHT; i++)
     {
-        for (j = 0; j < APP_IMG_WIDTH; j++)
+        for (j = 0; j < D_IMG_WIDTH; j++)
         {
             frameBuffer[i][j] = bgColor;
         }
@@ -221,7 +221,7 @@ void APP_FillFrameBuffer(uint32_t frameBuffer[APP_IMG_HEIGHT][APP_IMG_WIDTH])
         incX        = 1;
         changeColor = true;
     }
-    else if (APP_IMG_WIDTH - 1 == lowerRightX)
+    else if (D_IMG_WIDTH - 1 == lowerRightX)
     {
         incX        = -1;
         changeColor = true;
@@ -232,7 +232,7 @@ void APP_FillFrameBuffer(uint32_t frameBuffer[APP_IMG_HEIGHT][APP_IMG_WIDTH])
         incY        = 1;
         changeColor = true;
     }
-    else if (APP_IMG_HEIGHT - 1 == lowerRightY)
+    else if (D_IMG_HEIGHT - 1 == lowerRightY)
     {
         incY        = -1;
         changeColor = true;

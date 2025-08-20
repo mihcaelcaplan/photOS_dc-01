@@ -103,8 +103,8 @@ static struct jpeg_error_mgr jerr;
 	    row_stride = APP_FB_STRIDE_BYTE;
 
 	    /* Place the output image to the center of the screen. */
-	    buffer += row_stride * ((APP_FB_HEIGHT - cinfo.output_height) / 2);
-	    buffer += APP_FB_BPP * ((APP_FB_WIDTH - cinfo.output_width) / 2);
+	    buffer += row_stride * ((D_IMG_HEIGHT - cinfo.output_height) / 2);
+	    buffer += APP_FB_BPP * ((D_IMG_WIDTH - cinfo.output_width) / 2);
 
 	    while (cinfo.output_scanline < cinfo.output_height)
 	    {
@@ -143,8 +143,8 @@ void jpeg_encode(uint8_t *buffer, FIL *file){
 
 	jpeg_mem_dest(&cinfo, &jpg_buffer, &jpg_size);
 
-	cinfo.image_width = APP_FB_WIDTH;
-	cinfo.image_height = APP_FB_HEIGHT;
+	cinfo.image_width = D_IMG_WIDTH;
+	cinfo.image_height = D_IMG_HEIGHT;
 	cinfo.input_components = APP_FB_BPP;
 	cinfo.in_color_space = JCS_RGB; // TODO: this may change from the camera
 

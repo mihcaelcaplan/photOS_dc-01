@@ -303,6 +303,20 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_WDOG_B_PERIPHERAL                                     CSI   /*!< Peripheral name */
 #define BOARD_INITPINS_WDOG_B_SIGNAL                                   csi_vsync   /*!< Signal name */
 
+/* WAKEUP (coord L6), SD_PWREN/USER_BUTTON/SW5 */
+/* Routed pin properties */
+#define BOARD_INITPINS_USER_BUTTON_PERIPHERAL                              GPIO5   /*!< Peripheral name */
+#define BOARD_INITPINS_USER_BUTTON_SIGNAL                                gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_USER_BUTTON_CHANNEL                                    0U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_USER_BUTTON_GPIO                                    GPIO5   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_USER_BUTTON_GPIO_PIN                                   0U   /*!< GPIO pin number */
+#define BOARD_INITPINS_USER_BUTTON_GPIO_PIN_MASK                      (1U << 0U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_USER_BUTTON_PORT                                    GPIO5   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_USER_BUTTON_PIN                                        0U   /*!< PORT pin number */
+#define BOARD_INITPINS_USER_BUTTON_PIN_MASK                           (1U << 0U)   /*!< PORT pin mask */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *

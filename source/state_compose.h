@@ -10,7 +10,7 @@
 
 #include "state.h"
 
-void STATE_Compose_Init(void);
-void STATE_Compose_Loop(void);
+void STATE_Compose_Enter(void);
+void STATE_Compose_Exit(void);
 
 #endif /* STATE_COMPOSE_H_ */

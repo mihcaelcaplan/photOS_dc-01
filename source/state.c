@@ -9,20 +9,21 @@
 #include "fsl_debug_console.h"
 #include "state_compose.h"
 #include "battery_interface.h"
+#include "storage_usb_device.h"
 
+// the idea here is that interrupt handlers add to the event queue, the event queue is parsed in the state management periodic function 
+// could be in the get_state that runs at each state while condition check
+// or could be in a tick interrupt for more deterministic response
+// then the queued events are translated into state change that the state transition manages by exiting current (if necessary) and entering the new state
+// each state is a loop, and they are transitioned between by events
+// battery gating may be at the event parsing level or at the state transition level, depending on timing
 
 static state_t current_state = COMPOSE;
 
 void STATE_Init(void) {
     current_state = COMPOSE;
     PRINTF("STATE: Initialized to COMPOSE\r\n");
-    if(BATTERY_Get_Level() < 4){
-        STATE_Compose_Loop();
-    }
-    else{
-        PRINTF("STATE: Battery level too low, connect to charger\r\n");
-    }
-
+        STATE_Compose_Enter();
 }
 
 void STATE_transition(state_t new_state) {
@@ -31,15 +32,21 @@ void STATE_transition(state_t new_state) {
     
     PRINTF("STATE: Transitioning from %d to %d\r\n", previous_state, new_state);
     
+    // exit handlers
+    switch (previous_state){
+        case TRANSFER: 
+            PRINTF("STATE: Leaving TRANSFER mode\r\n");
+            USB_DeviceAppStop();
+            break;
+        default:
+        	PRINTF("STATE: Leaving %d mode, no exit handler\r\n", previous_state);
+    }
+
+    // entrance handlers
     switch (new_state) {
         case COMPOSE:
             PRINTF("STATE: Entering COMPOSE mode\r\n");
-            if(BATTERY_Get_Level() < 4){
-                STATE_Compose_Loop();
-            }
-            else{
-                PRINTF("STATE: Battery level too low, connect to charger\r\n");
-            }
+            STATE_Compose_Enter();
             break;
         case ADJUST:
             // PRINTF("STATE: Entering ADJUST mode\r\n");
@@ -54,7 +61,8 @@ void STATE_transition(state_t new_state) {
             // PRINTF("STATE: Entering BROWSE mode\r\n");
             break;
         case TRANSFER:
-            // PRINTF("STATE: Entering TRANSFER mode\r\n");
+            PRINTF("STATE: Entering TRANSFER mode\r\n");
+            USB_DeviceAppStart();
             break;
         case STOW:
             // PRINTF("STATE: Entering STOW mode\r\n");
@@ -67,4 +75,55 @@ void STATE_transition(state_t new_state) {
 
 state_t STATE_get_current(void) {
     return current_state;
+}
+
+
+void STATE_Queue_Init(state_queue_t *queue){
+    memset(queue, 0, sizeof(state_queue_t));
+    queue->head = 0;
+    queue->tail = 0;
+    queue->count = 0;
+}
+
+bool STATE_Queue_Pop(state_queue_t *queue, state_t *state){
+    if (STATE_Queue_IsEmpty(queue)) {
+        return false;
+    }
+    
+    *state = queue->states[queue->head];
+    queue->head = (queue->head + 1) % STATE_QUEUE_SIZE;
+    queue->count--;
+    
+    return true;
+}
+
+bool STATE_Queue_Push(state_queue_t *queue, state_t state){
+     if (STATE_Queue_IsFull(queue)) {
+        return false;
+    }
+    
+   queue->states[queue->tail] = state;
+    
+    queue->tail = (queue->tail + 1) % STATE_QUEUE_SIZE;
+    queue->count++;
+    
+    return true;
+
+}
+bool STATE_Queue_IsEmpty(state_queue_t *queue){
+     return queue->count == 0;
+
+    }
+bool STATE_Queue_IsFull(state_queue_t *queue){
+    return queue->count >= STATE_QUEUE_SIZE;
+}
+
+uint8_t STATE_Queue_Count(state_queue_t *queue){
+    return queue->count;
+}
+
+void STATE_Queue_Clear(state_queue_t *queue){
+    queue->head = 0;
+    queue->tail = 0;
+    queue->count = 0;
 }

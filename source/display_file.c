@@ -37,29 +37,29 @@ AT_NONCACHEABLE_SECTION(static FIL jpgFil);
 
 /*Helpers*/
 
-void Browse_ELCDIF_Init(void)
-{
-    const elcdif_rgb_mode_config_t config = {
-        .panelWidth    = APP_IMG_WIDTH,
-        .panelHeight   = APP_IMG_HEIGHT,
-        .hsw           = APP_HSW,
-        .hfp           = APP_HFP,
-        .hbp           = APP_HBP,
-        .vsw           = APP_VSW,
-        .vfp           = APP_VFP,
-        .vbp           = APP_VBP,
-        .polarityFlags = APP_POL_FLAGS,
-        .bufferAddr    = (uint32_t)s_frameBuffer[0],
-        .pixelFormat   = kELCDIF_PixelFormatRGB888,
-        .dataBus       = kELCDIF_DataBus18Bit,
-    };
-
-#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
-    BOARD_InitDisplayInterface();
-#endif
-    ELCDIF_RgbModeInit(LCDIF, &config);
-
-}
+//void Browse_ELCDIF_Init(void)
+//{
+//    const elcdif_rgb_mode_config_t config = {
+//        .panelWidth    = D_IMG_WIDTH,
+//        .panelHeight   = D_IMG_HEIGHT,
+//        .hsw           = APP_HSW,
+//        .hfp           = APP_HFP,
+//        .hbp           = APP_HBP,
+//        .vsw           = APP_VSW,
+//        .vfp           = APP_VFP,
+//        .vbp           = APP_VBP,
+//        .polarityFlags = APP_POL_FLAGS,
+//        .bufferAddr    = (uint32_t)s_frameBuffer[0],
+//        .pixelFormat   = kELCDIF_PixelFormatRGB888,
+//        .dataBus       = kELCDIF_DataBus18Bit,
+//    };
+//
+//#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
+//    BOARD_InitDisplayInterface();
+//#endif
+//    ELCDIF_RgbModeInit(LCDIF, &config);
+//
+//}
 
 
 // mount the sd card as a file system
@@ -204,7 +204,7 @@ void BROWSE_storeFile(){
 			PRINTF("file write fail");
 		}
 	/* fill the frame buffer. */
-		fill_framebuffer_gradient(s_frameBuffer[0], APP_FB_WIDTH, APP_FB_HEIGHT);
+		fill_framebuffer_gradient(s_frameBuffer[0], D_IMG_WIDTH, D_IMG_HEIGHT);
 
 		jpeg_encode((void*)&s_frameBuffer[0], &jpgFil);
 

@@ -18,14 +18,7 @@
 
 
 #include "storage_usb_device.h"
-#include "usb_device_config.h"
-#include "usb.h"
-#include "usb_device.h"
-#include "usb_device_class.h"
-#include "usb_device_msc.h"
-#include "usb_device_ch9.h"
-#include "usb_device_descriptor.h"
-#include "usb_phy.h"
+
 
 #include "sdmmc_config.h"
 
@@ -37,7 +30,19 @@
 #include "camera_interface.h"
 #include "battery_interface.h"
 #include "state.h"
+#include "events.h"
+#include "timer.h"
 
+// state and event queues
+state_queue_t state_q;
+event_queue_t event_q;
+
+
+// set up button interrupts
+void GPIO5_Combined_0_15_DriverIRQHandler(void){
+    GPIO_PortClearInterruptFlags(GPIO5, 1U << 0);
+	STATE_Queue_Push(&state_q, TRANSFER);
+}
 
 /*
  * @brief   Application entry point.
@@ -53,25 +58,34 @@ int main(void) {
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
     /* Init FSL debug console. */
     BOARD_InitDebugConsole();
+    TIMER_Init();
+
+    BATTERY_Init(); // TODO: initialize battery monitoring
+    
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
-    MUX_ToUSBC();
+    // MUX_ToUSBC();
+    
     USB_DeviceApplicationInit();
     DISPLAY_Init(); // very minimal display function, basically reset pulse
-    BATTERY_Init(); // initialize battery monitoring
     
+    CAMERA_Init();
+
+    EVENT_Init(&event_q);
+    STATE_Queue_Init(&state_q);
+
+    // STATE_Queue_Push(&state_q, TRANSFER);
+
+
+        
+    STATE_Init(); //start the state machine
 
     
-    CAMERA_Init(); // right now doing the display control for camera live view
-
-    simpleDelay(1); //TODO: needed?
-
-//    transfer_test();
-
-    STATE_Init(); //enter compose state
-
-    while(1) {
-        // enter the compose state and listen for events 
-
-     }
+    // shouldn't get here but will let debugger hook
+    while(1){
+    	__NOP();
+    	uint32_t pending_irq = NVIC_GetPendingIRQ(GPIO5_Combined_0_15_IRQn);
+    }
+    // shouldn't get here but would love to know if it does
+    PRINTF("Somehow reached the return :'(\r\n");
     return 0 ;
 }
