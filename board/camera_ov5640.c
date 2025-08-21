@@ -22,6 +22,7 @@
 
 // counters for irqs to catch overfiring
 int lcdirqc = 0;
+int lcdirqbufchangec = 0;
 int csiirqc = 0;
 
 // only enable cur_frame_done
@@ -36,14 +37,24 @@ void LCDIF_IRQHandler(void){
 	uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
     LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK; //  clear all interrupt
 
-    //  if (flags & kELCDIF_VsyncEdge){}
+     if (flags & kELCDIF_VsyncEdge){
+		// if (lcdMailbox.full){
+		// 	LCDIF->NEXT_BUF = lcdMailbox.data;
+		// 	lcdMailbox.full = false;
+		// 	lcdMailbox.data = 0;
+			
+		// 	lcdirqbufchangec++;
+		// }
+	 }
 	 
 	if (flags & kELCDIF_CurFrameDone)
 	 {
 		if (lcdMailbox.full){
-			LCDIF->NEXT_BUF = lcdMailbox.data;
-			lcdMailbox.full = false;
-			lcdMailbox.data = 0;
+		LCDIF->NEXT_BUF = lcdMailbox.data;
+		lcdMailbox.full = false;
+		lcdMailbox.data = 0;
+		
+		lcdirqbufchangec++;
 		}
 	 }
 
@@ -440,11 +451,17 @@ void binAndInterpolateForDisplay(uint8_t* source_buffer, uint8_t* dest_buffer, z
 	int source_h = 1920;
 
 	// linear = rows*row_len + columns
-	int roi_linear_start_1 = 0; 				 // h = 1920, w = 1920 	-> 4:1
-	int roi_linear_start_2 = 480*source_w + 480; // h = 960,  w = 960 	-> 2:1
-	int roi_linear_start_3 = 720*source_w + 720; // h = 480,  w = 480  	-> 1:1
+//	int roi_linear_start_1 = 0; 				 // h = 1920, w = 1920 	-> 4:1
+//	int roi_linear_start_2 = 480*source_w + 480; // h = 960,  w = 960 	-> 2:1
+//	int roi_linear_start_3 = 720*source_w + 720; // h = 480,  w = 480  	-> 1:1
 
-	int width = 480;
+	int roi_linear_start_1 = 0;
+	int roi_linear_start_2 = 0;
+	int roi_linear_start_3 = 0;
+
+
+
+	int width = source_w;
 
 	// sweep over the output array for consistency
 	for(int i=0; i < 480; i++){
@@ -496,8 +513,8 @@ void binAndInterpolateForDisplay(uint8_t* source_buffer, uint8_t* dest_buffer, z
 		
 			// for full zoom, indexing as linear array:  start + row*row_width + col
 			else if(level == zoom_level_3){
-				int src_i = i*source_w + j; // line number* line width + column number
-				// int src_i = roi_linear_start_3 + i*source_w + j; // line number* line width + column number
+//				int src_i = i*source_w + j; // line number* line width + column number
+				 int src_i = roi_linear_start_3 + i*source_w + j; // line number* line width + column number
 				
 				// border region
 				if( i == 0 || i == 480-1 || j == 0 || j == 480-1 ){

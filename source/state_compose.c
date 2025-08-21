@@ -18,6 +18,7 @@
 #include "camera_ov5640.h"
 #include "utils.h"
 #include "timer.h"
+#include "image_processing.h"
 
 
 
@@ -46,23 +47,27 @@ void STATE_Compose_Enter(void) {
 		//	enable lcdif and interrupts
 		ELCDIF_RgbModeStart(LCDIF);
 		ELCDIF_EnableInterrupts(LCDIF, kELCDIF_VsyncEdgeInterruptEnable | kELCDIF_CurFrameDoneInterruptEnable); //seems like don't need vsync
-
-//		one shot run
 		GPIO_PinWrite(GPIO1, 9U, 1U); //display backlight enable
 
 		int c = 0;
 
 		CSI_Start(CSI);
 
-		// mark both display buffers ready
-		display_buffer_manager.buffer0_ready = true;
-		display_buffer_manager.buffer1_ready = true;
 
-		display_buffer_manager.ready_sa = display_buffer_manager.buffer0_sa;
+		// init image processing
+		#define ZOOM_LEVEL zoom_level_3
+		#define TILE_SIZE 48
 
+		demosaic_options_t db_options;
+		PROCESSING_MakeOptions(ZOOM_LEVEL, TILE_SIZE, &db_options);
 
 		while(1){
-	//		wait until camera recieves a frame
+//			wait until frameshown
+			while(lcdMailbox.full){
+				__NOP();
+			}
+
+	//		wait until camera receives a frame
 			while(!cameraMailbox.full){
 				__NOP();
 			}
@@ -70,30 +75,55 @@ void STATE_Compose_Enter(void) {
 //			reset mailbox
 			cameraMailbox.full = false;
 			cameraMailbox.data = 0;
-
-
-//			processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)display_buffer_manager.ready_sa);
-//			 processForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)s_frameBuffer[i]);
-//			 interpolateForDisplay((uint32_t*)camera_buffer_manager.data_valid_sa, (uint32_t*)s_frameBuffer[i]);
-			
 	
 			int i = c%2; //ping pong var for framebuffers
+
+			uint8_t* source_buf = c_frameBuffer[i];
+			uint8_t* processing_buf = p_frameBuffer;
+			uint8_t* dest_buf = s_frameBuffer[i];
 			
 //			get timer
 			int process_start = TIMER_GetCurrentUs();
 
-//			#define ZOOM_LEVEL zoom_level_3
-//			binAndInterpolateForDisplay(c_frameBuffer[i], s_frameBuffer[i], ZOOM_LEVEL);
-			
-			uint8_t* dest_buf = s_frameBuffer[i];
 
-			fill_framebuffer_gradient(dest_buf, 480, 480);
+//			binAndInterpolateForDisplay(c_frameBuffer[i], dest_buf, ZOOM_LEVEL);
+//			fill_framebuffer_gradient(dest_buf, 480, 480);
 
+			/* IMAGE PIPELINE*/
+
+			// debayer
+			PROCESSING_Debayer(source_buf, processing_buf, &db_options);
+
+			// downscale if necessary
+			if(ZOOM_LEVEL == zoom_level_1){
+				// downscale 1:4
+			}
+			if(ZOOM_LEVEL == zoom_level_2){
+				// downscale 1:2
+			}
+			if (ZOOM_LEVEL == zoom_level_3){
+				// copy directly (row by row)
+				int source_width = 1920;
+				int dest_width = 480;
+				int start_row = 720;
+				int start_col = 720;
+				for(int i = 0; i< D_IMG_HEIGHT; i++){
+					// start address + row_offset+i*width + col_offset
+//					uint8_t* copy_src = processing_buf +i*source_width*3;
+					uint8_t* copy_src = processing_buf + ((start_row + i)*source_width + start_col)*3;
+					// start address + row_offset
+					uint8_t* copy_dest = dest_buf + i*dest_width*3;
+
+					memcpy(copy_dest, copy_src, dest_width*3);
+				}
+			}
 			int processing_time = TIMER_GetCurrentUs() - process_start;
 			PRINTF("TIME processing:  %d uS\r\n", processing_time);
 
+
 			// fill lcd mailbox
 			lcdMailbox.data = (uint32_t)dest_buf;
+//			lcdMailbox.data= processing_buf + 720*1920 +720;
 			lcdMailbox.full = true;
 			
 

@@ -11,6 +11,8 @@
 
 #include "fsl_debug_console.h"
 
+#define APP_CACHE_LINE_SIZE 0
+
 
 /* This struct represents a JPEG error handler */
 static struct jpeg_error_mgr jerr;

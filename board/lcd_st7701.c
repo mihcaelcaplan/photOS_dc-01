@@ -57,7 +57,7 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x05 , DATA);
 
 //	ST7701_SPIWrite(0xC3, COMMAND); // set RGBCTL
-//	ST7701_SPIWrite(0x80, DATA); //HV mode = 0x80 de mode = 0x00
+	ST7701_SPIWrite(0x80, DATA); //HV mode = 0x80 de mode = 0x00
 
 	ST7701_SPIWrite(0xCD, COMMAND);
 	ST7701_SPIWrite(0x68, DATA);
