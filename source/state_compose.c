@@ -55,7 +55,7 @@ void STATE_Compose_Enter(void) {
 
 
 		// init image processing
-		#define ZOOM_LEVEL zoom_level_1
+		#define ZOOM_LEVEL zoom_level_3
 		#define TILE_SIZE 48
 
 		demosaic_options_t db_options;
@@ -92,7 +92,7 @@ void STATE_Compose_Enter(void) {
 			/* IMAGE PIPELINE*/
 
 			// debayer
-			PROCESSING_Debayer(source_buf, processing_buf, &db_options);
+			PROCESSING_DebayerLiveView(source_buf, processing_buf, &db_options);
 
 			// downscale if necessary
 			if(ZOOM_LEVEL == zoom_level_1){

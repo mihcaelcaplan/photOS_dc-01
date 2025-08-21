@@ -18,6 +18,7 @@ typedef struct {
 	uint32_t roi_height;
 	uint8_t tile_size;
 	uint32_t source_buffer_stride;
+	zoom_level_t zoom;
 } demosaic_options_t;
 
 void PROCESSING_MakeOptions(zoom_level_t zoom, uint8_t tile_size, demosaic_options_t* options);
@@ -26,6 +27,6 @@ void PROCESSING_Debayer(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_o
 
 void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b);
 
-
+void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_options_t* options);
 
 #endif /* IMAGE_PROCESSING_H_ */
