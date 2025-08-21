@@ -55,7 +55,7 @@ void STATE_Compose_Enter(void) {
 
 
 		// init image processing
-		#define ZOOM_LEVEL zoom_level_3
+		#define ZOOM_LEVEL zoom_level_1
 		#define TILE_SIZE 48
 
 		demosaic_options_t db_options;
@@ -96,10 +96,68 @@ void STATE_Compose_Enter(void) {
 
 			// downscale if necessary
 			if(ZOOM_LEVEL == zoom_level_1){
-				// downscale 1:4
+//				// downscale 1:4
+
+				int start_row = 0;
+				int start_col = 0;
+				// copy directly (row by row)
+				int source_width = 1920;
+				int dest_width = 480;
+				for(int i = 0; i< D_IMG_HEIGHT; i++){
+					// start address + row_offset+i*width + col_offset
+
+//					i*2 skips rows across the 960 high source
+					uint8_t* copy_src = processing_buf + ((start_row + i*4)* source_width + start_col)*3;
+
+//					copy in a line to the buffer
+					uint8_t* copy_processing =rowBuffer[0];
+					memcpy(copy_processing, copy_src, 1920*3);
+
+					uint8_t* dest_row = dest_buf+ i*dest_width*3;
+
+//					walk through the rowbuffer and condense
+					for(int j = 0; j<dest_width; j++){
+						int row_i = 4*j*3;
+						uint8_t* row_pixel = rowBuffer[0] + row_i;
+						uint8_t* dest = dest_row + j*3;
+
+						memcpy(dest, row_pixel, 3);
+
+					}
+				}
+
 			}
 			if(ZOOM_LEVEL == zoom_level_2){
 				// downscale 1:2
+				
+				int start_row = 480;
+				int start_col = 480;
+				// copy directly (row by row)
+				int source_width = 1920;
+				int dest_width = 480;
+				for(int i = 0; i< D_IMG_HEIGHT; i++){
+					// start address + row_offset+i*width + col_offset
+
+//					i*2 skips rows across the 960 high source
+					uint8_t* copy_src = processing_buf + ((start_row + i*2)* source_width + start_col)*3;
+
+//					copy in a line to the buffer
+					uint8_t* copy_processing =rowBuffer[0];
+					memcpy(copy_processing, copy_src, 960*3);
+
+					uint8_t* dest_row = dest_buf+ i*dest_width*3;
+
+//					walk through the rowbuffer and condense
+					for(int j = 0; j<dest_width; j++){
+						int row_i = 2*j*3;
+						uint8_t* row_pixel = rowBuffer[0] + row_i;
+						uint8_t* dest = dest_row + j*3;
+
+						memcpy(dest, row_pixel, 3);
+
+					}
+				}
+
 			}
 			if (ZOOM_LEVEL == zoom_level_3){
 				// copy directly (row by row)
@@ -110,7 +168,7 @@ void STATE_Compose_Enter(void) {
 				for(int i = 0; i< D_IMG_HEIGHT; i++){
 					// start address + row_offset+i*width + col_offset
 //					uint8_t* copy_src = processing_buf +i*source_width*3;
-					uint8_t* copy_src = processing_buf + ((start_row + i)*source_width + start_col)*3;
+					uint8_t* copy_src = processing_buf + ((start_row + i)* source_width + start_col)*3;
 					// start address + row_offset
 					uint8_t* copy_dest = dest_buf + i*dest_width*3;
 

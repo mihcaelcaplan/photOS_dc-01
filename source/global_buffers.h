@@ -26,6 +26,9 @@ extern uint8_t c_frameBuffer[3][C_IMG_HEIGHT*C_IMG_WIDTH];
 extern uint8_t p_frameBuffer[C_IMG_HEIGHT*C_IMG_WIDTH * APP_FB_BPP];
 extern uint8_t s_frameBuffer[2][D_IMG_HEIGHT*D_IMG_WIDTH * APP_FB_BPP];
 
+// external buffer for 3 rows for interpolation
+extern uint8_t rowBuffer[3][C_IMG_WIDTH];
+
     //need a camera buffer valid manager
     typedef struct {
         uint32_t dma_buffer0_sa;

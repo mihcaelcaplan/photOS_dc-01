@@ -29,6 +29,8 @@ AT_NONCACHEABLE_SECTION_ALIGN
 	FRAME_BUFFER_ALIGN
 );
 
+// row buffer
+	uint8_t rowBuffer[3][C_IMG_WIDTH] __attribute__((section(".data.$SRAM_OC")));
 
 // init the manager
 camera_buffer_manager_t camera_buffer_manager = {

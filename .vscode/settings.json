@@ -37,7 +37,12 @@
         "functional": "c",
         "memory": "c",
         "utility": "c",
-        "complex": "c"
+        "complex": "c",
+        "__config": "c",
+        "__string": "c",
+        "memory_resource": "c",
+        "new": "c",
+        "atomic": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
