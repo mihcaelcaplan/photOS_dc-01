@@ -159,8 +159,8 @@ void registerInit(void){
 
 // pixclk = mclk/root_div/pre-div)*multiply/sysclk divider
 // (24Mhz/2/4)*100/6 = 50Mhz  idek anymore
-    OV5640_I2CWrite8(0x3035, 0x41);  // [7:4] sysclk divider, [3:0] mipi divider
-    OV5640_I2CWrite8(0x3036, 0xF8);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
+    OV5640_I2CWrite8(0x3035, 0x21);  // [7:4] sysclk divider, [3:0] mipi divider
+    OV5640_I2CWrite8(0x3036, 0x64);  // multiplier (Can be any integer from 4~127 and only even integers from 128~252)
     OV5640_I2CWrite8(0x3037, 0x11);  // [4] root divider (1 = root/2), [3:0] pre-divider (1,2,3,4,6,8)
 
 	OV5640_I2CWrite8(0x3108, 0x16); //set system dividers

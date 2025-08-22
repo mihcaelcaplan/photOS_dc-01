@@ -46,7 +46,7 @@ event_queue_t event_q;
         kGPIO_IntRisingEdge,
     };
 
-void GPIO5_Combined_0_15_DriverIRQHandler(void){
+void GPIO5_Combined_0_15_IRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO5, 1U << 0);
 	STATE_Queue_Push(&state_q, TRANSFER);
 	SDK_ISR_EXIT_BARRIER;
