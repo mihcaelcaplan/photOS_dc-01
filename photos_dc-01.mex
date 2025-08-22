@@ -338,12 +338,7 @@
                   <pin peripheral="CSI" signal="csi_data, 04" pin_num="H11" pin_signal="GPIO_AD_B1_13"/>
                   <pin peripheral="CSI" signal="csi_data, 02" pin_num="J14" pin_signal="GPIO_AD_B1_15"/>
                   <pin peripheral="CSI" signal="csi_vsync" pin_num="D14" pin_signal="GPIO_B1_13"/>
-                  <pin peripheral="GPIO5" signal="gpio_io, 00" pin_num="L6" pin_signal="WAKEUP">
-                     <pin_features>
-                        <pin_feature name="identifier" value="USER_BUTTON"/>
-                        <pin_feature name="software_input_on" value="Disable"/>
-                     </pin_features>
-                  </pin>
+                  <pin peripheral="GPIO5" signal="gpio_io, 00" pin_num="L6" pin_signal="WAKEUP"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">

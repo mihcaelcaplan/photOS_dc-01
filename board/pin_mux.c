@@ -288,7 +288,7 @@ BOARD_InitPins:
   - {pin_num: H11, peripheral: CSI, signal: 'csi_data, 04', pin_signal: GPIO_AD_B1_13}
   - {pin_num: J14, peripheral: CSI, signal: 'csi_data, 02', pin_signal: GPIO_AD_B1_15}
   - {pin_num: D14, peripheral: CSI, signal: csi_vsync, pin_signal: GPIO_B1_13}
-  - {pin_num: L6, peripheral: GPIO5, signal: 'gpio_io, 00', pin_signal: WAKEUP, identifier: USER_BUTTON, software_input_on: Disable}
+  - {pin_num: L6, peripheral: GPIO5, signal: 'gpio_io, 00', pin_signal: WAKEUP}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 

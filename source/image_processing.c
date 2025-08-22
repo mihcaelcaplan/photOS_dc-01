@@ -186,57 +186,93 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 	// for 480x480 dest buf, will be < 1920, +=8 at zoom level 1
 	// 960 +=4 at zoom_level 2
 	// 480 +=1 at zoom_level 3
-	for( int pixel_row = 0 ; pixel_row < roi_height; pixel_row++ ){
 
+	int dest_width = 480;
+	int dest_height = 480;
+
+	int row_num = 1;
+	int offset_step = 1;
+
+	switch(zoom){
+		case zoom_level_1: 
+			row_num = 2;
+			offset_step = 8;
+			break;
+		case zoom_level_2: 
+			row_num = 2;
+			offset_step = 4;
+			break;
+		case zoom_level_3: 
+		// default 1,1
+			break;
+		default:
+			break;
+	};
+
+	// will get 2 adjacent rows for scaling down to live view at larger input sizes
+	int dest_row_c = 0;
+	
+	for( int pixel_row = 0 ; pixel_row < dest_width/row_num; pixel_row++ ){
+		
+		int dest_col_c = 0;
 		// get row indices
-		int row_i = start_row + pixel_row; //absolute row index
+		for(int inner_row = 0; inner_row < row_num; inner_row++){
+			int row_i = start_row + pixel_row*offset_step + inner_row; //absolute row index
+			
+			int row_above_i = clampi(row_i + 1, 0, 1919);
+			int row_below_i = clampi(row_i - 1, 0, 1919);
+			
+			// get row pointers
+			uint8_t* row = source_buffer + row_i * source_buffer_stride;
+			uint8_t* row_above = source_buffer + row_above_i * source_buffer_stride;
+			uint8_t* row_below = source_buffer + row_below_i * source_buffer_stride;
 
-		int row_above_i = clampi(row_i + 1, 0, 1919);
-		int row_below_i = clampi(row_i - 1, 0, 1919);
-		
-		// get row pointers
-		uint8_t* row = source_buffer + row_i * source_buffer_stride;
-		uint8_t* row_above = source_buffer + row_above_i * source_buffer_stride;
-		uint8_t* row_below = source_buffer + row_below_i * source_buffer_stride;
+			//copy to row-processing buffer (only copy roi width)
+			if(pixel_row == 0){
+				// get all buffers
+				memcpy(buffered_row[2], row_above + start_col, roi_width);
+				memcpy(buffered_row[1], row + start_col, roi_width);
+				memcpy(buffered_row[0], row_below + start_col, roi_width);
+			}
+			else{
+				// rotate and get 1 buf
+				uint8_t* temp = buffered_row[0];
+				buffered_row[0] = buffered_row[1]; //center to bottom
+				buffered_row[1] = buffered_row[2]; //top to center
+				buffered_row[2] = temp;
+	//
+				memcpy(buffered_row[2], row_above + start_col, roi_width);
+			}
+			
+			
+			for( int pixel_col = 0; pixel_col < dest_height/row_num; pixel_col++ ){
+				// inner loop
+				
+				for (int inner_col = 0; inner_col < row_num; inner_col++){
+					
+					int col_i = pixel_col*offset_step + inner_row;
+					// no offset needed because copied rows always start at 0
+					// declare output pixel values
+					uint8_t r,g,b;
+					
+					// process and set rgb
+					processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
+					
+					// write to processing buffer - downsampling will happen later
+					// write as packed rgb888
+					uint8_t* out_row = dest_buffer + dest_row_c * dest_width * 3; //row_i has start col baked in TODO: this should be dest_buffer_stride (the same)
+					uint8_t* out_px = out_row + (dest_col_c * 3);
+					
+					out_px[0] = r;
+					out_px[1] = g;
+					out_px[2] = b;
 
-		//copy to row-processing buffer (only copy roi width)
-		if(pixel_row == 0){
-			// get all buffers
-			memcpy(buffered_row[2], row_above + start_col, roi_width);
-			memcpy(buffered_row[1], row + start_col, roi_width);
-			memcpy(buffered_row[0], row_below + start_col, roi_width);
-		}
-		else{
-			// rotate and get 1 buf
-			uint8_t* temp = buffered_row[0];
-			buffered_row[0] = buffered_row[1]; //center to bottom
-			buffered_row[1] = buffered_row[2]; //top to center
-			buffered_row[2] = temp;
-//
-			memcpy(buffered_row[2], row_above + start_col, roi_width);
-		}
-		
-
-		
-		for( int pixel_col = 0; pixel_col < roi_width; pixel_col++ ){
-			// inner loop
-			
-			// no offset needed because copied rows always start at 0
-			int col_i = pixel_col;
-			
-			// declare output pixel values
-			uint8_t r,g,b;
-			
-			// process and set rgb
-			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
-			
-			// write to processing buffer - downsampling will happen later
-			// write as packed rgb888
-			uint8_t* out_row = dest_buffer + row_i * source_buffer_stride * 3; //row_i has start col baked in TODO: this should be dest_buffer_stride (the same)
-			uint8_t* out_px = out_row + (start_col + col_i ) * 3;
-			out_px[0] = r;
-			out_px[1] = g;
-			out_px[2] = b;
+					// increment dest_col_counter
+					dest_col_c++;
+				}
+			}
+			// increment dest_row_counter
+			dest_row_c++;
 		}
 	}
 

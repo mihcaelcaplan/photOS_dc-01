@@ -39,10 +39,19 @@ event_queue_t event_q;
 
 
 // set up button interrupts
+/* Define the init structure for the input switch pin */
+    gpio_pin_config_t sw_config = {
+        kGPIO_DigitalInput,
+        0,
+        kGPIO_IntRisingEdge,
+    };
+
 void GPIO5_Combined_0_15_DriverIRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO5, 1U << 0);
 	STATE_Queue_Push(&state_q, TRANSFER);
+	SDK_ISR_EXIT_BARRIER;
 }
+
 
 /*
  * @brief   Application entry point.
@@ -55,19 +64,19 @@ int main(void) {
     MUX_Init();
     BOARD_InitBootClocks();
     BOARD_InitBootPeripherals();
-    BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
+//    BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
     /* Init FSL debug console. */
     BOARD_InitDebugConsole();
     TIMER_Init();
 
-    BATTERY_Init(); // TODO: initialize battery monitoring
+//    BATTERY_Init(); // TODO: initialize battery monitoring
     
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
     // MUX_ToUSBC();
     
-    USB_DeviceApplicationInit();
+//    USB_DeviceApplicationInit();
     DISPLAY_Init(); // very minimal display function, basically reset pulse
-    
+//
     CAMERA_Init();
 
     EVENT_Init(&event_q);
@@ -75,15 +84,24 @@ int main(void) {
 
     // STATE_Queue_Push(&state_q, TRANSFER);
 
+	/* Enable GPIO pin interrupt */
+    GPIO_PinInit(GPIO5, 0, &sw_config);
+    GPIO_PortEnableInterrupts(GPIO5, 1U << 0);
 
-        
+    EnableIRQ(GPIO5_Combined_0_15_IRQn);
+    
     STATE_Init(); //start the state machine
 
     
     // shouldn't get here but will let debugger hook
     while(1){
+//    	if (1 == GPIO_PinRead(GPIO5, 0)){
+//    		PRINTF("SW: hi");
+//    	}
+//    	else PRINTF("SW: lo");
+//    	simpleDelay(150);
+
     	__NOP();
-    	uint32_t pending_irq = NVIC_GetPendingIRQ(GPIO5_Combined_0_15_IRQn);
     }
     // shouldn't get here but would love to know if it does
     PRINTF("Somehow reached the return :'(\r\n");
