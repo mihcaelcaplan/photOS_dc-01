@@ -29,7 +29,9 @@ typedef enum _state {
 // declarations
 void STATE_Init(void);
 
-void STATE_transition(state_t new_state);
+void STATE_transition(void);
+
+void STATE_set_current(state_t new_state);
 
 // state queue functions
 #define STATE_QUEUE_SIZE 16

@@ -20,7 +20,7 @@
 #include "fsl_sdio.h"
 #endif
 #include "clock_config.h"
-#include "fsl_adapter_gpio.h"
+//#include "fsl_adapter_gpio.h"s
 #include "fsl_sdmmc_host.h"
 #include "fsl_sdmmc_common.h"
 
@@ -38,7 +38,7 @@
 #define BOARD_SDMMC_SD_CD_GPIO_BASE      GPIO2
 #define BOARD_SDMMC_SD_CD_GPIO_PORT      2
 #define BOARD_SDMMC_SD_CD_GPIO_PIN       28U
-#define BOARD_SDMMC_SD_CD_INTTERUPT_TYPE kHAL_GpioInterruptEitherEdge
+//#define BOARD_SDMMC_SD_CD_INTTERUPT_TYPE kHAL_GpioInterruptEitherEdge
 #define BOARD_SDMMC_SD_CD_INSERT_LEVEL   (0U)
 /* @brief card detect type
  *

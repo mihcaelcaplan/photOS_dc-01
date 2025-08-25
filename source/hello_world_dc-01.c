@@ -46,9 +46,12 @@ event_queue_t event_q;
         kGPIO_IntRisingEdge,
     };
 
+int zoom_c = 0;
+
 void GPIO5_Combined_0_15_IRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO5, 1U << 0);
-	STATE_Queue_Push(&state_q, TRANSFER);
+    // set state flag 
+    STATE_set_current(CAPTURE);
 	SDK_ISR_EXIT_BARRIER;
 }
 
@@ -94,6 +97,7 @@ int main(void) {
 
     
     // shouldn't get here but will let debugger hook
+    PRINTF("IDLE... \r\n");
     while(1){
 //    	if (1 == GPIO_PinRead(GPIO5, 0)){
 //    		PRINTF("SW: hi");

@@ -25,8 +25,6 @@
 void STATE_Compose_Enter(void) {
     PRINTF("COMPOSE: Entering compose loop\r\n");
     
-    while (STATE_get_current() == COMPOSE) {
-
         CSI->DMASA_FB1 = camera_buffer_manager.dma_buffer0_sa;
 		CSI->DMASA_FB2 = camera_buffer_manager.dma_buffer1_sa;
 
@@ -55,13 +53,13 @@ void STATE_Compose_Enter(void) {
 
 
 		// init image processing
-		#define ZOOM_LEVEL zoom_level_2
+		#define ZOOM_LEVEL zoom_level_3
 		#define TILE_SIZE 48
 
 		demosaic_options_t db_options;
 		PROCESSING_MakeOptions(ZOOM_LEVEL, TILE_SIZE, &db_options);
 
-		while(1){
+		while (STATE_get_current() == COMPOSE) {
 //			wait until frameshown
 			while(lcdMailbox.full){
 				__NOP();
@@ -91,7 +89,7 @@ void STATE_Compose_Enter(void) {
 			PROCESSING_DebayerLiveView(source_buf, dest_buf, &db_options);
 
 			int processing_time = TIMER_GetCurrentUs() - process_start;
-			PRINTF("TIME processing:  %d uS\r\n", processing_time);
+//			PRINTF("TIME processing:  %d uS\r\n", processing_time);
 
 
 			// fill lcd mailbox
@@ -100,12 +98,11 @@ void STATE_Compose_Enter(void) {
 			
 
 			c++;
+			__WFI(); // Wait for interrupt
 		}
 
    
-        
-        __WFI(); // Wait for interrupt
-    }
-    
     PRINTF("COMPOSE: Exiting compose loop\r\n");
+	// TODO: branch to new state
+    STATE_transition();
 }

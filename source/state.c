@@ -19,63 +19,80 @@
 // battery gating may be at the event parsing level or at the state transition level, depending on timing
 
 static state_t current_state = COMPOSE;
+state_t last_state = 0;
 
+// set up the initial state
 void STATE_Init(void) {
+    // TODO: refactor to set_current_state -> state_transition flow
     current_state = COMPOSE;
     PRINTF("STATE: Initialized to COMPOSE\r\n");
         STATE_Compose_Enter();
 }
 
-void STATE_transition(state_t new_state) {
-    state_t previous_state = current_state;
-    current_state = new_state;
-    
-    PRINTF("STATE: Transitioning from %d to %d\r\n", previous_state, new_state);
-    
-    // exit handlers
-    switch (previous_state){
-        case TRANSFER: 
-            PRINTF("STATE: Leaving TRANSFER mode\r\n");
-            USB_DeviceAppStop();
-            break;
-        default:
-        	PRINTF("STATE: Leaving %d mode, no exit handler\r\n", previous_state);
-    }
+// goes after the state checking while loop in inner state
 
-    // entrance handlers
-    switch (new_state) {
-        case COMPOSE:
-            PRINTF("STATE: Entering COMPOSE mode\r\n");
-            STATE_Compose_Enter();
-            break;
-        case ADJUST:
-            // PRINTF("STATE: Entering ADJUST mode\r\n");
-            break;
-        case CAPTURE:
-            // PRINTF("STATE: Entering CAPTURE mode\r\n");
-            break;
-        case REVIEW:
-            // PRINTF("STATE: Entering REVIEW mode\r\n");
-            break;
-        case BROWSE:
-            // PRINTF("STATE: Entering BROWSE mode\r\n");
-            break;
-        case TRANSFER:
-            PRINTF("STATE: Entering TRANSFER mode\r\n");
-            USB_DeviceAppStart();
-            break;
-        case STOW:
-            // PRINTF("STATE: Entering STOW mode\r\n");
-            break;
-        default:
-            // PRINTF("STATE: Unknown state %d\r\n", new_state);
-            break;
-    }
+void STATE_transition() {
+
+    if (last_state != current_state){
+        PRINTF("STATE: Transitioning from %d to %d\r\n", last_state, current_state);
+        
+        // exit handlers
+        switch (last_state){
+            case TRANSFER: 
+                PRINTF("STATE: Leaving TRANSFER mode\r\n");
+                USB_DeviceAppStop();
+                break;
+            default:
+                PRINTF("STATE: Leaving %d mode, no exit handler\r\n", last_state);
+        }
+
+        // entrance handlers
+        switch (current_state) {
+            case COMPOSE:
+                PRINTF("STATE: Entering COMPOSE mode\r\n");
+                STATE_Compose_Enter();
+                break;
+            case ADJUST:
+                // PRINTF("STATE: Entering ADJUST mode\r\n");
+                break;
+            case CAPTURE:
+                PRINTF("STATE: Entering CAPTURE mode\r\n");
+                STATE_Capture_Enter();
+                break;
+            case REVIEW:
+                // PRINTF("STATE: Entering REVIEW mode\r\n");
+                break;
+            case BROWSE:
+                // PRINTF("STATE: Entering BROWSE mode\r\n");
+                break;
+            case TRANSFER:
+                PRINTF("STATE: Entering TRANSFER mode\r\n");
+                USB_DeviceAppStart();
+                break;
+            case STOW:
+                // PRINTF("STATE: Entering STOW mode\r\n");
+                break;
+            default:
+                // PRINTF("STATE: Unknown state %d\r\n", new_state);
+                break;
+        }
+}
 }
 
 state_t STATE_get_current(void) {
     return current_state;
 }
+
+
+void STATE_set_current(state_t new_state){
+    // push states down
+	if(!(new_state == current_state)){
+		last_state = current_state;
+		current_state = new_state;
+	}
+
+}
+
 
 
 void STATE_Queue_Init(state_queue_t *queue){

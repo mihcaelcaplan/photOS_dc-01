@@ -42,7 +42,11 @@
         "__string": "c",
         "memory_resource": "c",
         "new": "c",
-        "atomic": "c"
+        "atomic": "c",
+        "bitset": "c",
+        "format": "c",
+        "state_compose.h": "c",
+        "cstdint": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
