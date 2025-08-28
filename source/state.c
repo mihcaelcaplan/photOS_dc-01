@@ -67,7 +67,8 @@ void STATE_transition() {
                 break;
             case TRANSFER:
                 PRINTF("STATE: Entering TRANSFER mode\r\n");
-                USB_DeviceAppStart();
+                // 
+                // USB_DeviceAppStart();
                 break;
             case STOW:
                 // PRINTF("STATE: Entering STOW mode\r\n");

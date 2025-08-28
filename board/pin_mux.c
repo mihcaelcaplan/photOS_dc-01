@@ -87,7 +87,7 @@ pin_labels:
 - {pin_num: D13, pin_signal: GPIO_B1_12, label: 'SD_CD_SW/SD_CD_SW/J22[9]', identifier: SD_CD_SW}
 - {pin_num: D14, pin_signal: GPIO_B1_13, label: 'WDOG_B/WDOG_B/U27[3]', identifier: WDOG_B}
 - {pin_num: C14, pin_signal: GPIO_B1_14, label: MUX_S/SD0_VSELECT, identifier: MUX_S;SD0_VSELECT}
-- {pin_num: B14, pin_signal: GPIO_B1_15, label: 'USB_HOST_PWR/BACKLIGHT_CTL/USB_HOST_PWR/U28[A1]/BACKLIGHT_CTL/U14[4]', identifier: BACKLIGHT_CTL}
+- {pin_num: B14, pin_signal: GPIO_B1_15, label: BATT_PMIC_INT, identifier: BACKLIGHT_CTL;BATT_PMIC_INT}
 - {pin_num: E9, pin_signal: NVCC_GPIO0, label: DCDC_3V3/NVCC_GPIO_3V3}
 - {pin_num: F10, pin_signal: NVCC_GPIO1, label: DCDC_3V3/NVCC_GPIO_3V3}
 - {pin_num: J10, pin_signal: NVCC_GPIO2, label: DCDC_3V3/NVCC_GPIO_3V3}
@@ -289,6 +289,8 @@ BOARD_InitPins:
   - {pin_num: J14, peripheral: CSI, signal: 'csi_data, 02', pin_signal: GPIO_AD_B1_15}
   - {pin_num: D14, peripheral: CSI, signal: csi_vsync, pin_signal: GPIO_B1_13}
   - {pin_num: L6, peripheral: GPIO5, signal: 'gpio_io, 00', pin_signal: WAKEUP}
+  - {pin_num: B14, peripheral: GPIO2, signal: 'gpio_io, 31', pin_signal: GPIO_B1_15, identifier: BATT_PMIC_INT, pull_up_down_config: Pull_Up_100K_Ohm, pull_keeper_select: Pull,
+    drive_strength: R0_4}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -347,6 +349,7 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_12_USDHC1_CD_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_13_CSI_VSYNC, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_GPIO2_IO30, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0, 0U); 
@@ -364,6 +367,7 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL, 0x18B0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA, 0x18B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0xB0A0U); 
 }
 
 /*

@@ -46,7 +46,10 @@
         "bitset": "c",
         "format": "c",
         "state_compose.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "image_processing.h": "c",
+        "fsl_elcdif.h": "c",
+        "stdint.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

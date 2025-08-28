@@ -29,13 +29,17 @@ AT_NONCACHEABLE_SECTION_ALIGN
 	FRAME_BUFFER_ALIGN
 );
 
-// row buffer
+// row buffers for debayer
 	uint8_t rowBuffer[3][C_IMG_WIDTH] __attribute__((section(".data.$SRAM_OC")));
+
+// row buffer for jpeg scanline output
+	uint8_t scanlineBuffer[C_IMG_WIDTH*APP_FB_BPP] __attribute__((section(".data.$SRAM_OC")));
 
 // init the manager
 camera_buffer_manager_t camera_buffer_manager = {
 	.dma_buffer0_sa = &c_frameBuffer[0],
 	.dma_buffer1_sa = &c_frameBuffer[1],
+	.procesing_buffer_sa = &c_frameBuffer[2],
 };
 
 // init the manager

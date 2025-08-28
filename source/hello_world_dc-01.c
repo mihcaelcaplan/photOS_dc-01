@@ -64,35 +64,33 @@ int main(void) {
     /* Init board hardware. */
     BOARD_ConfigMPU();
     BOARD_InitBootPins();
-    MUX_Init();
     BOARD_InitBootClocks();
     BOARD_InitBootPeripherals();
-//    BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
-    /* Init FSL debug console. */
     BOARD_InitDebugConsole();
     TIMER_Init();
-
-//    BATTERY_Init(); // TODO: initialize battery monitoring
+    
+    // set up pmic
+    MUX_Init(); //switch mux to pmic
+    BATTERY_Init(); // turn on dp/dm detection
+    // 
+    MUX_ToUSBC();
+    BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
+    USB_DeviceApplicationInit();
     
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
-    // MUX_ToUSBC();
     
-//    USB_DeviceApplicationInit();
     DISPLAY_Init(); // very minimal display function, basically reset pulse
 //
     CAMERA_Init();
-
-    EVENT_Init(&event_q);
-    STATE_Queue_Init(&state_q);
-
-    // STATE_Queue_Push(&state_q, TRANSFER);
-
-	/* Enable GPIO pin interrupt */
+	
+    /* Enable GPIO pin interrupt */
     GPIO_PinInit(GPIO5, 0, &sw_config);
     GPIO_PortEnableInterrupts(GPIO5, 1U << 0);
 
     EnableIRQ(GPIO5_Combined_0_15_IRQn);
     
+    
+    USB_DeviceAppStart();
     STATE_Init(); //start the state machine
 
     

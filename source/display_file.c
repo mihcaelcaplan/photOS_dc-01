@@ -63,7 +63,7 @@ AT_NONCACHEABLE_SECTION(static FIL jpgFil);
 
 
 // mount the sd card as a file system
-static int MOUNT_SDCard(void)
+int MOUNT_SDCard(void)
 {
     FRESULT error;
     const TCHAR driverName[3U] = {SDDISK + '0', ':', '/'};
@@ -108,15 +108,15 @@ static int MOUNT_SDCard(void)
     }
 
 
-    // Open file to check
-    error = f_open(&jpgFil, TEST_PHOTO, FA_OPEN_EXISTING);
-    if (error != FR_OK)
-    {
-        PRINTF("No demo jpeg file!\r\n");
-        return -4;
-    }
-
-    f_close(&jpgFil);
+//    // Open file to check
+//    error = f_open(&jpgFil, TEST_PHOTO, FA_OPEN_EXISTING);
+//    if (error != FR_OK)
+//    {
+//        PRINTF("No demo jpeg file!\r\n");
+//        return -4;
+//    }
+//
+//    f_close(&jpgFil);
 
     return 0;
 }

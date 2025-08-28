@@ -102,7 +102,7 @@
                <pin_label pin_num="D13" pin_signal="GPIO_B1_12" label="SD_CD_SW/SD_CD_SW/J22[9]" identifier="SD_CD_SW"/>
                <pin_label pin_num="D14" pin_signal="GPIO_B1_13" label="WDOG_B/WDOG_B/U27[3]" identifier="WDOG_B"/>
                <pin_label pin_num="C14" pin_signal="GPIO_B1_14" label="MUX_S/SD0_VSELECT" identifier="MUX_S;SD0_VSELECT"/>
-               <pin_label pin_num="B14" pin_signal="GPIO_B1_15" label="USB_HOST_PWR/BACKLIGHT_CTL/USB_HOST_PWR/U28[A1]/BACKLIGHT_CTL/U14[4]" identifier="BACKLIGHT_CTL"/>
+               <pin_label pin_num="B14" pin_signal="GPIO_B1_15" label="BATT_PMIC_INT" identifier="BACKLIGHT_CTL;BATT_PMIC_INT"/>
                <pin_label pin_num="E9" pin_signal="NVCC_GPIO0" label="DCDC_3V3/NVCC_GPIO_3V3"/>
                <pin_label pin_num="F10" pin_signal="NVCC_GPIO1" label="DCDC_3V3/NVCC_GPIO_3V3"/>
                <pin_label pin_num="J10" pin_signal="NVCC_GPIO2" label="DCDC_3V3/NVCC_GPIO_3V3"/>
@@ -339,6 +339,14 @@
                   <pin peripheral="CSI" signal="csi_data, 02" pin_num="J14" pin_signal="GPIO_AD_B1_15"/>
                   <pin peripheral="CSI" signal="csi_vsync" pin_num="D14" pin_signal="GPIO_B1_13"/>
                   <pin peripheral="GPIO5" signal="gpio_io, 00" pin_num="L6" pin_signal="WAKEUP"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 31" pin_num="B14" pin_signal="GPIO_B1_15">
+                     <pin_features>
+                        <pin_feature name="identifier" value="BATT_PMIC_INT"/>
+                        <pin_feature name="pull_up_down_config" value="Pull_Up_100K_Ohm"/>
+                        <pin_feature name="pull_keeper_select" value="Pull"/>
+                        <pin_feature name="drive_strength" value="R0_4"/>
+                     </pin_features>
+                  </pin>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">

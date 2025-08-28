@@ -53,11 +53,11 @@ void STATE_Compose_Enter(void) {
 
 
 		// init image processing
-		#define ZOOM_LEVEL zoom_level_3
-		#define TILE_SIZE 48
+		#define ZOOM_LEVEL zoom_level_2
+//		#define TILE_SIZE 48
 
 		demosaic_options_t db_options;
-		PROCESSING_MakeOptions(ZOOM_LEVEL, TILE_SIZE, &db_options);
+		PROCESSING_MakeOptions(ZOOM_LEVEL, &db_options);
 
 		while (STATE_get_current() == COMPOSE) {
 //			wait until frameshown
@@ -69,16 +69,20 @@ void STATE_Compose_Enter(void) {
 			while(!cameraMailbox.full){
 				__NOP();
 			}
+			uint8_t* source_buf;
+			uint8_t* dest_buf;
+			if(cameraMailbox.data==1){
+				source_buf = camera_buffer_manager.dma_buffer0_sa;
+				dest_buf = display_buffer_manager.buffer0_sa;
+			}
+			else if(cameraMailbox.data==2){
+				source_buf = camera_buffer_manager.dma_buffer1_sa;
+				dest_buf = display_buffer_manager.buffer1_sa;
+			}
 
 //			reset mailbox
 			cameraMailbox.full = false;
 			cameraMailbox.data = 0;
-	
-			int i = c%2; //ping pong var for framebuffers
-
-			uint8_t* source_buf = c_frameBuffer[i];
-			uint8_t* processing_buf = p_frameBuffer;
-			uint8_t* dest_buf = s_frameBuffer[i];
 			
 //			get timer
 			int process_start = TIMER_GetCurrentUs();

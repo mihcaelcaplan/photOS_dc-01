@@ -8,6 +8,7 @@
 #include "fsl_common.h"
 #include "fsl_debug_console.h"
 #include "storage_usb_device.h"
+#include "state.h"
 
 // Global variable definitions
 USB_DMA_INIT_DATA_ALIGN(USB_DATA_ALIGN_SIZE)
@@ -162,6 +163,10 @@ usb_status_t USB_DeviceMscCallback(class_handle_t handle, uint32_t event, void *
             lbaInformation->logicalUnitInformations[0].totalLbaNumberSupports = USB_Disk_GetBlockCount();
             lbaInformation->logicalUnitInformations[0].bulkInBufferSize       = USB_DEVICE_MSC_READ_BUFF_SIZE;
             lbaInformation->logicalUnitInformations[0].bulkOutBufferSize      = USB_DEVICE_MSC_WRITE_BUFF_SIZE;
+
+            // change state into transfer
+            STATE_set_current(TRANSFER);
+
             break;
         case kUSB_DeviceMscEventTestUnitReady:
             /*change the test unit ready command's sense data if need, be careful to modify*/
@@ -353,11 +358,11 @@ void USB_DeviceApplicationInit(void)
     g_msc.deviceHandle = NULL;
     if (kStatus_USB_Success != USB_DeviceClassInit(CONTROLLER_ID, &msc_config_list, &g_msc.deviceHandle))
     {
-        PRINTF("USB device init failed\r\n");
+        PRINTF("USB: device init failed\r\n");
     }
     else
     {
-//        PRINTF("USB device mass storage demo\r\n");
+        PRINTF("USB: device mass storage class init\r\n");
         g_msc.mscHandle = msc_config_list.config->classHandle;
     }
 

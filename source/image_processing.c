@@ -9,12 +9,13 @@
 #include "camera_ov5640.h"
 #include "fsl_debug_console.h"
 #include "global_buffers.h"
+#include "jpeglib.h"
 
 // create row buffer pointers for use in pointer rotations
 uint8_t* buffered_row[3] = {rowBuffer[0], rowBuffer[1], rowBuffer[2]};
 
 
-void PROCESSING_MakeOptions(zoom_level_t zoom, uint8_t tile_size, demosaic_options_t* options){
+void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 
 	switch (zoom) {
 		case zoom_level_1:
@@ -42,9 +43,6 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, uint8_t tile_size, demosaic_optio
 			options->start_row = 0;
 			break;
 	}
-
-	assert((options->roi_width % tile_size) == 0);
-	options->tile_size = tile_size;
 
 	options->source_buffer_stride = 1920;
 
@@ -115,6 +113,59 @@ void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* op
 		}
 }
 
+void processOnePixel_Bilinear(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b){
+
+		// clamps the offsets so edges mirror themselves across the edge
+		int left_offset = clampi(col_i - 1, 0, roi_width-1);
+		int right_offset = clampi(col_i + 1, 0, roi_width-1);
+
+		uint8_t* top_row = buffered_row[2];
+		uint8_t* center_row = buffered_row[1];
+		uint8_t* bottom_row = buffered_row[0];
+//
+		// load relevant neighbors
+		uint8_t center = center_row[col_i];
+		uint8_t right = center_row[right_offset];
+		uint8_t left = center_row[left_offset];
+		uint8_t up = top_row[col_i]; 
+		uint8_t up_left= top_row[left_offset]; 
+		uint8_t up_right = top_row[right_offset]; 
+		uint8_t down = bottom_row[col_i];
+		uint8_t down_right = bottom_row[right_offset];
+		uint8_t down_left = bottom_row[left_offset]; 
+
+		// even rows: BG..
+		// even col, B 
+		if((row_i & 1) == 0 && (col_i & 1) == 0){
+			*b = center;
+			*r = (down_left + down_right + up_left + up_right) >> 2;// diagonals
+			*g = (right + up + left +down) >> 2; // straight
+		}
+		
+		// odd col, G 
+		else if((row_i & 1) == 0 && (col_i & 1) == 1){
+			*g = center;
+			*b = (right + left) >> 1;
+			*r = (up + down) >> 1;
+		}
+
+		// odd cols: GR
+		// even col: G
+		else if((row_i & 1) == 1 && (col_i & 1) == 0){
+			*g = center;
+			*r = (right + left) >> 1;
+			*b = (up + down) >> 1;
+
+		}
+		
+		// odd col, R
+		else if((row_i & 1) == 1 && (col_i & 1) == 1){
+			*r = center;
+			*b = (down_left + down_right + up_left + up_right) >> 2;// diagonals
+			*g = (right + up + left + down) >> 2; // straight
+		}
+}
+
 
 // FOR FULL RES IN PROCESSING BUFFER 1920x1920x3 bytes
 void PROCESSING_Debayer(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_options_t* options){
@@ -157,7 +208,7 @@ void PROCESSING_Debayer(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_o
 			uint8_t r,g,b;
 			
 			// process and set rgb
-			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
+			processOnePixel_Bilinear(row_i, col_i, options, &r, &g, &b);
 			
 			// write to processing buffer - downsampling will happen later
 			// write as packed rgb888
@@ -276,6 +327,111 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 		}
 	}
 
+}
+
+// globalize cinfo
+struct jpeg_compress_struct cinfo;
+struct jpeg_error_mgr jerr;
+/*
+* debayer 3 rows at a time, straight to JPEG buffer
+*/
+// create jpeg
+void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options){
+	// set up variables
+	int source_buffer_stride = options->source_buffer_stride; //processing in place
+	// int tile_size = options->tile_size;
+	int roi_width = options->roi_width;
+	int roi_height = options->roi_height;
+	int start_col = options->start_col;
+	int start_row = options->start_row;
+
+
+	unsigned char* jpg_buffer = p_frameBuffer;
+	unsigned long jpg_size = sizeof(p_frameBuffer);
+
+	JSAMPROW row_pointer[1] = {scanlineBuffer}; /* Output row buffer */
+
+	cinfo.err = jpeg_std_error(&jerr);
+
+
+	jpeg_create_compress(&cinfo);
+
+	jpeg_mem_dest(&cinfo, &jpg_buffer, &jpg_size);
+
+	cinfo.image_width = roi_width;
+	cinfo.image_height = roi_height;
+	cinfo.input_components = APP_FB_BPP;
+	cinfo.in_color_space = JCS_RGB; 
+
+	jpeg_set_defaults( &cinfo );
+
+	// Absolutely minimal settings:
+//	jpeg_set_quality(&cinfo, 50, TRUE);        // Very low quality
+//	cinfo.dct_method = JDCT_IFAST;             // Fastest/least memory DCT
+//	cinfo.smoothing_factor = 0;                 // No smoothing
+//	cinfo.optimize_coding = FALSE;              // No optimization
+//	cinfo.progressive_mode = FALSE;             // No progressive
+
+	jpeg_start_compress( &cinfo, TRUE );
+
+	while( cinfo.next_scanline < cinfo.image_height )
+	{
+		// get raw data rows
+		int row_i = start_row + cinfo.next_scanline; //absolute row index
+		
+		int row_above_i = clampi(row_i + 1, 0, 1919);
+		int row_below_i = clampi(row_i - 1, 0, 1919);
+		
+		// get row pointers
+		uint8_t* row = source_buffer + row_i * source_buffer_stride;
+		uint8_t* row_above = source_buffer + row_above_i * source_buffer_stride;
+		uint8_t* row_below = source_buffer + row_below_i * source_buffer_stride;
+
+		// buffer row neighborhood
+		if(cinfo.next_scanline == 0){
+				// get all buffers
+				memcpy(buffered_row[2], row_above + start_col, roi_width);
+				memcpy(buffered_row[1], row + start_col, roi_width);
+				memcpy(buffered_row[0], row_below + start_col, roi_width);
+			}
+			else{
+				// rotate and get 1 buf
+				uint8_t* temp = buffered_row[0];
+				buffered_row[0] = buffered_row[1]; //center to bottom
+				buffered_row[1] = buffered_row[2]; //top to center
+				buffered_row[2] = temp;
+				memcpy(buffered_row[2], row_above + start_col, roi_width);
+			}
+			
+		// create destination row pointer
+		uint8_t* out_row = scanlineBuffer; //row_i has start col baked in TODO: this should be dest_buffer_stride (the same)
+			
+		// debayer 1 row to processing buffer
+		for( int pixel_col = 0; pixel_col < roi_width; pixel_col++ ){
+			// inner loop
+			
+			// no offset needed because copied rows always start at 0
+			int col_i = pixel_col;
+			
+			// declare output pixel values
+			uint8_t r,g,b;
+			
+			// process and set rgb, assumes rowbuffers are memcopyed to and rotated
+			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
+
+			uint8_t* out_px = out_row + col_i * 3;
+			out_px[2] = r;
+			out_px[1] = g;
+			out_px[0] = b;
+		}
+
+		// set row pointer and write; iterates the scanline counter
+		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
+	}
+	
+	// finish compression when whole image is done
+	jpeg_finish_compress(&cinfo);
+	
 }
 
 // NOTES

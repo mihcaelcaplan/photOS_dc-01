@@ -27,8 +27,6 @@ void MUX_Init(void)
 
 	//	init the switch pin to route to pmic initially
 	GPIO_PinInit(GPIO2, 30U, &mux_config);
-
-
 };
 
 //main interface
