@@ -54,8 +54,8 @@ struct mailbox {
 	uint32_t data;
 };
 
-extern struct mailbox cameraMailbox;
-extern struct mailbox lcdMailbox;
+extern volatile struct mailbox cameraMailbox;
+extern volatile struct mailbox lcdMailbox;
 
 
 

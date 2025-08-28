@@ -50,5 +50,5 @@ display_buffer_manager_t display_buffer_manager = {
 };
 
 // init the mailbox with data = framebuffer that returned
-struct mailbox cameraMailbox = {false, 0};
-struct mailbox lcdMailbox = {false, 0};
+volatile struct mailbox cameraMailbox = {false, 0};
+volatile struct mailbox lcdMailbox = {false, 0};

@@ -7,9 +7,12 @@
 
 #include "state.h"
 #include "fsl_debug_console.h"
-#include "state_compose.h"
 #include "battery_interface.h"
 #include "storage_usb_device.h"
+#include "state_compose.h"
+#include "state_capture.h"
+#include "state_transfer.h"
+
 
 // the idea here is that interrupt handlers add to the event queue, the event queue is parsed in the state management periodic function 
 // could be in the get_state that runs at each state while condition check
@@ -38,10 +41,10 @@ void STATE_transition() {
         
         // exit handlers
         switch (last_state){
-            case TRANSFER: 
-                PRINTF("STATE: Leaving TRANSFER mode\r\n");
-                USB_DeviceAppStop();
-                break;
+//            case TRANSFER:
+//                PRINTF("STATE: Leaving TRANSFER mode\r\n");
+//                USB_DeviceAppStop();
+//                break;
             default:
                 PRINTF("STATE: Leaving %d mode, no exit handler\r\n", last_state);
         }
@@ -67,8 +70,7 @@ void STATE_transition() {
                 break;
             case TRANSFER:
                 PRINTF("STATE: Entering TRANSFER mode\r\n");
-                // 
-                // USB_DeviceAppStart();
+                STATE_Transfer_Enter();
                 break;
             case STOW:
                 // PRINTF("STATE: Entering STOW mode\r\n");

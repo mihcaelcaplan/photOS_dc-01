@@ -651,7 +651,7 @@ uint32_t videoPllFreq;
 //	LCDIF->VDCTRL4 |= LCDIF_VDCTRL4_DOTCLK_DLY_SEL(3);
 
 // make sure to set big endian swap so that RGB becomes BGR
-	LCDIF->CTRL_SET = LCDIF_CTRL_CLR_CSC_DATA_SWIZZLE(1);
+//	LCDIF->CTRL_SET = LCDIF_CTRL_CLR_CSC_DATA_SWIZZLE(1);
 
 
 //	backlight on

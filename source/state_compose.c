@@ -53,7 +53,7 @@ void STATE_Compose_Enter(void) {
 
 
 		// init image processing
-		#define ZOOM_LEVEL zoom_level_2
+		#define ZOOM_LEVEL zoom_level_1
 //		#define TILE_SIZE 48
 
 		demosaic_options_t db_options;
@@ -90,7 +90,9 @@ void STATE_Compose_Enter(void) {
 			/* IMAGE PIPELINE*/
 
 			// debayer
-			PROCESSING_DebayerLiveView(source_buf, dest_buf, &db_options);
+			 PROCESSING_DebayerLiveView(source_buf, dest_buf, &db_options);
+//			 PROCESSING_DebayerLiveView_Raw(source_buf, dest_buf, &db_options);
+			
 
 			int processing_time = TIMER_GetCurrentUs() - process_start;
 //			PRINTF("TIME processing:  %d uS\r\n", processing_time);

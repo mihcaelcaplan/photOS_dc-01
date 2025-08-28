@@ -71,7 +71,8 @@ int main(void) {
     
     // set up pmic
     MUX_Init(); //switch mux to pmic
-    BATTERY_Init(); // turn on dp/dm detection
+
+    pmic_connected_t usb_connected = BATTERY_Init(); // turn on dp/dm detection
     // 
     MUX_ToUSBC();
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
@@ -89,8 +90,9 @@ int main(void) {
 
     EnableIRQ(GPIO5_Combined_0_15_IRQn);
     
-    
+//  doesn't need to be conditional because state logic connected to usb events
     USB_DeviceAppStart();
+
     STATE_Init(); //start the state machine
 
     

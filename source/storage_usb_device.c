@@ -237,6 +237,9 @@ usb_status_t USB_DeviceCallback(usb_device_handle handle, uint32_t event, void *
     uint8_t *temp8     = (uint8_t *)param;
     switch (event)
     {
+    	case kUSB_DeviceEventDetach:
+    		STATE_set_current(COMPOSE);
+    	break;
         case kUSB_DeviceEventBusReset:
         {
             g_msc.attach               = 0U;

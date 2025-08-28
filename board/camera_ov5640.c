@@ -25,37 +25,30 @@ int lcdirqc = 0;
 int lcdirqbufchangec = 0;
 int csiirqc = 0;
 
-// only enable cur_frame_done
-volatile bool pending_frame = false;
-volatile uint32_t pending_frame_sa;
-//volatile uint32_t active_frame_sa;
-
-volatile uint32_t last_frame_shown = 0;
-
 
 void LCDIF_IRQHandler(void){
 	uint32_t flags = (LCDIF->CTRL1 & ELCDIF_CTRL1_IRQ_MASK);
     LCDIF->CTRL1_CLR = ELCDIF_CTRL1_IRQ_MASK; //  clear all interrupt
 
      if (flags & kELCDIF_VsyncEdge){
-		// if (lcdMailbox.full){
-		// 	LCDIF->NEXT_BUF = lcdMailbox.data;
-		// 	lcdMailbox.full = false;
-		// 	lcdMailbox.data = 0;
+		 if (lcdMailbox.full){
+		 	LCDIF->NEXT_BUF = lcdMailbox.data;
+		 	lcdMailbox.full = false;
+		 	lcdMailbox.data = 0;
 			
-		// 	lcdirqbufchangec++;
-		// }
+		 	lcdirqbufchangec++;
+		 }
 	 }
 	 
 	if (flags & kELCDIF_CurFrameDone)
 	 {
-		if (lcdMailbox.full){
-		LCDIF->NEXT_BUF = lcdMailbox.data;
-		lcdMailbox.full = false;
-		lcdMailbox.data = 0;
-		
-		lcdirqbufchangec++;
-		}
+//		if (lcdMailbox.full){
+//		LCDIF->NEXT_BUF = lcdMailbox.data;
+//		lcdMailbox.full = false;
+//		lcdMailbox.data = 0;
+//
+//		lcdirqbufchangec++;
+//		}
 	 }
 
 	lcdirqc++;

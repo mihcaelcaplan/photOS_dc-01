@@ -69,14 +69,10 @@ gpio_pin_config_t pmic_int_config = {
 	kGPIO_IntRisingEdge,
 };
 
-enum  {
-	PMIC_Not_Connected = 0x00,
-	PMIC_Connected_SDP = 0x05,
-	PMIC_Connected_CDP = 0x06,
-	PMIC_Connected_DCP = 0x07,
-} pmic_enum;
 
-void BATTERY_Init(void){
+
+// returns the vin_status
+pmic_connected_t BATTERY_Init(void){
 	uint8_t pmic_status = 0;
 	BATTERY_I2CRead8(0x0C, &pmic_status);
 
@@ -100,12 +96,13 @@ void BATTERY_Init(void){
 				PRINTF("BATTERY: Connected to non-standard\r\n");
 			}
 			else{
-				PRINTF("BATTERY: bad PMIC status");
+				PRINTF("BATTERY: bad PMIC status\r\n");
 			}
 			break;
 	}
 
 	PRINTF("BATTERY: Init completed\r\n");
+	return vin_status;
 }
 
 battery_level_t BATTERY_Get_Level(void){
