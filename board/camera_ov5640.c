@@ -158,12 +158,46 @@ void registerInit(void){
 
 	OV5640_I2CWrite8(0x3108, 0x16); //set system dividers
 
-
+	// system control registers, which blocks are in reset are not (0b1=reset)
 	OV5640_I2CWrite8(0x3000, 0x00); //take core blocks out of reset
+	OV5640_I2CWrite8(0x3001, 0x08); //reset everything except format control 
 	OV5640_I2CWrite8(0x3002, 0x1C); //put jfifo, sfifo, jpg in reset
+	// OV5640_I2CWrite8(0x3003, 0x00); //seems all necessary
+	
+	// system clocks
 	OV5640_I2CWrite8(0x3004, 0xFF); // turn MCU clocks on
 	OV5640_I2CWrite8(0x3006, 0xc3); // disable clock of JPEG2x, JPEG
+	
 	OV5640_I2CWrite8(0x300e, 0x58); //mipi off, DVP on (should be default)
+	
+	
+	// black level calibration
+	// OV5640_I2CWrite8(0x4000, 0x89); //blc enable =  b[0] 
+	OV5640_I2CWrite8(0x4001, 0x02); //start line = b[5:0]
+	// OV5640_I2CWrite8(0x4002, 0x45); 
+	// OV5640_I2CWrite8(0x4003, 0x08); 
+	OV5640_I2CWrite8(0x4004, 0x08); //line number to process
+	OV5640_I2CWrite8(0x4005, 0x1a); // b[1] = blc update
+	
+	// OV5640_I2CWrite8(0x4009, 0x89); //default: b[0] = blc enable
+
+	// AEC target 
+//	main wpt bpt
+	OV5640_I2CWrite8(0x3a0f, 0x66); // , wpt
+	OV5640_I2CWrite8(0x3a10, 0x64); // , bpt
+
+	OV5640_I2CWrite8(0x3a1b, 0x68); // , wpt2
+	OV5640_I2CWrite8(0x3a1e, 0x62); // , bp2
+
+	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
+	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
+
+	// AGC gain
+	OV5640_I2CWrite8(0x3a13, 0x80); // pre-gain = 2x
+	OV5640_I2CWrite8(0x3a18, 0x00); // gain ceiling
+	OV5640_I2CWrite8(0x3a19, 0x20); // gain ceiling = 2x
+
+	
 
 //set up image window constraints
    OV5640_I2CWrite8(0x3800, 0x00 );// X start [11:8]
@@ -222,7 +256,7 @@ void registerInit(void){
 //    OV5640_I2CWrite8(0x4300, 0xf8); //raw, default pixel order
     OV5640_I2CWrite8(0x4300, 0x00);
 // ISP disable
-    OV5640_I2CWrite8(0x5000, 0x00); // all isp off
+    OV5640_I2CWrite8(0x5000, 0x06); // all isp off except defect pixel cancel
     OV5640_I2CWrite8(0x5001, 0x00);
 
     OV5640_I2CWrite8(0x3008, 0x02);// wake up from standby
