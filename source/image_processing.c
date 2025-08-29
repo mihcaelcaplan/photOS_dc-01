@@ -47,6 +47,13 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 	options->source_buffer_stride = 1920;
 
 	options->zoom = zoom;
+
+	// set some default gains
+	options->r_gain = 384; //1.5
+	options->g_gain = 256; //1
+	options->b_gain = 384; //1.5
+	options->pixel_gain = 309; //1.2
+
 }
 
 static inline int clampi(int v, int low, int high){
@@ -266,6 +273,11 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 	int start_row = options->start_row;
 	zoom_level_t zoom = options->zoom;
 
+	// Combine gains beforehand (do this once, not per pixel)
+	int combined_r_gain = (options->r_gain * options->pixel_gain) >> 8;  // Pre-scale down
+	int combined_g_gain = (options->g_gain * options->pixel_gain) >> 8;
+	int combined_b_gain = (options->b_gain * options->pixel_gain) >> 8;
+
 	// for 480x480 dest buf, will be < 1920, +=8 at zoom level 1
 	// 960 +=4 at zoom_level 2
 	// 480 +=1 at zoom_level 3
@@ -353,9 +365,11 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 					uint8_t* out_row = dest_buffer + dest_row_c * dest_width * 3; //row_i has start col baked in TODO: this should be dest_buffer_stride (the same)
 					uint8_t* out_px = out_row + (dest_col_c * 3);
 					
-					out_px[0] = b;
-					out_px[1] = g;
-					out_px[2] = r;
+					// out_px[0] = clampi(b + (b >> options->zoom_gain_div), 0, 255);
+					out_px[0] = clampi(( b * combined_b_gain ) >> 8, 0, 255);
+					out_px[1] = clampi(( g * combined_g_gain ) >> 8, 0, 255);
+					out_px[2] = clampi(( r * combined_r_gain ) >> 8, 0, 255);
+					//  out_px[2] = clampi(r + (r >> options->zoom_gain_div), 0, 255);
 //					out_px[1] = 0;
 //					out_px[2] = 0;
 
@@ -410,6 +424,10 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options)
 	int roi_height = options->roi_height;
 	int start_col = options->start_col;
 	int start_row = options->start_row;
+
+	int combined_r_gain = (options->r_gain * options->pixel_gain) >> 8;  // Pre-scale down
+	int combined_g_gain = (options->g_gain * options->pixel_gain) >> 8;
+	int combined_b_gain = (options->b_gain * options->pixel_gain) >> 8;
 
 
 	unsigned char* jpg_buffer = p_frameBuffer;
@@ -487,9 +505,9 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options)
 			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
 
 			uint8_t* out_px = out_row + col_i * 3;
-			out_px[2] = r;
-			out_px[1] = g;
-			out_px[0] = b;
+			out_px[0] = clampi(( b * combined_b_gain ) >> 8, 0, 255);
+			out_px[1] = clampi(( g * combined_g_gain ) >> 8, 0, 255);
+			out_px[2] = clampi(( r * combined_r_gain ) >> 8, 0, 255);
 		}
 
 		// set row pointer and write; iterates the scanline counter

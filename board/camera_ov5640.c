@@ -183,19 +183,38 @@ void registerInit(void){
 
 	// AEC target 
 //	main wpt bpt
-	OV5640_I2CWrite8(0x3a0f, 0x40); // , wpt
-	OV5640_I2CWrite8(0x3a10, 0x38); // , bpt
+	OV5640_I2CWrite8(0x3a0f, 0x50); // , wpt
+	OV5640_I2CWrite8(0x3a10, 0x48); // , bpt
 
-	OV5640_I2CWrite8(0x3a1b, 0x40); // , wpt2
-	OV5640_I2CWrite8(0x3a1e, 0x38); // , bp2
+	OV5640_I2CWrite8(0x3a1b, 0x50); // , wpt2
+	OV5640_I2CWrite8(0x3a1e, 0x46); // , bp2
 
-	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
-	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
+//	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
+//	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
 
 	// AGC gain
 	OV5640_I2CWrite8(0x3a13, 0x80); // pre-gain = 2x
 	OV5640_I2CWrite8(0x3a18, 0x00); // gain ceiling
-	OV5640_I2CWrite8(0x3a19, 0x40); // gain ceiling = 4x
+	OV5640_I2CWrite8(0x3a19, 0x10); // gain ceiling = 3x
+
+	// set up gamma
+	OV5640_I2CWrite8(0x5480, 0x01); // Gamma bias plus on, bit[0]
+	OV5640_I2CWrite8(0x5481, 0x08);
+	OV5640_I2CWrite8(0x5482, 0x14);
+	OV5640_I2CWrite8(0x5483, 0x28);
+	OV5640_I2CWrite8(0x5484, 0x51);
+	OV5640_I2CWrite8(0x5485, 0x65);
+	OV5640_I2CWrite8(0x5486, 0x71);
+	OV5640_I2CWrite8(0x5487, 0x7d);
+	OV5640_I2CWrite8(0x5488, 0x87);
+	OV5640_I2CWrite8(0x5489, 0x91);
+	OV5640_I2CWrite8(0x548a, 0x9a);
+	OV5640_I2CWrite8(0x548b, 0xaa);
+	OV5640_I2CWrite8(0x548c, 0xb8);
+	OV5640_I2CWrite8(0x548d, 0xcd);
+	OV5640_I2CWrite8(0x548e, 0xdd);
+	OV5640_I2CWrite8(0x548f, 0xea);
+	OV5640_I2CWrite8(0x5490, 0x1d);
 
 	
 
@@ -249,14 +268,15 @@ void registerInit(void){
 
 // Timing control (flip/mirror)
 //    OV5640_I2CWrite8(0x3820, 0x41);  // [2] ISP flip, [1] sensor flip
-//    OV5640_I2CWrite8(0x3821, 0x02);  // [5] jpeg en, [2]isp mirror, [1] sensor mirror, [0] horizontal binning enable (vertical binning auto-enable on Y inc.)
+//    OV5640_I2CWrite8(0x3821, 0x00);  // [5] jpeg en, [2]isp mirror, [1] sensor mirror, [0] horizontal binning enable (vertical binning auto-enable on Y inc.)
 
 // Output Interface:
 // Raw format output (bypass ISP)
 //    OV5640_I2CWrite8(0x4300, 0xf8); //raw, default pixel order
     OV5640_I2CWrite8(0x4300, 0x00);
-// ISP disable
-    OV5640_I2CWrite8(0x5000, 0x06); // all isp off except defect pixel cancel
+
+    // ISP disable/enable
+    OV5640_I2CWrite8(0x5000, 0x26); // all isp off except defect pixel cancel b[2:1] and gamma b[5]
     OV5640_I2CWrite8(0x5001, 0x00);
 
     OV5640_I2CWrite8(0x3008, 0x02);// wake up from standby

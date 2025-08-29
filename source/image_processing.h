@@ -19,6 +19,11 @@ typedef struct {
 	uint8_t tile_size;
 	uint32_t source_buffer_stride;
 	zoom_level_t zoom;
+
+	int r_gain; // r_channel = r * r_gain/255
+	int g_gain; // g_channel = g * g_gain/255
+	int b_gain; // b_channel = b * b_gain/255
+	int pixel_gain; // brightness (iso?) = pixel * pixel_gain/255
 } demosaic_options_t;
 
 extern struct jpeg_compress_struct cinfo;
