@@ -183,11 +183,11 @@ void registerInit(void){
 
 	// AEC target 
 //	main wpt bpt
-	OV5640_I2CWrite8(0x3a0f, 0x66); // , wpt
-	OV5640_I2CWrite8(0x3a10, 0x64); // , bpt
+	OV5640_I2CWrite8(0x3a0f, 0x40); // , wpt
+	OV5640_I2CWrite8(0x3a10, 0x38); // , bpt
 
-	OV5640_I2CWrite8(0x3a1b, 0x68); // , wpt2
-	OV5640_I2CWrite8(0x3a1e, 0x62); // , bp2
+	OV5640_I2CWrite8(0x3a1b, 0x40); // , wpt2
+	OV5640_I2CWrite8(0x3a1e, 0x38); // , bp2
 
 	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
 	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
@@ -195,7 +195,7 @@ void registerInit(void){
 	// AGC gain
 	OV5640_I2CWrite8(0x3a13, 0x80); // pre-gain = 2x
 	OV5640_I2CWrite8(0x3a18, 0x00); // gain ceiling
-	OV5640_I2CWrite8(0x3a19, 0x20); // gain ceiling = 2x
+	OV5640_I2CWrite8(0x3a19, 0x40); // gain ceiling = 4x
 
 	
 
