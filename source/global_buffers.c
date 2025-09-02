@@ -52,3 +52,6 @@ display_buffer_manager_t display_buffer_manager = {
 // init the mailbox with data = framebuffer that returned
 volatile struct mailbox cameraMailbox = {false, 0};
 volatile struct mailbox lcdMailbox = {false, 0};
+
+// global photo counter stored in attributes.dat
+uint32_t global_dcim_counter = 0;

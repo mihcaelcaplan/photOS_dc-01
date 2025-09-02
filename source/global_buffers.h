@@ -57,6 +57,9 @@ struct mailbox {
 extern volatile struct mailbox cameraMailbox;
 extern volatile struct mailbox lcdMailbox;
 
+extern uint32_t global_dcim_counter;
+
+
 
 
 #endif /* GLOBAL_BUFFERS_H_ */

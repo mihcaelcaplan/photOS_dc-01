@@ -48,11 +48,11 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 
 	options->zoom = zoom;
 
-	// set some default gains
-	options->r_gain = 384; //1.5
-	options->g_gain = 256; //1
-	options->b_gain = 384; //1.5
-	options->pixel_gain = 309; //1.2
+	// set some default gains - gain = gain/255
+	options->r_gain = 284; 
+	options->g_gain = 244; 
+	options->b_gain = 460; 
+	options->pixel_gain = 300; 
 
 }
 

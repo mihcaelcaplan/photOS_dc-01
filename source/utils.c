@@ -13,9 +13,10 @@
 //   g_systickCounter++;
 //}
 
+// 
 void simpleDelay(uint32_t ms){
 
-	uint32_t msToUs = ms*1000;
+	uint32_t msToUs = ms * 1000;
 
 	SDK_DelayAtLeastUs(msToUs, SystemCoreClock);
 

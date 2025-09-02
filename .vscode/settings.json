@@ -49,7 +49,17 @@
         "cstdint": "c",
         "image_processing.h": "c",
         "fsl_elcdif.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "display_file.h": "c",
+        "storage_sd_device.h": "c",
+        "jpeg_interface.h": "c",
+        "sdmmc_config.h": "c",
+        "lcd_st7701.h": "c",
+        "display_interface.h": "c",
+        "jpeglib.h": "c",
+        "clock_config.h": "c",
+        "stdio.h": "c",
+        "button.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -41,9 +41,9 @@ void STATE_transition() {
         
         // exit handlers
         switch (last_state){
-//            case TRANSFER:
-//                PRINTF("STATE: Leaving TRANSFER mode\r\n");
-//                USB_DeviceAppStop();
+           case TRANSFER:
+               PRINTF("STATE: Leaving TRANSFER mode\r\n");
+               STATE_Transfer_Exit();
 //                break;
             default:
                 PRINTF("STATE: Leaving %d mode, no exit handler\r\n", last_state);

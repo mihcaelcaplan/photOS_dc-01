@@ -686,7 +686,6 @@ void DISPLAY_On(void){
 
 	//	???
 		ST7701_SPIWrite(0x13, COMMAND);
-		simpleDelay(1);
 //
 //		PRINTF("LCDIF camera DISPLAY start...\r\n");
 //
@@ -710,4 +709,7 @@ void DISPLAY_Stop(void){
 	GPIO_PinWrite(GPIO1, 9U, 0U);
 }
 
-
+void DISPLAY_Off(void){
+	ST7701_SPIWrite(0x23, COMMAND);
+	GPIO_PinWrite(GPIO1, 9U, 0U);
+}

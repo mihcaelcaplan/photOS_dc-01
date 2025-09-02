@@ -15,14 +15,8 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "fsl_debug_console.h"
-
-
 #include "storage_usb_device.h"
-
-
 #include "sdmmc_config.h"
-
-/* TODO: insert other include files here. */
 #include "usb_mux.h"
 #include "debug_shell.h"
 #include "display_interface.h"
@@ -32,29 +26,8 @@
 #include "state.h"
 #include "events.h"
 #include "timer.h"
-
-// state and event queues
-state_queue_t state_q;
-event_queue_t event_q;
-
-
-// set up button interrupts
-/* Define the init structure for the input switch pin */
-    gpio_pin_config_t sw_config = {
-        kGPIO_DigitalInput,
-        0,
-        kGPIO_IntRisingEdge,
-    };
-
-int zoom_c = 0;
-
-void GPIO5_Combined_0_15_IRQHandler(void){
-    GPIO_PortClearInterruptFlags(GPIO5, 1U << 0);
-    // set state flag 
-    STATE_set_current(CAPTURE);
-	SDK_ISR_EXIT_BARRIER;
-}
-
+#include "display_file.h"
+#include "button.h"
 
 /*
  * @brief   Application entry point.
@@ -68,46 +41,32 @@ int main(void) {
     BOARD_InitBootPeripherals();
     BOARD_InitDebugConsole();
     TIMER_Init();
+    BUTTON_Init();
     
     // set up pmic
     MUX_Init(); //switch mux to pmic
-
     pmic_connected_t usb_connected = BATTERY_Init(); // turn on dp/dm detection
-    // 
     MUX_ToUSBC();
+    
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
     USB_DeviceApplicationInit();
+    USB_DeviceAppStart();
+     MOUNT_SDCard(); //necessary :)
+    
+    DISPLAY_Init();
+    CAMERA_Init();
+    
     
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
-    
-    DISPLAY_Init(); // very minimal display function, basically reset pulse
-//
-    CAMERA_Init();
-	
-    /* Enable GPIO pin interrupt */
-    GPIO_PinInit(GPIO5, 0, &sw_config);
-    GPIO_PortEnableInterrupts(GPIO5, 1U << 0);
-
-    EnableIRQ(GPIO5_Combined_0_15_IRQn);
-    
-//  doesn't need to be conditional because state logic connected to usb events
-    USB_DeviceAppStart();
-
     STATE_Init(); //start the state machine
 
-    
-    // shouldn't get here but will let debugger hook
+
+    // shouldn't get here but will let debugger hook if it does
     PRINTF("IDLE... \r\n");
     while(1){
-//    	if (1 == GPIO_PinRead(GPIO5, 0)){
-//    		PRINTF("SW: hi");
-//    	}
-//    	else PRINTF("SW: lo");
-//    	simpleDelay(150);
-
     	__NOP();
     }
-    // shouldn't get here but would love to know if it does
+    // shouldn't get here ever but would love to know if we do somehow
     PRINTF("Somehow reached the return :'(\r\n");
     return 0 ;
 }

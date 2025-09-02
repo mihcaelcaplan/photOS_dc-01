@@ -283,15 +283,27 @@ void registerInit(void){
 }
 
 void OV5640_Init(void){
+
+//	// 1ms reset pulse
+		gpio_pin_config_t ov5640_reset = {
+				kGPIO_DigitalOutput,
+				1U,
+				kGPIO_NoIntmode
+		};
+	//	set up gpio
+	GPIO_PinInit(GPIO1, RESET_GPIO, &ov5640_reset);
+	GPIO_PinWrite(GPIO1,RESET_GPIO, 0U);
+	simpleDelay(2);
 	GPIO_PinWrite(GPIO1,RESET_GPIO, 1U);
 
-/* Enable the master function and disable the slave function. */
+/* Enable the master function and disable the slave function. TODO: move to like i2c init */ 
 	LPI2C_MasterEnable(CAMERA_I2C, true);
 	LPI2C_SlaveEnable(CAMERA_I2C, false);
 
 	//init registers
+	simpleDelay(10);
+	
 	registerInit();
-	simpleDelay(5);
 
 //	test pattern
 //	 OV5640_I2CWrite8(0x503d, 0x80);
@@ -301,17 +313,6 @@ void OV5640_Init(void){
 
 
 void CAMERA_Init(void){
-
-//	// 1ms reset pulse
-		gpio_pin_config_t ov5640_reset = {
-				kGPIO_DigitalOutput,
-				1U,
-				kGPIO_NoIntmode
-		};
-	//	set up gpio
-		GPIO_PinInit(GPIO1, RESET_GPIO, &ov5640_reset);
-		GPIO_PinWrite(GPIO1,RESET_GPIO, 0U);
-//
 ////	init the CSI clock
 //	/* CSI MCLK select 24M. */
 //	    /*
@@ -353,25 +354,23 @@ csi_config_t ov5640_config  = {
 	CSI_Reset(CSI);
 
 	CSI_Init(CSI, &ov5640_config);// register the frame buffer addresses
-	CSI->CR2  = (CSI->CR2& ~!CSI_CR2_BTS_MASK) | 0x2 << CSI_CR2_BTS_SHIFT;
+	CSI->CR2 = (CSI->CR2& ~!CSI_CR2_BTS_MASK) | 0x2 << CSI_CR2_BTS_SHIFT; //TODO: ?
 
-
-
-
-	CSI_ReflashFifoDma(CSI, kCSI_RxFifo);
-
+	// CSI_ReflashFifoDma(CSI, kCSI_RxFifo);
 
 	CSI_SetRxBufferAddr(CSI, 0, (uint32_t)c_frameBuffer[0]);
 	CSI_SetRxBufferAddr(CSI, 1, (uint32_t)c_frameBuffer[1]);
 
-
 	NVIC_ClearPendingIRQ(CSI_IRQn);
 	EnableIRQ(CSI_IRQn);
+	
+	// clear framebuffers
+	memset(&c_frameBuffer[0], 0, sizeof(c_frameBuffer[0]));//
+	memset(&c_frameBuffer[1], 0, sizeof(c_frameBuffer[1]));//
+	memset(&c_frameBuffer[2], 0, sizeof(c_frameBuffer[2]));//
 //
 	//	//	configure the control regs once mclk up from csi init (24 MHz)
 	OV5640_Init();
-
-//	memset(&c_frameBuffer[0], 0, sizeof(c_frameBuffer[0]));//
 }
 
 #define R_GAIN 256

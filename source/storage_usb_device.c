@@ -213,6 +213,7 @@ usb_status_t USB_DeviceMscCallback(class_handle_t handle, uint32_t event, void *
             {
                 g_msc.stop = 1U; /* stop command */
             }
+            STATE_set_current(COMPOSE);
             break;
         default:
             error = kStatus_USB_InvalidRequest;
