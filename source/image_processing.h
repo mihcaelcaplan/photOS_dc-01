@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include "camera_ov5640.h"
+#include "global_buffers.h"
 
 typedef struct {
 	uint32_t start_row;

@@ -59,6 +59,13 @@ extern volatile struct mailbox lcdMailbox;
 
 extern uint32_t global_dcim_counter;
 
+typedef enum {
+    zoom_level_1 = 4,
+    zoom_level_2 = 2,
+    zoom_level_3 = 1
+} zoom_level_t;
+extern zoom_level_t zoom_level;
+
 
 
 

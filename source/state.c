@@ -12,6 +12,8 @@
 #include "state_compose.h"
 #include "state_capture.h"
 #include "state_transfer.h"
+#include "state_adjust.h"
+
 
 
 // the idea here is that interrupt handlers add to the event queue, the event queue is parsed in the state management periodic function 
@@ -56,7 +58,8 @@ void STATE_transition() {
                 STATE_Compose_Enter();
                 break;
             case ADJUST:
-                // PRINTF("STATE: Entering ADJUST mode\r\n");
+                 PRINTF("STATE: Entering ADJUST mode\r\n");
+                 STATE_Adjust_Enter();
                 break;
             case CAPTURE:
                 PRINTF("STATE: Entering CAPTURE mode\r\n");

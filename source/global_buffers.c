@@ -55,3 +55,5 @@ volatile struct mailbox lcdMailbox = {false, 0};
 
 // global photo counter stored in attributes.dat
 uint32_t global_dcim_counter = 0;
+
+zoom_level_t zoom_level = zoom_level_1;

@@ -24,8 +24,8 @@ void STATE_Capture_Enter(void){
 
     // make options 
     demosaic_options_t db_options;
-	#define ZOOM_LEVEL zoom_level_2
-    PROCESSING_MakeOptions(ZOOM_LEVEL, &db_options);
+	// #define ZOOM_LEVEL zoom_level_2
+    PROCESSING_MakeOptions(zoom_level, &db_options);
     
         // capture
     // wait for
