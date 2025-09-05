@@ -9,40 +9,39 @@
  #include "state.h"
 #include "timer.h"
 
-
-volatile int button_press_start = 0;
-volatile bool button_pressed = false;
-long time_depressed = 0;
-long debounce_time = 0;
-
+volatile bool button_pressed = 0;
+volatile long now = 0;
+volatile long last_irq_time = 0;
+volatile long button_press_start = 0;
+#define DEBOUNCE_TIME 50000
 
  void GPIO5_Combined_0_15_IRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO5, 1U << 0); //clear
+    uint32_t pin_state = GPIO_PinReadPadStatus(GPIO5, 0);
+    uint32_t now = TIMER_GetCurrentUs();
 
-    // check if this is the press or release
-    if(button_pressed == false){
-	    // start the timer
-    	button_press_start = TIMER_GetCurrentUs();
-    	button_pressed = true;
+    if (now - last_irq_time < DEBOUNCE_TIME) {
+          return;  // Ignore bounces
+      }
+      last_irq_time = now;
+
+    // Now process the clean state change
+    if (pin_state == 0 && !button_pressed) {
+        // Clean press event
+        button_pressed = true;           // SET THE FLAG
+        button_press_start = now;        // START TIMING
     }
-    else if(button_pressed == true){
+    else if (pin_state == 1 && button_pressed) {
+        // Clean release event
+        button_pressed = false;          // CLEAR THE FLAG
+        long duration = now - button_press_start;  //   CALCULATE DURATION
 
-//    	debounce 50 ms
-    	debounce_time = TIMER_GetCurrentUs() - button_press_start;
+        // Handle state transitions based on duration
+        if (duration < 400000) STATE_set_current(CAPTURE);
+        else STATE_set_current(ADJUST);
+      }
 
-    	if(debounce_time > 50000){
-			//stop the timer, clear the flag and switch
-			time_depressed = debounce_time;
-			button_pressed = false;
-
-			if(time_depressed < 400000) STATE_set_current(CAPTURE);
-			if(time_depressed > 400000) STATE_set_current(ADJUST);
-    	}
-
-    }
-    // set state flag
-    // STATE_set_current(CAPTURE);
-     SDK_ISR_EXIT_BARRIER;
+    SDK_ISR_EXIT_BARRIER;
 }
 
 gpio_pin_config_t main_sw_config = {

@@ -49,10 +49,10 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 	options->zoom = zoom;
 
 	// set some default gains - gain = gain/255
-	options->r_gain = 284; 
-	options->g_gain = 244; 
-	options->b_gain = 460; 
-	options->pixel_gain = 300; 
+	options->r_gain = 300; 
+	options->g_gain = 280; 
+	options->b_gain = 360; 
+	options->pixel_gain = 256; 
 
 }
 
@@ -277,25 +277,23 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 	int combined_r_gain = (options->r_gain * options->pixel_gain) >> 8;  // Pre-scale down
 	int combined_g_gain = (options->g_gain * options->pixel_gain) >> 8;
 	int combined_b_gain = (options->b_gain * options->pixel_gain) >> 8;
-
+	
+	int dest_width = 480;
+	int dest_height = 480;
+	
+	int row_num = 1;
+	int offset_step = 1;
+//	PRINTF("zoom_level: %d\r\n", zoom_level);
+	
 	// for 480x480 dest buf, will be < 1920, +=8 at zoom level 1
 	// 960 +=4 at zoom_level 2
 	// 480 +=1 at zoom_level 3
-
-	int dest_width = 480;
-	int dest_height = 480;
-
-	int row_num = 1;
-	int offset_step = 1;
-
 	switch(zoom){
 		case zoom_level_1: 
-			row_num = 2;
-			offset_step = 8;
+			offset_step = 4;
 			break;
 		case zoom_level_2: 
-			row_num = 2;
-			offset_step = 4;
+			offset_step = 2;
 			break;
 		case zoom_level_3: 
 		// default 1,1
@@ -304,82 +302,74 @@ void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, de
 			break;
 	};
 
-	// will get 2 adjacent rows for scaling down to live view at larger input sizes
-	int dest_row_c = 0;
+	// clear display buffer
+	// memset(dest_buffer, 0x80, dest_height*dest_width*3);
 	
-	for( int pixel_row = 0 ; pixel_row < dest_width/row_num; pixel_row++ ){
+	// set up outside loop
+	int row_offset = 0;
+	int col_offset = 0;
+	
+	// will get 2 adjacent rows for scaling down to live view at larger input sizes	
+	for( int pixel_row = 0 ; pixel_row < dest_height; pixel_row++ ){
 		
-		int dest_col_c = 0;
-		// get row indices
-		for(int inner_row = 0; inner_row < row_num; inner_row++){
-			int row_i = start_row + pixel_row*offset_step + inner_row; //absolute row index
-			
-			int row_above_i = clampi(row_i - 1, 0, source_buffer_stride-1);
-			int row_below_i = clampi(row_i + 1, 0, source_buffer_stride-1);
-			
-			// get row pointers
-			uint8_t* row = source_buffer + row_i * source_buffer_stride;
-			uint8_t* row_above = source_buffer + row_above_i * source_buffer_stride;
-			uint8_t* row_below = source_buffer + row_below_i * source_buffer_stride;
-
-			//copy to row-processing buffer (only copy roi width)
-			if(pixel_row == 0){
-				// get all buffers
-				memcpy(buffered_row[2], row_above + start_col, roi_width);
-				memcpy(buffered_row[1], row + start_col, roi_width);
-				memcpy(buffered_row[0], row_below + start_col, roi_width);
-			}
-			else{
-
-				uint8_t* temp = buffered_row[2];
-
-				buffered_row[2] = buffered_row[1];
-				buffered_row[1] = buffered_row[0];
-				buffered_row[0] = temp;
-
-				memcpy(buffered_row[0], row_below +start_col, roi_width);
-
-
-
-				
-			}
-			
-			
-			for( int pixel_col = 0; pixel_col < dest_height/row_num; pixel_col++ ){
-				// inner loop
-				
-				for (int inner_col = 0; inner_col < row_num; inner_col++){
-					
-					int col_i = pixel_col*offset_step + inner_col;
-					// no offset needed because copied rows always start at 0
-					// declare output pixel values
-					uint8_t r,g,b = 0;
-					
-					// process and set rgb
-					 processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
-//					processOnePixel_Luma(row_i, col_i, options, &r, &g, &b);
-//					processOnePixel_Raw(row_i, col_i, options, &r, &g, &b);
-
-					
-					// write as packed rgb888
-					uint8_t* out_row = dest_buffer + dest_row_c * dest_width * 3; //row_i has start col baked in TODO: this should be dest_buffer_stride (the same)
-					uint8_t* out_px = out_row + (dest_col_c * 3);
-					
-					// out_px[0] = clampi(b + (b >> options->zoom_gain_div), 0, 255);
-					out_px[0] = clampi(( b * combined_b_gain ) >> 8, 0, 255);
-					out_px[1] = clampi(( g * combined_g_gain ) >> 8, 0, 255);
-					out_px[2] = clampi(( r * combined_r_gain ) >> 8, 0, 255);
-					//  out_px[2] = clampi(r + (r >> options->zoom_gain_div), 0, 255);
-//					out_px[1] = 0;
-//					out_px[2] = 0;
-
-					// increment dest_col_counter
-					dest_col_c++;
-				}
-			}
-			// increment dest_row_counter
-			dest_row_c++;
+		// calculate an offset for sampling pattern at downscale
+		if(offset_step > 1){ // if downsampling
+			row_offset = pixel_row & 1 ; //0, 1, 0, 1, ...
 		}
+		
+		// get row indices
+		int row_i = start_row + pixel_row*offset_step + row_offset; //absolute row index
+		
+		int row_above_i = clampi(row_i - 1, 0, source_buffer_stride-1);
+		int row_below_i = clampi(row_i + 1, 0, source_buffer_stride-1);
+		
+		// get row pointers
+		uint8_t* row = source_buffer + row_i * source_buffer_stride;
+		uint8_t* row_above = source_buffer + row_above_i * source_buffer_stride;
+		uint8_t* row_below = source_buffer + row_below_i * source_buffer_stride;
+
+		//copy to row-processing buffer (only copy roi width)
+		 if(pixel_row == 0){
+			// get all buffers
+			memcpy(buffered_row[2], row_above + start_col, roi_width);
+			memcpy(buffered_row[1], row + start_col, roi_width);
+			memcpy(buffered_row[0], row_below + start_col, roi_width);
+		}
+		 else{
+		 	uint8_t* temp = buffered_row[2];
+
+		 	buffered_row[2] = buffered_row[1];
+		 	buffered_row[1] = buffered_row[0];
+		 	buffered_row[0] = temp;
+
+		 	memcpy(buffered_row[0], row_below +start_col, roi_width);
+		 }
+		
+		uint8_t* out_row = dest_buffer + pixel_row * dest_width * 3; 
+
+		for( int pixel_col = 0; pixel_col < dest_width; pixel_col++ ){
+			
+			// set up column offsets for bayer pattern completeness 
+			if(offset_step > 1){ // if downsampling
+				col_offset = pixel_col & 1 ; //0, 1, 0, 1, ...
+			}
+			
+			int col_i = pixel_col*offset_step + col_offset;
+			
+			// declare output pixel values
+			uint8_t r,g,b = 0;
+			
+			// process and set rgb
+			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
+			
+			// write as packed rgb888
+			uint8_t* out_px = out_row + (pixel_col * 3);
+			
+			// out_px[0] = clampi(b + (b >> options->zoom_gain_div), 0, 255);
+			out_px[0] = clampi(( b * combined_b_gain ) >> 8, 0, 255);
+			out_px[1] = clampi(( g * combined_g_gain ) >> 8, 0, 255);
+			out_px[2] = clampi(( r * combined_r_gain ) >> 8, 0, 255);
+			}		
 	}
 
 }
@@ -416,7 +406,7 @@ struct jpeg_error_mgr jerr;
 * debayer 3 rows at a time, straight to JPEG buffer
 */
 // create jpeg
-void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options){
+void PROCESSING_DebayerJPEG(uint8_t* source_buffer, unsigned char** jpg_buffer_ptr, unsigned long* jpg_size_ptr, demosaic_options_t* options){
 	// set up variables
 	int source_buffer_stride = options->source_buffer_stride; //processing in place
 	// int tile_size = options->tile_size;
@@ -429,9 +419,11 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options)
 	int combined_g_gain = (options->g_gain * options->pixel_gain) >> 8;
 	int combined_b_gain = (options->b_gain * options->pixel_gain) >> 8;
 
-
-	unsigned char* jpg_buffer = p_frameBuffer;
-	unsigned long jpg_size = sizeof(p_frameBuffer);
+	// unsigned char* jpg_buffer = NULL;
+	// unsigned long jpg_size = 0;
+//	unsigned char* jpg_buffer = p_frameBuffer;
+//	unsigned long jpg_size = sizeof(p_frameBuffer);
+//	 unsigned long jpg_size = roi_height * roi_width * APP_FB_BPP;
 
 	JSAMPROW row_pointer[1] = {scanlineBuffer}; /* Output row buffer */
 
@@ -440,7 +432,7 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options)
 
 	jpeg_create_compress(&cinfo);
 
-	jpeg_mem_dest(&cinfo, &jpg_buffer, &jpg_size);
+	jpeg_mem_dest(&cinfo, jpg_buffer_ptr, jpg_size_ptr);
 
 	cinfo.image_width = roi_width;
 	cinfo.image_height = roi_height;
@@ -449,12 +441,12 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, demosaic_options_t* options)
 
 	jpeg_set_defaults( &cinfo );
 
-	// Absolutely minimal settings:
-//	jpeg_set_quality(&cinfo, 50, TRUE);        // Very low quality
-//	cinfo.dct_method = JDCT_IFAST;             // Fastest/least memory DCT
-//	cinfo.smoothing_factor = 0;                 // No smoothing
-//	cinfo.optimize_coding = FALSE;              // No optimization
-//	cinfo.progressive_mode = FALSE;             // No progressive
+	 jpeg_set_quality(&cinfo, 95, TRUE);        // High quality (85-95 range)
+//	 cinfo.dct_method = JDCT_ISLOW;             // Most accurate DCT method
+	 cinfo.dct_method = JDCT_FLOAT;             // Most accurate DCT method
+	 cinfo.smoothing_factor = 0;                 // Keep at 0 (smoothing reduces quality)
+//	 cinfo.optimize_coding = TRUE;               // Enable Huffman optimization
+//	 cinfo.progressive_mode = TRUE;              // Optional: enables progressive JPEG
 
 	jpeg_start_compress( &cinfo, TRUE );
 

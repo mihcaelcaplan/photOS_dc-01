@@ -43,7 +43,6 @@ void STATE_Adjust_Enter(void) {
 
 void STATE_Adjust_Exit(void) {
     PRINTF("ADJUST: Exiting adjust state\r\n");
-    PRINTF("ADJUST: 
-        current_state: %d\r\n", zoom_level);
+    PRINTF("ADJUST: current_state: %d\r\n", zoom_level);
     PRINTF("ADJUST: current_state: %d\r\n", last_zoom_level);
 }

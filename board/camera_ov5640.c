@@ -35,13 +35,13 @@ void LCDIF_IRQHandler(void){
 		 	LCDIF->NEXT_BUF = lcdMailbox.data;
 		 	lcdMailbox.full = false;
 		 	lcdMailbox.data = 0;
-			
+
 		 	lcdirqbufchangec++;
 		 }
 	 }
-	 
-	if (flags & kELCDIF_CurFrameDone)
-	 {
+
+//	if (flags & kELCDIF_CurFrameDone)
+//	 {
 //		if (lcdMailbox.full){
 //		LCDIF->NEXT_BUF = lcdMailbox.data;
 //		lcdMailbox.full = false;
@@ -49,7 +49,7 @@ void LCDIF_IRQHandler(void){
 //
 //		lcdirqbufchangec++;
 //		}
-	 }
+//	 }
 
 	lcdirqc++;
     __DSB();

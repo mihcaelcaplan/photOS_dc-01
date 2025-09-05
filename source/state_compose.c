@@ -108,7 +108,13 @@ void STATE_Compose_Enter(void) {
 		}
 
    
-    PRINTF("COMPOSE: Exiting compose loop\r\n");
+    PRINTF("COMPOSE: Exiting coxmpose loop\r\n");
 	// TODO: branch to new state
     STATE_transition();
 }
+
+void STATE_Compose_Exit(void){
+	// clean rowbuffers
+	memset(rowBuffer, 0, 3*C_IMG_WIDTH);
+}
+

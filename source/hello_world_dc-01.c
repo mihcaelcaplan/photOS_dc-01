@@ -49,9 +49,9 @@ int main(void) {
     MUX_ToUSBC();
     
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
+    MOUNT_SDCard(); //necessary :)
     USB_DeviceApplicationInit();
     USB_DeviceAppStart();
-     MOUNT_SDCard(); //necessary :)
     
     DISPLAY_Init();
     CAMERA_Init();

@@ -43,7 +43,12 @@ void STATE_transition() {
         
         // exit handlers
         switch (last_state){
-           case TRANSFER:
+            case COMPOSE:
+                // clean the rowbuffers
+                STATE_Compose_Exit();
+
+                break;
+            case TRANSFER:
                PRINTF("STATE: Leaving TRANSFER mode\r\n");
                STATE_Transfer_Exit();
 //                break;

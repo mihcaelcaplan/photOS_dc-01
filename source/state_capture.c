@@ -59,8 +59,12 @@ void STATE_Capture_Enter(void){
 	cameraMailbox.full = false;
 	cameraMailbox.data = 0;
 
-        //	Debayer
-    PROCESSING_DebayerJPEG(camera_buffer_manager.procesing_buffer_sa, &db_options);
+    unsigned char* jpg_buffer = p_frameBuffer;
+    unsigned long jpg_size = sizeof(p_frameBuffer);
+    // unsigned char* jpg_buffer = NULL;
+    // unsigned long jpg_size = 0;
+
+    PROCESSING_DebayerJPEG(camera_buffer_manager.procesing_buffer_sa, &jpg_buffer, &jpg_size, &db_options);
 	
     // set up filename and iterate counter and open jpg file
     FRESULT error;
@@ -80,8 +84,13 @@ void STATE_Capture_Enter(void){
     }
     //	write buffer to a file
 	UINT bytesWritten = 0;
-    unsigned char *write_pos = p_frameBuffer;
-	UINT bytesRemain = sizeof(p_frameBuffer);
+    // unsigned char *write_pos = p_frameBuffer;
+    unsigned char *write_pos = jpg_buffer;
+
+    // UINT bytesRemain = db_options.roi_height*db_options.roi_width * APP_FB_BPP;
+    // UINT bytesRemain = sizeof(p_frameBuffer);
+    UINT bytesRemain = jpg_size;
+
 
 	while (bytesRemain > 0){
         f_write(&jpgFil, write_pos, bytesRemain, &bytesWritten);
@@ -95,13 +104,18 @@ void STATE_Capture_Enter(void){
 
 //	 iterate the counter
 	global_dcim_counter++;
-	error = f_open(&attributeFil, "DCIM/DC01/attrib.dat", FA_OPEN_EXISTING | FA_WRITE);
+	
+    // write the file
+    error = f_open(&attributeFil, "DCIM/DC01/attrib.dat", FA_OPEN_EXISTING | FA_WRITE);
 		if (error != FR_OK){
 			PRINTF("counter update fail");
 		}
 	f_write(&attributeFil, &global_dcim_counter, sizeof(global_dcim_counter), &br);
 	f_close(&attributeFil);
 	f_mount(NULL, "2:/", 0);
+
+    // free the jpeg buffer
+//    SDK_Free(jpeg_dest);
 
     // switch back to compose
     STATE_set_current(COMPOSE);
