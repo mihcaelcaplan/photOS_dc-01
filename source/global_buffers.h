@@ -20,10 +20,13 @@
 #define APP_FB_STRIDE_BYTE (D_IMG_WIDTH * APP_FB_BPP)
 #define FRAME_BUFFER_ALIGN 64
 
-    
-//declare buffers extern so the actual memory only lives in one place =)
+/* CAMERA FRAMEBUFFERS (receive) */    
 extern uint8_t c_frameBuffer[3][C_IMG_HEIGHT*C_IMG_WIDTH];
+
+/* PROCESSING FRAMEBUFFER() 1/3 size fb for generous jpeg destination buffer) */    
 extern uint8_t p_frameBuffer[C_IMG_HEIGHT*C_IMG_WIDTH]; //1/3 raw for jpeg
+
+
 extern uint8_t s_frameBuffer[2][D_IMG_HEIGHT*D_IMG_WIDTH * APP_FB_BPP];
 
 // external buffer for 3 rows for interpolation
@@ -39,7 +42,7 @@ extern uint8_t scanlineBuffer[C_IMG_WIDTH*APP_FB_BPP];
     } camera_buffer_manager_t;
 
     //need a display buffer ready manage
-    typedef struct {
+    typedef str
         // addresses
         uint32_t buffer0_sa;
 	    uint32_t buffer1_sa;
