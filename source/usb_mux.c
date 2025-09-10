@@ -12,6 +12,7 @@
 #define SWITCH_TO_PMIC 0U
 #define SWITCH_TO_USBC 1U
 
+// TODO: add flag if usb enumerates after switch to usbc so that transfer state can be entered (or prompted)
 
 
 // sets the mux up, including configuring the gpio to be the correct state after power up
@@ -26,8 +27,6 @@ void MUX_Init(void)
 
 	//	init the switch pin to route to pmic initially
 	GPIO_PinInit(GPIO2, 30U, &mux_config);
-
-
 };
 
 //main interface

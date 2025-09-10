@@ -11,6 +11,8 @@
 
 #include "fsl_debug_console.h"
 
+#define APP_CACHE_LINE_SIZE 0
+
 
 /* This struct represents a JPEG error handler */
 static struct jpeg_error_mgr jerr;
@@ -103,8 +105,8 @@ static struct jpeg_error_mgr jerr;
 	    row_stride = APP_FB_STRIDE_BYTE;
 
 	    /* Place the output image to the center of the screen. */
-	    buffer += row_stride * ((APP_FB_HEIGHT - cinfo.output_height) / 2);
-	    buffer += APP_FB_BPP * ((APP_FB_WIDTH - cinfo.output_width) / 2);
+	    buffer += row_stride * ((D_IMG_HEIGHT - cinfo.output_height) / 2);
+	    buffer += APP_FB_BPP * ((D_IMG_WIDTH - cinfo.output_width) / 2);
 
 	    while (cinfo.output_scanline < cinfo.output_height)
 	    {
@@ -143,8 +145,8 @@ void jpeg_encode(uint8_t *buffer, FIL *file){
 
 	jpeg_mem_dest(&cinfo, &jpg_buffer, &jpg_size);
 
-	cinfo.image_width = APP_FB_WIDTH;
-	cinfo.image_height = APP_FB_HEIGHT;
+	cinfo.image_width = D_IMG_WIDTH;
+	cinfo.image_height = D_IMG_HEIGHT;
 	cinfo.input_components = APP_FB_BPP;
 	cinfo.in_color_space = JCS_RGB; // TODO: this may change from the camera
 
@@ -177,5 +179,60 @@ void jpeg_encode(uint8_t *buffer, FIL *file){
 
 }
 
+// encode the contents of a buffer and put it in a file
+void jpeg_encode_stream(uint8_t *buffer, FIL *file){
+
+	static struct jpeg_compress_struct cinfo;
+
+	unsigned char *jpg_buffer;
+	unsigned char *write_pos;
+
+	UINT bytesWritten;
+	UINT bytesRemain;
+
+	unsigned long jpg_size = 0; //let the jpeg lib tell us the size
+
+	JSAMPROW row_pointer[1] = {0}; /* Output row buffer */
+
+	cinfo.err = jpeg_std_error( &jerr );
+
+	jpeg_create_compress(&cinfo);
+
+
+	jpeg_mem_dest(&cinfo, &jpg_buffer, &jpg_size);
+
+	cinfo.image_width = D_IMG_WIDTH;
+	cinfo.image_height = D_IMG_HEIGHT;
+	cinfo.input_components = APP_FB_BPP;
+	cinfo.in_color_space = JCS_RGB; // TODO: this may change from the camera
+
+	jpeg_set_defaults(&cinfo );
+
+	jpeg_start_compress(&cinfo, TRUE );
+
+	while( cinfo.next_scanline < cinfo.image_height )
+	{
+		row_pointer[0] = &buffer[ cinfo.next_scanline * cinfo.image_width *  cinfo.input_components];
+		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
+	}
+
+    jpeg_finish_compress(&cinfo);
+
+//	now the mem dest should be filled so just write that to a file
+	bytesRemain = jpg_size; //updated with size since we gave a pointer to mem_dest
+	write_pos = jpg_buffer; // pointer to beginning of the dest buf
+
+	//	write buffer to a file
+	while (bytesRemain > 0)
+		{
+			f_write(file, write_pos, bytesRemain, &bytesWritten);
+			bytesRemain -= bytesWritten;
+			write_pos += bytesWritten;
+		}
+
+	jpeg_destroy_compress( &cinfo );
+	free(jpg_buffer);
+
+}
 
 

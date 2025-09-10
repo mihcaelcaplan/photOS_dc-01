@@ -18,8 +18,19 @@
 #include "fsl_elcdif.h"
 
 
-uint32_t txCount = 0;
+//display features
+#define APP_HSW        20
+#define APP_HFP        40
+#define APP_HBP        50
+ 
+#define APP_VSW        10
+#define APP_VFP        5
+#define APP_VBP        5
+#define APP_POL_FLAGS \
+(kELCDIF_DataEnableActiveHigh | kELCDIF_VsyncActiveLow | kELCDIF_HsyncActiveLow | kELCDIF_DriveDataOnFallingClkEdge)
 
+
+uint32_t txCount = 0;
 //the magic sequence from https://cdn-shop.adafruit.com/product-files/5826/GX_ST7701S+HSD4.0_480480_RGB_V0.txt
 void ST7701_Manufacturer_Init(void){
 
@@ -46,7 +57,7 @@ void ST7701_Manufacturer_Init(void){
 	ST7701_SPIWrite(0x05 , DATA);
 
 //	ST7701_SPIWrite(0xC3, COMMAND); // set RGBCTL
-//	ST7701_SPIWrite(0x80, DATA); //HV mode = 0x80 de mode = 0x00
+	ST7701_SPIWrite(0x80, DATA); //HV mode = 0x80 de mode = 0x00
 
 	ST7701_SPIWrite(0xCD, COMMAND);
 	ST7701_SPIWrite(0x68, DATA);
@@ -593,6 +604,56 @@ void DISPLAY_Init(void){
 	ST7701_Init();
 
 
+///* Initialize the LCD_DISP. */
+//   /*
+//    * The desired output frame rate is 60Hz. So the pixel clock frequency is:
+//    * (480 + 41 + 4 + 18) * (272 + 10 + 4 + 2) * 60 = 9.2M.
+//    *
+//    * Here use the video pll (93MHz) as pixel clock source,
+//    * pixel clock = F_video_pll / (prediv + 1) / (div + 1) = 93 / 5 / 2 = 9.3M.
+//    */
+uint32_t videoPllFreq;
+
+   CLOCK_EnableClock(kCLOCK_Lcd);
+   CLOCK_EnableClock(kCLOCK_LcdPixel);
+   ELCDIF_Reset(LCDIF);
+
+
+//		initdisplay :)
+	 const elcdif_rgb_mode_config_t config = {
+			.panelWidth    = D_IMG_WIDTH,
+			.panelHeight   = D_IMG_HEIGHT,
+			.hsw           = APP_HSW,
+			.hfp           = APP_HFP,
+			.hbp           = APP_HBP,
+			.vsw           = APP_VSW,
+			.vfp           = APP_VFP,
+			.vbp           = APP_VBP,
+			.polarityFlags = APP_POL_FLAGS,
+			.bufferAddr    = NULL,
+			.pixelFormat   = kELCDIF_PixelFormatRGB888,
+			.dataBus       = kELCDIF_DataBus18Bit,
+		};
+
+	ELCDIF_RgbModeInit(LCDIF, &config);
+//
+////	disable the block
+//	LCDIF->CTRL_CLR = LCDIF_CTRL_DOTCLK_MODE_MASK;
+//
+	NVIC_ClearPendingIRQ(LCDIF_IRQn);
+	NVIC_SetPriority(LCDIF_IRQn, 3);
+	EnableIRQ(LCDIF_IRQn);
+//
+//	//add recover on underflow
+	LCDIF->CTRL1_SET = LCDIF_CTRL1_RECOVER_ON_UNDERFLOW_MASK;
+
+//	 clk delay
+//	LCDIF->VDCTRL4 |= LCDIF_VDCTRL4_DOTCLK_DLY_SEL(3);
+
+// make sure to set big endian swap so that RGB becomes BGR
+//	LCDIF->CTRL_SET = LCDIF_CTRL_CLR_CSC_DATA_SWIZZLE(1);
+
+
 //	backlight on
 //	GPIO_PinWrite(GPIO1, 9U, 1U);
 
@@ -625,7 +686,6 @@ void DISPLAY_On(void){
 
 	//	???
 		ST7701_SPIWrite(0x13, COMMAND);
-		simpleDelay(1);
 //
 //		PRINTF("LCDIF camera DISPLAY start...\r\n");
 //
@@ -649,4 +709,7 @@ void DISPLAY_Stop(void){
 	GPIO_PinWrite(GPIO1, 9U, 0U);
 }
 
-
+void DISPLAY_Off(void){
+	ST7701_SPIWrite(0x23, COMMAND);
+	GPIO_PinWrite(GPIO1, 9U, 0U);
+}

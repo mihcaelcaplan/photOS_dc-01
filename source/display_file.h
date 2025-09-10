@@ -10,5 +10,7 @@
 
 void DISPLAY_showStoredFile(void);
 
+int MOUNT_SDCard(void);
+
 
 #endif /* DISPLAY_FILE_H_ */

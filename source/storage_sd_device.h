@@ -13,8 +13,10 @@
 #ifndef STORAGE_SD_DEVICE_H_
 #define STORAGE_SD_DEVICE_H_
 
+
 /*SD Card related */
 #define USB_DEVICE_DISK_BLOCK_SIZE_POWER (9U)
+
 
 void BOARD_USB_Disk_Config(uint8_t usbPriorty);
 

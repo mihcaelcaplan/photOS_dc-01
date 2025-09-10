@@ -23,6 +23,7 @@
 #include "storage_sd_device.h"
 #include "fsl_elcdif.h"
 #include "jpeg_interface.h"
+#include "global_buffers.h"
 
 
 
@@ -35,40 +36,32 @@ AT_NONCACHEABLE_SECTION(static FATFS g_fileSystem); /* File system object */
 AT_NONCACHEABLE_SECTION(static FIL jpgFil);
 
 
-/*Helpers*/
-
-void Browse_ELCDIF_Init(void)
-{
-    const elcdif_rgb_mode_config_t config = {
-        .panelWidth    = APP_IMG_WIDTH,
-        .panelHeight   = APP_IMG_HEIGHT,
-        .hsw           = APP_HSW,
-        .hfp           = APP_HFP,
-        .hbp           = APP_HBP,
-        .vsw           = APP_VSW,
-        .vfp           = APP_VFP,
-        .vbp           = APP_VBP,
-        .polarityFlags = APP_POL_FLAGS,
-        .bufferAddr    = (uint32_t)s_frameBuffer[0],
-        .pixelFormat   = kELCDIF_PixelFormatRGB888,
-        .dataBus       = kELCDIF_DataBus18Bit,
-    };
-
-#if (defined(APP_ELCDIF_HAS_DISPLAY_INTERFACE) && APP_ELCDIF_HAS_DISPLAY_INTERFACE)
-    BOARD_InitDisplayInterface();
-#endif
-    ELCDIF_RgbModeInit(LCDIF, &config);
-
+FRESULT mkdir_p(const char *path) {
+    FILINFO fno;
+    FRESULT fr = f_stat(path, &fno);
+    if (fr == FR_OK) {
+        return (fno.fattrib & AM_DIR) ? FR_OK : FR_EXIST;
+    } else if (fr == FR_NO_FILE) {
+        char tmp[256];
+        strcpy(tmp, path);
+        char *slash = strrchr(tmp, '/');
+        if (slash) {
+            *slash = '\0';
+            fr = mkdir_p(tmp);
+            if (fr != FR_OK) return fr;
+        }
+        return f_mkdir(path);
+    }
+    return fr;
 }
 
-
 // mount the sd card as a file system
-static int MOUNT_SDCard(void)
+int MOUNT_SDCard(void)
 {
     FRESULT error;
     const TCHAR driverName[3U] = {SDDISK + '0', ':', '/'};
 
-    const TCHAR directoryName[4U] = {'D', 'C', 'I', 'M'};
+    // const TCHAR directoryName[4U] = {'D', 'C', 'I', 'M'};
 
 
     // clear FATFS manually
@@ -96,27 +89,27 @@ static int MOUNT_SDCard(void)
         return -3;
     }
 
+	// check if path exists correctly and make it if it doesn't
+	mkdir_p("DCIM/DC01");
 
+	FIL fil;
+	FRESULT fr;
+	UINT br;
 
-    char cwd_buffer[256] = {0};  // Buffer to store current working directory
-    // Get current working directory
-    error = f_getcwd(cwd_buffer, sizeof(cwd_buffer));
-    if (error == FR_OK) {
-        PRINTF("Current directory: %s\n", cwd_buffer);
-    } else {
-        PRINTF("f_getcwd failed with error: %d\n", error);
-    }
-
-
-    // Open file to check
-    error = f_open(&jpgFil, TEST_PHOTO, FA_OPEN_EXISTING);
-    if (error != FR_OK)
-    {
-        PRINTF("No demo jpeg file!\r\n");
-        return -4;
-    }
-
-    f_close(&jpgFil);
+	// check that a file counter exists and make it if not
+	fr = f_open(&fil, "DCIM/DC01/attrib.dat", FA_READ);
+	if (fr == FR_OK) {
+   // file exists → read the saved counter
+		f_read(&fil, &global_dcim_counter, sizeof(global_dcim_counter), &br);
+		f_close(&fil);
+	} else if (fr == FR_NO_FILE) {
+		// file does not exist → first run
+		fr = f_open(&fil, "DCIM/DC01/attrib.dat", FA_WRITE | FA_CREATE_NEW);
+		if (fr != FR_OK) PRINTF("attribute not created but needed\r\n");
+		f_write(&fil, &global_dcim_counter, sizeof(global_dcim_counter), &br);
+		f_chmod("DCIM/DC01/attrib.dat", AM_HID, AM_HID);
+		f_close(&fil);
+	}
 
     return 0;
 }
@@ -204,7 +197,7 @@ void BROWSE_storeFile(){
 			PRINTF("file write fail");
 		}
 	/* fill the frame buffer. */
-		fill_framebuffer_gradient(s_frameBuffer[0], APP_FB_WIDTH, APP_FB_HEIGHT);
+		fill_framebuffer_gradient(s_frameBuffer[0], D_IMG_WIDTH, D_IMG_HEIGHT);
 
 		jpeg_encode((void*)&s_frameBuffer[0], &jpgFil);
 

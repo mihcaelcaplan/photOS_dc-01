@@ -11,6 +11,7 @@
 #define I2C_CAMERA_CONTROL
 
 #include "fsl_common.h"
+#include "global_buffers.h"
 
 // internal prototypes
 void OV5640_Init(void);
@@ -24,6 +25,14 @@ void CAMERA_Run(void);
 void CAMERA_Stop(void);
 
 
+void binAndInterpolateForDisplay(uint8_t* source_buffer, uint8_t* dest_buffer, zoom_level_t level);
+void interpolateForDisplay(uint8_t* source_buffer, uint8_t* dest_buffer);
+void processForDisplay(uint32_t* source_buffer, uint32_t* dest_buffer);
+void transfer_test(void);
 
+// Volatile variables accessible from other modules
+extern volatile bool pending_frame;
+extern volatile uint32_t pending_frame_sa;
+extern volatile uint32_t active_frame_sa;
 
 #endif /* CAMERA_OV5640_H_ */
