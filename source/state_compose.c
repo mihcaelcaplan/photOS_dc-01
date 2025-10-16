@@ -55,8 +55,7 @@ void STATE_Compose_Enter(void) {
 		// init image processing
 		// #define ZOOM_LEVEL zoom_level_2
 //		#define TILE_SIZE 48
-
-		demosaic_options_t db_options;
+		
 		PROCESSING_MakeOptions(zoom_level, &db_options);
 
 		while (STATE_get_current() == COMPOSE) {

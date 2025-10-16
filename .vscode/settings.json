@@ -63,7 +63,8 @@
         "fsl_gpio.h": "c",
         "state_adjust.h": "c",
         "state_transfer.h": "c",
-        "list": "c"
+        "list": "c",
+        "timer.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

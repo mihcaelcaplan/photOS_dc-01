@@ -14,7 +14,17 @@
 // create row buffer pointers for use in pointer rotations
 uint8_t* buffered_row[3] = {rowBuffer[0], rowBuffer[1], rowBuffer[2]};
 
+demosaic_options_t db_options = {
+	// set some default gains - gain = gain/255
+	.r_gain = 300,
+	.g_gain = 280,
+	.b_gain = 360,
+	.pixel_gain = 256
 
+};
+
+
+// TODO: should be named set_zoom really
 void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 
 	switch (zoom) {
@@ -48,11 +58,6 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 
 	options->zoom = zoom;
 
-	// set some default gains - gain = gain/255
-	options->r_gain = 300; 
-	options->g_gain = 280; 
-	options->b_gain = 360; 
-	options->pixel_gain = 256; 
 
 }
 

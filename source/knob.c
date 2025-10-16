@@ -5,83 +5,58 @@
  *      Author: mcaplan
  */
 #include "knob.h"
+#include "state_adjust.h"
+#include "state.h"
+
+/* This probably should be abstracted to like a hardware implementation
+So problem is that the interrupt strategy is driven by the hardware implementation slightly
+For ex, my encoder is both high in between detent positions and then drives the quadrature pulses on each line with an offset
+so if i put interrupts on both falling edges, i can read pin state and check which one is first
+*/
 
 // void GPIO2_Combined_0_15_IRQHandler(void){
 
 //  }
 
-volatile quad_state_t last_e_state;
+volatile encoder_state_t current_e_state = 0;
+volatile uint8_t last_combined = 0;
+volatile uint8_t combined = 0;
+volatile uint8_t code = 0;
 
 void GPIO2_Combined_16_31_IRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO2, 1U << KNOB_A_GPIO_A); //clear A
     GPIO_PortClearInterruptFlags(GPIO2, 1U << KNOB_A_GPIO_B); //clear B
 
+
     // read pin states
-    uint32_t pin_state_a = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_A);
-    uint32_t pin_state_b = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_B);
+    if (adjustMailbox.encoder_a == 0){
+		uint32_t pin_state_a = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_A);
+		uint32_t pin_state_b = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_B);
 
-    quad_state_t current_e_state;
-    // pins -> quad state
-    if((pin_state_a & pin_state_b) == 1){ // 11
-        current_e_state = hahb;
-    }
-    else{
-        if(pin_state_a == 1){ // 10
-            current_e_state = halb;
-        }
-        else if(pin_state_b == 1){ // 01
-            current_e_state = lahb;
-        }
-        else{ // 00
-            current_e_state = lalb;
-        }
+		//
+		combined = (pin_state_a << 1) | pin_state_b;
+		code = (last_combined << 2) | combined;
+
+		if(code == 0b1101 || code == 0b0100 || code == 0b0010 || code == 0b1011){
+			current_e_state = CCW;
+		}
+		else if (code == 0b1110 || code == 0b0111 || code == 0b0001 || code == 0b1000){
+			current_e_state = CW;
+		}
+
+		adjustMailbox.encoder_a = current_e_state;
     }
 
-    output_state_t encoder_output = no_change;
-    // quad_state -> rotation state
-    // basically if a changes first it's forward if b changes first it's reverse
-    if(last_e_state == hahb){
-        if(current_e_state == lahb){
-            encoder_output = forward;
-        }
-        else if(current_e_state == halb){
-            encoder_output = reverse;
-        }
-    }
-    else if(last_e_state == halb){
-        if(current_e_state == hahb){
-            encoder_output = forward;
-        }
-        else if(current_e_state == lalb){
-            encoder_output = reverse;
-        }
-    }
-    else if(last_e_state == lahb){
-        if(current_e_state == lalb){
-            encoder_output = forward;
-        }
-        else if(current_e_state == hahb){
-            encoder_output = reverse;
-        } 
-    }
-    else if(last_e_state == lalb){
-        if(current_e_state == halb){
-            encoder_output = forward;
-        }
-        else if(current_e_state == lahb){
-            encoder_output = reverse;
-        } 
-    }
+    // switch state
+    STATE_set_current(ADJUST);
 
-    // set the new last state before exit
-    last_e_state = current_e_state;
     __DSB;
  }
 
  gpio_pin_config_t knob_encoder_config = {
     kGPIO_DigitalInput,
     0,
-	kGPIO_IntRisingEdge,
+	kGPIO_IntFallingEdge,
 };
 
 
@@ -89,8 +64,8 @@ void GPIO2_Combined_16_31_IRQHandler(void){
      /* Enable GPIO pin interrupt */
     GPIO_PinInit(KNOB_A_GPIO, KNOB_A_GPIO_A, &knob_encoder_config);
     GPIO_PinInit(KNOB_A_GPIO, KNOB_A_GPIO_B, &knob_encoder_config);
-    GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_A);
-    GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_B);
+     GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_A);
+   GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_B);
 
     EnableIRQ(GPIO2_Combined_16_31_IRQn);
     

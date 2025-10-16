@@ -15,20 +15,11 @@
 #define KNOB_A_GPIO_A 26
 #define KNOB_A_GPIO_B 27
 
-// quadrature state enum
-typedef enum {
-    hahb, // 11
-    halb, // 10
-    lahb, // 01
-    lalb  // 00
-} quad_state_t;
-
 // 
 typedef enum {
-    forward,
-    reverse,
-    no_change,
-} output_state_t;
+    CW = 0xA,
+    CCW = 0xB,
+} encoder_state_t;
 
 
 

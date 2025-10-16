@@ -20,23 +20,49 @@
 #include "timer.h"
 #include "image_processing.h"
 
-zoom_level_t last_zoom_level = zoom_level_1;
+static inline int clampi(int v, int low, int high){
+	if( v < low ) return low;
+	if (v > high) return high;
+	return v;
+}
 
+// init things
+zoom_level_t last_zoom_level = zoom_level_1;
+volatile struct inputMailbox adjustMailbox = {
+		.encoder_a = 0
+};
+
+encoder_state_t _encoder_a = 0;;
 void STATE_Adjust_Enter(void) {
     PRINTF("ADJUST: Entering adjust state\r\n");
-    
-    if(last_zoom_level == zoom_level_1){
-        zoom_level = zoom_level_2;
+
+    _encoder_a = adjustMailbox.encoder_a;
+
+    //    check the mailbox
+    if(_encoder_a == CW){
+    	db_options.r_gain+=10;
     }
-    else if(last_zoom_level == zoom_level_2){
-        zoom_level = zoom_level_3;
+    else if(_encoder_a == CCW){
+    	db_options.r_gain-=10;
     }
-    else if(last_zoom_level == zoom_level_3){
-        zoom_level = zoom_level_1;
-    }
+
+    PRINTF("ADJUST: %d\r\n", db_options.r_gain);
+	adjustMailbox.encoder_a = 0;
+
     
 
-    last_zoom_level = zoom_level;    
+//    if(last_zoom_level == zoom_level_1){
+//        zoom_level = zoom_level_2;
+    // }
+    // else if(last_zoom_level == zoom_level_2){
+    //     zoom_level = zoom_level_3;
+    // }
+    // else if(last_zoom_level == zoom_level_3){
+    //     zoom_level = zoom_level_1;
+    // }
+    // last_zoom_level = zoom_level;
+    
+
     STATE_set_current(COMPOSE);
     STATE_transition();
 }

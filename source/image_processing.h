@@ -27,6 +27,8 @@ typedef struct {
 	int pixel_gain; // brightness (iso?) = pixel * pixel_gain/255
 } demosaic_options_t;
 
+extern demosaic_options_t db_options; 
+
 extern struct jpeg_compress_struct cinfo;
 extern struct jpeg_error_mgr jerr;
 

@@ -291,8 +291,8 @@ BOARD_InitPins:
   - {pin_num: L6, peripheral: GPIO5, signal: 'gpio_io, 00', pin_signal: WAKEUP}
   - {pin_num: B14, peripheral: GPIO2, signal: 'gpio_io, 31', pin_signal: GPIO_B1_15, identifier: BATT_PMIC_INT, pull_up_down_config: Pull_Up_100K_Ohm, pull_keeper_select: Pull,
     drive_strength: R0_4}
-  - {pin_num: B13, peripheral: GPIO2, signal: 'gpio_io, 26', pin_signal: GPIO_B1_10}
-  - {pin_num: C13, peripheral: GPIO2, signal: 'gpio_io, 27', pin_signal: GPIO_B1_11}
+  - {pin_num: B13, peripheral: GPIO2, signal: 'gpio_io, 26', pin_signal: GPIO_B1_10, open_drain: Disable}
+  - {pin_num: C13, peripheral: GPIO2, signal: 'gpio_io, 27', pin_signal: GPIO_B1_11, open_drain: Disable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -371,6 +371,8 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL, 0x18B0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA, 0x18B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_10_GPIO2_IO26, 0x10B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_11_GPIO2_IO27, 0x10B0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0xB0A0U); 
 }
 

@@ -9,8 +9,19 @@
 #define STATE_ADJUST_H_
 
 #include "state.h"
+#include "knob.h"
 
 void STATE_Adjust_Enter(void);
 void STATE_Adjust_Exit(void);
+void STATE_Adjust_Init(void);
+
+// set up a mailbox for passing around information
+struct inputMailbox{
+	encoder_state_t encoder_a;
+};
+
+extern volatile struct inputMailbox adjustMailbox;
+
+
 
 #endif /* STATE_ADJUST_H_ */
