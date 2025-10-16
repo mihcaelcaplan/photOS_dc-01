@@ -62,7 +62,8 @@
         "button.h": "c",
         "fsl_gpio.h": "c",
         "state_adjust.h": "c",
-        "state_transfer.h": "c"
+        "state_transfer.h": "c",
+        "list": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

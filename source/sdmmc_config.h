@@ -20,7 +20,7 @@
 #include "fsl_sdio.h"
 #endif
 #include "clock_config.h"
-//#include "fsl_adapter_gpio.h"s
+//#include "fsl_adapter_gpio.h"
 #include "fsl_sdmmc_host.h"
 #include "fsl_sdmmc_common.h"
 

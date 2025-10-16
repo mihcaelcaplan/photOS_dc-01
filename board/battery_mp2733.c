@@ -17,10 +17,11 @@
 int gpio_c = 0;
 // set up input handler
 bool int_triggered = false;
-void GPIO2_Combined_16_31_IRQHandler(void){
-		int_triggered = true;
-		gpio_c++;
-}
+
+//void GPIO2_Combined_16_31_IRQHandler(void){
+//		int_triggered = true;
+//		gpio_c++;
+//}
 
 
 uint32_t BATTERY_I2CRead8(uint8_t address, uint8_t* rcv_buf){

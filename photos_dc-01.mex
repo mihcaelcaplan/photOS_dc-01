@@ -347,6 +347,8 @@
                         <pin_feature name="drive_strength" value="R0_4"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="GPIO2" signal="gpio_io, 26" pin_num="B13" pin_signal="GPIO_B1_10"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 27" pin_num="C13" pin_signal="GPIO_B1_11"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">

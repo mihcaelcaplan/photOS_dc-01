@@ -28,6 +28,7 @@
 #include "timer.h"
 #include "display_file.h"
 #include "button.h"
+#include "knob.h"
 
 /*
  * @brief   Application entry point.
@@ -42,6 +43,7 @@ int main(void) {
     BOARD_InitDebugConsole();
     TIMER_Init();
     BUTTON_Init();
+    KNOB_Init();
     
     // set up pmic
     MUX_Init(); //switch mux to pmic

@@ -38,7 +38,7 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK 0x4300U /*!< GPIO1 and GPIO6 share same IO MUX function, GPIO_MUX1 selects one GPIO function: affected bits mask */
-#define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0xC0000000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
+#define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0xCC000000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
 
 /* GPIO_SD_B0_01 (coord J3), SD1_CLK/J24[3]/SD1_CLK/J22[5]/J17[3] */
 /* Routed pin properties */
@@ -316,6 +316,20 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_BATT_PMIC_INT_PORT                                  GPIO2   /*!< PORT peripheral base pointer */
 #define BOARD_INITPINS_BATT_PMIC_INT_PIN                                     31U   /*!< PORT pin number */
 #define BOARD_INITPINS_BATT_PMIC_INT_PIN_MASK                        (1U << 31U)   /*!< PORT pin mask */
+
+/* GPIO_B1_11 (coord C13), ENET_RXER/ENET_RXER/U18[20] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ENET_RXER_PERIPHERAL                                GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_ENET_RXER_SIGNAL                                  gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_ENET_RXER_CHANNEL                                     27U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_ENET_RXER_GPIO                                      GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_ENET_RXER_GPIO_PIN                                    27U   /*!< GPIO pin number */
+#define BOARD_INITPINS_ENET_RXER_GPIO_PIN_MASK                       (1U << 27U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_ENET_RXER_PORT                                      GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_ENET_RXER_PIN                                         27U   /*!< PORT pin number */
+#define BOARD_INITPINS_ENET_RXER_PIN_MASK                            (1U << 27U)   /*!< PORT pin mask */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
