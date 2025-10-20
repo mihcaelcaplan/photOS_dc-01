@@ -18,6 +18,8 @@ void STATE_Adjust_Init(void);
 // set up a mailbox for passing around information
 struct inputMailbox{
 	encoder_state_t encoder_a;
+	encoder_state_t encoder_b;
+	encoder_state_t encoder_c;
 };
 
 extern volatile struct inputMailbox adjustMailbox;

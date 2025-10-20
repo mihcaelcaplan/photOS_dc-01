@@ -29,27 +29,71 @@ static inline int clampi(int v, int low, int high){
 // init things
 zoom_level_t last_zoom_level = zoom_level_1;
 volatile struct inputMailbox adjustMailbox = {
-		.encoder_a = 0
+		.encoder_a = 0,
+		.encoder_b = 0,
+		.encoder_c = 0
 };
 
-encoder_state_t _encoder_a = 0;;
+encoder_state_t _encoder_a = 0;
+encoder_state_t _encoder_b = 0;
+encoder_state_t _encoder_c = 0;
+
+
+// moving for smooth input
+int current_gain = 0;
+int last_gain = 0;
+
+
+//void adjustExposure(int exposure)
+
 void STATE_Adjust_Enter(void) {
     PRINTF("ADJUST: Entering adjust state\r\n");
 
-    _encoder_a = adjustMailbox.encoder_a;
-
-    //    check the mailbox
-    if(_encoder_a == CW){
-    	db_options.r_gain+=10;
-    }
-    else if(_encoder_a == CCW){
-    	db_options.r_gain-=10;
-    }
-
-    PRINTF("ADJUST: %d\r\n", db_options.r_gain);
-	adjustMailbox.encoder_a = 0;
-
     
+    _encoder_a = adjustMailbox.encoder_a;
+    _encoder_b = adjustMailbox.encoder_b;
+    _encoder_c = adjustMailbox.encoder_c;
+
+	//    check the mailbox
+	if(_encoder_a == CW){
+		current_gain = db_options.r_gain+=10;
+		last_gain = current_gain;
+	}
+	if(_encoder_a == CCW){
+		current_gain = db_options.r_gain-=10;
+		last_gain = current_gain;
+	}
+
+	if(_encoder_b == CW){
+		current_gain = db_options.g_gain+=10;
+	   last_gain = current_gain;
+	}
+	if(_encoder_b == CCW){
+	current_gain = db_options.g_gain-=10;
+	   last_gain = current_gain;
+	}
+
+	if(_encoder_c == CW){
+		current_gain = db_options.b_gain+=10;
+		  last_gain = current_gain;
+	  }
+	if(_encoder_c == CCW){
+	current_gain = db_options.b_gain-=10;
+	  last_gain = current_gain;
+	}
+
+
+
+
+    PRINTF("ADJUST R: %d\r\n", db_options.r_gain);
+    PRINTF("ADJUST G: %d\r\n", db_options.g_gain);
+    PRINTF("ADJUST B: %d\r\n", db_options.b_gain);
+	
+    //clear mailboxes
+    adjustMailbox.encoder_a = 0;
+    adjustMailbox.encoder_b = 0;
+    adjustMailbox.encoder_c = 0;
+
 
 //    if(last_zoom_level == zoom_level_1){
 //        zoom_level = zoom_level_2;

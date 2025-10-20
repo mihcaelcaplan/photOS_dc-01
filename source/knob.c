@@ -14,59 +14,156 @@ For ex, my encoder is both high in between detent positions and then drives the 
 so if i put interrupts on both falling edges, i can read pin state and check which one is first
 */
 
-// void GPIO2_Combined_0_15_IRQHandler(void){
 
-//  }
+// set up the encoder structs
+encoder_t encoder_a = {
+		.gpio =  KNOB_GPIO,
+		.pin_a = KNOB_A_GPIO_A,
+		.pin_b = KNOB_A_GPIO_B
+};
+
+encoder_t encoder_b = {
+		.gpio =  KNOB_GPIO,
+		.pin_a = KNOB_B_GPIO_A,
+		.pin_b = KNOB_B_GPIO_B
+};
+
+encoder_t encoder_c = {
+		.gpio =  KNOB_GPIO,
+		.pin_a = KNOB_C_GPIO_A,
+		.pin_b = KNOB_C_GPIO_B
+};
+
 
 volatile encoder_state_t current_e_state = 0;
 volatile uint8_t last_combined = 0;
 volatile uint8_t combined = 0;
 volatile uint8_t code = 0;
 
+// for debounce
+volatile int e_now = 0;
+volatile int encoder_last_us = 0;
+
+#define ENCODER_DEBOUNCE_TIME_US 500
+
+static const int8_t delta_table[16] = {
+        0,  1, -1, 127,
+       -1,  0, 127, 1,
+        1, 127,  0, -1,
+       127, -1,  1,  0
+    };
+
+uint8_t last_a_state;
+uint8_t last_b_state;
+uint8_t last_c_state;
+
 void GPIO2_Combined_16_31_IRQHandler(void){
-    GPIO_PortClearInterruptFlags(GPIO2, 1U << KNOB_A_GPIO_A); //clear A
-    GPIO_PortClearInterruptFlags(GPIO2, 1U << KNOB_A_GPIO_B); //clear B
+//	create a full interrupt mask
+uint32_t mask = (1u << encoder_a.pin_a) | (1u << encoder_a.pin_b) |
+        (1u << encoder_b.pin_a) | (1u << encoder_b.pin_b) |
+        (1u << encoder_c.pin_a) |  (1u << encoder_c.pin_b);
 
+//	need to clear all the flags
+  GPIO_PortClearInterruptFlags(GPIO2, mask); //clear all interrupt sources
 
-    // read pin states
-    if (adjustMailbox.encoder_a == 0){
-		uint32_t pin_state_a = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_A);
-		uint32_t pin_state_b = GPIO_PinReadPadStatus(KNOB_A_GPIO, KNOB_A_GPIO_B);
+  // ignore spurious edges (debounce)
+  e_now = TIMER_GetCurrentUs();
+  if((e_now - encoder_last_us) < ENCODER_DEBOUNCE_TIME_US){
+    return;
+  }
 
-		//
-		combined = (pin_state_a << 1) | pin_state_b;
-		code = (last_combined << 2) | combined;
+//    read the gpio
+uint32_t knob_gpio_state = KNOB_GPIO->DR;
 
-		if(code == 0b1101 || code == 0b0100 || code == 0b0010 || code == 0b1011){
-			current_e_state = CCW;
-		}
-		else if (code == 0b1110 || code == 0b0111 || code == 0b0001 || code == 0b1000){
-			current_e_state = CW;
-		}
+uint8_t a_pin_a = (knob_gpio_state >> encoder_a.pin_a) & 1u;
+uint8_t a_pin_b = (knob_gpio_state >> encoder_a.pin_b) & 1u;
+uint8_t a_state = (a_pin_a << 1) | a_pin_b;
 
-		adjustMailbox.encoder_a = current_e_state;
-    }
+uint8_t b_pin_a = (knob_gpio_state >> encoder_b.pin_a) & 1u;
+uint8_t b_pin_b = (knob_gpio_state >> encoder_b.pin_b) & 1u;
+uint8_t b_state = (b_pin_a << 1) | b_pin_b;
 
-    // switch state
-    STATE_set_current(ADJUST);
+uint8_t c_pin_a = (knob_gpio_state >> encoder_c.pin_a) & 1u;
+uint8_t c_pin_b = (knob_gpio_state >> encoder_c.pin_b) & 1u;
+uint8_t c_state = (c_pin_a << 1) | c_pin_b;
 
-    __DSB;
- }
+int8_t a_delta = 0;
+int8_t b_delta = 0;
+int8_t c_delta = 0;
 
- gpio_pin_config_t knob_encoder_config = {
-    kGPIO_DigitalInput,
-    0,
-	kGPIO_IntFallingEdge,
+if(a_state != last_a_state){
+  // update a
+  code = (last_a_state << 2)| a_state;
+  a_delta = delta_table[code];
+  last_a_state = a_state;
+}
+if(b_state != last_b_state){
+  // update b
+  code = (last_b_state << 2)| b_state;
+  b_delta = delta_table[code];
+  last_b_state = b_state;
+}
+if(c_state != last_c_state){
+  // update c
+  code = (last_c_state << 2)| c_state;
+  c_delta = delta_table[code];
+  last_c_state = c_state;
+}
+
+if(a_delta!= 127){
+  // update mailbox
+  adjustMailbox.encoder_a = a_delta;
+}
+if(b_delta!= 127){
+  // update mailbox
+  adjustMailbox.encoder_b = b_delta;
+}
+if(c_delta!= 127){
+  // update mailbox
+  adjustMailbox.encoder_c = c_delta;
+}
+
+STATE_set_current(ADJUST);
+
+}
+
+gpio_pin_config_t knob_encoder_config = {
+  kGPIO_DigitalInput,
+  0,
+kGPIO_IntFallingEdge,
 };
 
 
- void KNOB_Init(void){
-     /* Enable GPIO pin interrupt */
-    GPIO_PinInit(KNOB_A_GPIO, KNOB_A_GPIO_A, &knob_encoder_config);
-    GPIO_PinInit(KNOB_A_GPIO, KNOB_A_GPIO_B, &knob_encoder_config);
-     GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_A);
-   GPIO_PortEnableInterrupts(KNOB_A_GPIO, 1U << KNOB_A_GPIO_B);
+void KNOB_Init(void){
+    /* Enable GPIO pin interrupt */
+  GPIO_PinInit(encoder_a.gpio, encoder_a.pin_a, &knob_encoder_config);
+  GPIO_PinInit(encoder_a.gpio, encoder_a.pin_b, &knob_encoder_config);
+  GPIO_PinInit(encoder_b.gpio, encoder_b.pin_a, &knob_encoder_config);
+  GPIO_PinInit(encoder_b.gpio, encoder_b.pin_b, &knob_encoder_config);
+  GPIO_PinInit(encoder_c.gpio, encoder_c.pin_a, &knob_encoder_config);
+  GPIO_PinInit(encoder_c.gpio, encoder_c.pin_b, &knob_encoder_config);
+  
+  GPIO_PortEnableInterrupts(encoder_a.gpio, 1U << encoder_a.pin_a);
+  GPIO_PortEnableInterrupts(encoder_a.gpio, 1U << encoder_a.pin_b);
+  GPIO_PortEnableInterrupts(encoder_b.gpio, 1U << encoder_b.pin_a);
+  GPIO_PortEnableInterrupts(encoder_b.gpio, 1U << encoder_b.pin_b);
+  GPIO_PortEnableInterrupts(encoder_c.gpio, 1U << encoder_c.pin_a);
+  GPIO_PortEnableInterrupts(encoder_c.gpio, 1U << encoder_c.pin_b);
 
-    EnableIRQ(GPIO2_Combined_16_31_IRQn);
-    
+
+// init encoder pin state and times
+int now = TIMER_GetCurrentUs();
+encoder_a.last_edge_ms = now;
+encoder_b.last_edge_ms = now;
+encoder_c.last_edge_ms = now;
+
+uint32_t encoder_port = KNOB_GPIO->DR;
+
+
+encoder_a.last_state = (((encoder_port >> encoder_a.pin_a) & 0x1U) << 1) | ((encoder_port >> encoder_a.pin_b) & 0x1U);
+encoder_b.last_state = (((encoder_port >> encoder_b.pin_a) & 0x1U) << 1) | ((encoder_port >> encoder_b.pin_b) & 0x1U);
+encoder_c.last_state = (((encoder_port >> encoder_c.pin_a) & 0x1U) << 1) | ((encoder_port >> encoder_c.pin_b) & 0x1U);
+
+
+  EnableIRQ(GPIO2_Combined_16_31_IRQn);
 }

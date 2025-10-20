@@ -293,6 +293,10 @@ BOARD_InitPins:
     drive_strength: R0_4}
   - {pin_num: B13, peripheral: GPIO2, signal: 'gpio_io, 26', pin_signal: GPIO_B1_10, open_drain: Disable}
   - {pin_num: C13, peripheral: GPIO2, signal: 'gpio_io, 27', pin_signal: GPIO_B1_11, open_drain: Disable}
+  - {pin_num: A12, peripheral: GPIO2, signal: 'gpio_io, 24', pin_signal: GPIO_B1_08}
+  - {pin_num: A13, peripheral: GPIO2, signal: 'gpio_io, 25', pin_signal: GPIO_B1_09}
+  - {pin_num: B12, peripheral: GPIO2, signal: 'gpio_io, 23', pin_signal: GPIO_B1_07}
+  - {pin_num: C12, peripheral: GPIO2, signal: 'gpio_io, 22', pin_signal: GPIO_B1_06}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -348,6 +352,10 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_03_LCD_DATA15, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_04_LCD_DATA16, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_05_LCD_DATA17, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_06_GPIO2_IO22, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_07_GPIO2_IO23, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_08_GPIO2_IO24, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_09_GPIO2_IO25, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_10_GPIO2_IO26, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_11_GPIO2_IO27, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_B1_12_USDHC1_CD_B, 0U); 

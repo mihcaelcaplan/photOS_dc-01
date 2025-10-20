@@ -357,6 +357,10 @@
                         <pin_feature name="open_drain" value="Disable"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="GPIO2" signal="gpio_io, 24" pin_num="A12" pin_signal="GPIO_B1_08"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 25" pin_num="A13" pin_signal="GPIO_B1_09"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 23" pin_num="B12" pin_signal="GPIO_B1_07"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 22" pin_num="C12" pin_signal="GPIO_B1_06"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UART">

@@ -38,7 +38,7 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK 0x4300U /*!< GPIO1 and GPIO6 share same IO MUX function, GPIO_MUX1 selects one GPIO function: affected bits mask */
-#define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0xCC000000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
+#define BOARD_INITPINS_IOMUXC_GPR_GPR27_GPIO_MUX2_GPIO_SEL_MASK 0xCFC00000U /*!< GPIO2 and GPIO7 share same IO MUX function, GPIO_MUX2 selects one GPIO function: affected bits mask */
 
 /* GPIO_SD_B0_01 (coord J3), SD1_CLK/J24[3]/SD1_CLK/J22[5]/J17[3] */
 /* Routed pin properties */
@@ -330,6 +330,62 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_ENET_RXER_PORT                                      GPIO2   /*!< PORT peripheral base pointer */
 #define BOARD_INITPINS_ENET_RXER_PIN                                         27U   /*!< PORT pin number */
 #define BOARD_INITPINS_ENET_RXER_PIN_MASK                            (1U << 27U)   /*!< PORT pin mask */
+
+/* GPIO_B1_08 (coord A12), ENET_TXD1/ENET_TXD1/U18[25] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ENET_TXD1_PERIPHERAL                                GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_ENET_TXD1_SIGNAL                                  gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_ENET_TXD1_CHANNEL                                     24U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_ENET_TXD1_GPIO                                      GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXD1_GPIO_PIN                                    24U   /*!< GPIO pin number */
+#define BOARD_INITPINS_ENET_TXD1_GPIO_PIN_MASK                       (1U << 24U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_ENET_TXD1_PORT                                      GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXD1_PIN                                         24U   /*!< PORT pin number */
+#define BOARD_INITPINS_ENET_TXD1_PIN_MASK                            (1U << 24U)   /*!< PORT pin mask */
+
+/* GPIO_B1_09 (coord A13), ENET_TXEN/ENET_TXEN/U18[23] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ENET_TXEN_PERIPHERAL                                GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_ENET_TXEN_SIGNAL                                  gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_ENET_TXEN_CHANNEL                                     25U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_ENET_TXEN_GPIO                                      GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXEN_GPIO_PIN                                    25U   /*!< GPIO pin number */
+#define BOARD_INITPINS_ENET_TXEN_GPIO_PIN_MASK                       (1U << 25U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_ENET_TXEN_PORT                                      GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXEN_PIN                                         25U   /*!< PORT pin number */
+#define BOARD_INITPINS_ENET_TXEN_PIN_MASK                            (1U << 25U)   /*!< PORT pin mask */
+
+/* GPIO_B1_07 (coord B12), ENET_TXD0/ENET_TXD0/U18[24] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ENET_TXD0_PERIPHERAL                                GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_ENET_TXD0_SIGNAL                                  gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_ENET_TXD0_CHANNEL                                     23U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_ENET_TXD0_GPIO                                      GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXD0_GPIO_PIN                                    23U   /*!< GPIO pin number */
+#define BOARD_INITPINS_ENET_TXD0_GPIO_PIN_MASK                       (1U << 23U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_ENET_TXD0_PORT                                      GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_ENET_TXD0_PIN                                         23U   /*!< PORT pin number */
+#define BOARD_INITPINS_ENET_TXD0_PIN_MASK                            (1U << 23U)   /*!< PORT pin mask */
+
+/* GPIO_B1_06 (coord C12), ENET_CRS_DV/ENET_CRS_DV/U18[18] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ENET_CRS_DV_PERIPHERAL                              GPIO2   /*!< Peripheral name */
+#define BOARD_INITPINS_ENET_CRS_DV_SIGNAL                                gpio_io   /*!< Signal name */
+#define BOARD_INITPINS_ENET_CRS_DV_CHANNEL                                   22U   /*!< Signal channel */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_ENET_CRS_DV_GPIO                                    GPIO2   /*!< GPIO peripheral base pointer */
+#define BOARD_INITPINS_ENET_CRS_DV_GPIO_PIN                                  22U   /*!< GPIO pin number */
+#define BOARD_INITPINS_ENET_CRS_DV_GPIO_PIN_MASK                     (1U << 22U)   /*!< GPIO pin mask */
+#define BOARD_INITPINS_ENET_CRS_DV_PORT                                    GPIO2   /*!< PORT peripheral base pointer */
+#define BOARD_INITPINS_ENET_CRS_DV_PIN                                       22U   /*!< PORT pin number */
+#define BOARD_INITPINS_ENET_CRS_DV_PIN_MASK                          (1U << 22U)   /*!< PORT pin mask */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
