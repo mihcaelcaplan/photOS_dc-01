@@ -41,8 +41,8 @@ int main(void) {
     BOARD_InitBootClocks();
     BOARD_InitBootPeripherals();
     BOARD_InitDebugConsole();
-    TIMER_Init();
     BUTTON_Init();
+    TIMER_Init();
     KNOB_Init();
     
     // set up pmic
@@ -60,6 +60,7 @@ int main(void) {
     
     
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
+//    TIMER_TurnOnInterrupts();
     STATE_Init(); //start the state machine
 
 

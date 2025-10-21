@@ -1090,6 +1090,33 @@
                         </struct>
                      </config_set>
                   </instance>
+                  <instance name="PIT" uuid="80dc1f5f-9d9c-4986-966c-48520b7008c5" type="pit" type_id="pit_2.0.3" mode="LPTMR_GENERAL" peripheral="PIT" enabled="false" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="fsl_pit">
+                        <setting name="enableRunInDebug" value="false"/>
+                        <setting name="enableSharedInterrupt" value="false"/>
+                        <struct name="sharedInterrupt">
+                           <setting name="IRQn" value="PIT_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <struct name="timingConfig">
+                           <setting name="clockSource" value="BusInterfaceClock"/>
+                           <setting name="clockSourceFreq" value="ClocksTool_DefaultInit"/>
+                        </struct>
+                        <array name="channels">
+                           <struct name="0">
+                              <setting name="channel_id" value="CHANNEL_0"/>
+                              <setting name="channelNumber" value="0"/>
+                              <setting name="enableChain" value="false"/>
+                              <setting name="timerPeriod" value="1kHz"/>
+                              <setting name="startTimer" value="true"/>
+                              <setting name="enableInterrupt" value="true"/>
+                           </struct>
+                        </array>
+                     </config_set>
+                  </instance>
                </instances>
             </functional_group>
          </functional_groups>

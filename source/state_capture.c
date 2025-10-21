@@ -13,6 +13,8 @@
 #include "storage_sd_device.h"
 #include "display_file.h"
 #include "fsl_csi.h"
+#include "image_processing.h"
+
 
 // declare some objects
 //AT_NONCACHEABLE_SECTION(static FATFS g_fileSystem); /* File system object */
@@ -23,7 +25,7 @@ AT_NONCACHEABLE_SECTION(static FIL attributeFil);
 void STATE_Capture_Enter(void){
 
     // make options 
-    demosaic_options_t db_options;
+    // demosaic_options_t db_options;
 	// #define ZOOM_LEVEL zoom_level_2
     PROCESSING_MakeOptions(zoom_level, &db_options);
     

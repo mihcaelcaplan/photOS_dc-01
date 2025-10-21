@@ -20,6 +20,7 @@ struct inputMailbox{
 	encoder_state_t encoder_a;
 	encoder_state_t encoder_b;
 	encoder_state_t encoder_c;
+	uint8_t multifunction_toggle;
 };
 
 extern volatile struct inputMailbox adjustMailbox;

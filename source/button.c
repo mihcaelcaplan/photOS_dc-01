@@ -7,14 +7,28 @@
 
  #include "button.h"
  #include "state.h"
+ #include "state_adjust.h"
 #include "timer.h"
 
+
+// ONOFF BUTTON (already debounced in hardware)
+void SNVS_LP_WRAPPER_IRQHandler(void){
+//	clear flag
+	SNVS->LPSR |= SNVS_LPSR_SPOF_MASK; // w1c reg
+
+    STATE_set_current(CAPTURE);
+}
+
+
+// need my own debounce for this
 volatile bool button_pressed = 0;
 volatile long now = 0;
 volatile long last_irq_time = 0;
 volatile long button_press_start = 0;
 #define DEBOUNCE_TIME 50000
 
+
+// WAKEUP BUTTON
  void GPIO5_Combined_0_15_IRQHandler(void){
     GPIO_PortClearInterruptFlags(GPIO5, 1U << 0); //clear
     uint32_t pin_state = GPIO_PinReadPadStatus(GPIO5, 0);
@@ -37,8 +51,11 @@ volatile long button_press_start = 0;
         long duration = now - button_press_start;  //   CALCULATE DURATION
 
         // Handle state transitions based on duration
-        if (duration < 400000) STATE_set_current(CAPTURE);
-        else STATE_set_current(ADJUST);
+        if (duration < 400000) { // short press
+            adjustMailbox.multifunction_toggle = 1;
+
+        }
+        // else STATE_set_current(ADJUST);
       }
 
     SDK_ISR_EXIT_BARRIER;
@@ -52,10 +69,12 @@ gpio_pin_config_t main_sw_config = {
 
 
 void BUTTON_Init(void){
-     /* Enable GPIO pin interrupt */
+     /* Enable GPIO pin interrupt  for wakeup button*/
     GPIO_PinInit(GPIO5, 0, &main_sw_config);
     GPIO_PortEnableInterrupts(GPIO5, 1U << 0);
-
     EnableIRQ(GPIO5_Combined_0_15_IRQn);
+
+    /*Enable Snvs lp interrupt for onoff button*/
+    EnableIRQ(SNVS_LP_WRAPPER_IRQn);
     
 }

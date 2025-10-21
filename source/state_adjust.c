@@ -31,7 +31,8 @@ zoom_level_t last_zoom_level = zoom_level_1;
 volatile struct inputMailbox adjustMailbox = {
 		.encoder_a = 0,
 		.encoder_b = 0,
-		.encoder_c = 0
+		.encoder_c = 0,
+		.multifunction_toggle = 0
 };
 
 encoder_state_t _encoder_a = 0;
@@ -49,12 +50,19 @@ int last_gain = 0;
 void STATE_Adjust_Enter(void) {
     PRINTF("ADJUST: Entering adjust state\r\n");
 
-    
+	// check if multifunction toggle is requested and switch encoder control as necessary
+
+
+    // store local values
     _encoder_a = adjustMailbox.encoder_a;
     _encoder_b = adjustMailbox.encoder_b;
     _encoder_c = adjustMailbox.encoder_c;
+	//clear mailboxes
+    adjustMailbox.encoder_a = 0;
+    adjustMailbox.encoder_b = 0;
+    adjustMailbox.encoder_c = 0;
 
-	//    check the mailbox
+	//    check the mailbox values rcved and update if necessary
 	if(_encoder_a == CW){
 		current_gain = db_options.r_gain+=10;
 		last_gain = current_gain;
@@ -83,16 +91,11 @@ void STATE_Adjust_Enter(void) {
 	}
 
 
-
-
     PRINTF("ADJUST R: %d\r\n", db_options.r_gain);
     PRINTF("ADJUST G: %d\r\n", db_options.g_gain);
     PRINTF("ADJUST B: %d\r\n", db_options.b_gain);
 	
-    //clear mailboxes
-    adjustMailbox.encoder_a = 0;
-    adjustMailbox.encoder_b = 0;
-    adjustMailbox.encoder_c = 0;
+
 
 
 //    if(last_zoom_level == zoom_level_1){

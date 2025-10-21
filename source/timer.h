@@ -14,5 +14,13 @@ void TIMER_Init(void);
 
 int TIMER_GetCurrentUs(void);
 
+void TIMER_ScheduleInterrupt(int interruptTime);
+void TIMER_TurnOnInterrupts(void);
+
+
+// GPT interrupt timing
+#define GPT_INTERRUPT_PERIOD_US 1000
+
+extern volatile int last_scheduled_interrupt;
 
 #endif /* TIMER_H_ */
