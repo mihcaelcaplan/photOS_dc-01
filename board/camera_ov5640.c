@@ -20,10 +20,20 @@
 #define OV5460_I2C_ADDRESS_READ 0x3C
 #define RESET_GPIO 14U
 
+extern ov5640_settings_t ov5640_settings = {
+	.exp_width = 2,
+	// .exposure = 76, // for aec midpoint
+	.exposure = 1000, // for manual
+	.gain  = 1,
+	.vts = 1968 //default full width
+};
+
+
 // counters for irqs to catch overfiring
 int lcdirqc = 0;
 int lcdirqbufchangec = 0;
 int csiirqc = 0;
+
 
 
 void LCDIF_IRQHandler(void){
@@ -181,21 +191,32 @@ void registerInit(void){
 	
 	// OV5640_I2CWrite8(0x4009, 0x89); //default: b[0] = blc enable
 
-	// AEC target 
-//	main wpt bpt
-	OV5640_I2CWrite8(0x3a0f, 0x50); // , wpt
-	OV5640_I2CWrite8(0x3a10, 0x48); // , bpt
+	// try a manual exposure/gain setting
+	OV5640_I2CWrite8(0x3503, 0x03); // turn on manual aec and agc
 
-	OV5640_I2CWrite8(0x3a1b, 0x50); // , wpt2
-	OV5640_I2CWrite8(0x3a1e, 0x46); // , bp2
+	// call helper to sync w/ settings
+	OV5640_SetExposure(ov5640_settings.exposure);
+	
+	
 
-//	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
-//	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
+// // AEC target 
+// //	main wpt bpt
+// 	uint8_t black_point = ov5640_settings.exposure - (ov5640_settings.exp_width/2);
+// 	uint8_t white_point = ov5640_settings.exposure + (ov5640_settings.exp_width/2);
 
-	// AGC gain
-	OV5640_I2CWrite8(0x3a13, 0x80); // pre-gain = 2x
-	OV5640_I2CWrite8(0x3a18, 0x00); // gain ceiling
-	OV5640_I2CWrite8(0x3a19, 0x10); // gain ceiling = 3x
+// 	OV5640_I2CWrite8(0x3a0f, white_point); // , wpt
+// 	OV5640_I2CWrite8(0x3a10, black_point); // , bpt
+
+// 	OV5640_I2CWrite8(0x3a1b, white_point); // , wpt2
+// 	OV5640_I2CWrite8(0x3a1e, black_point - 2); // , bp2
+
+// //	OV5640_I2CWrite8(0x3a11, 0x60); // fast zone high
+// //	OV5640_I2CWrite8(0x3a1f, 0x14); // fast zone low
+
+// 	// AGC gain
+// 	OV5640_I2CWrite8(0x3a13, 0x80); // pre-gain = 2x
+// 	OV5640_I2CWrite8(0x3a18, 0x00); // gain ceiling
+// 	OV5640_I2CWrite8(0x3a19, 0x10); // gain ceiling = 3x
 
 	// set up gamma
 	OV5640_I2CWrite8(0x5480, 0x01); // Gamma bias plus on, bit[0]
@@ -235,10 +256,11 @@ void registerInit(void){
     OV5640_I2CWrite8(0x380A, 0x07); //DVP output vertical height [11:8]
     OV5640_I2CWrite8(0x380B, 0x80); //DVP output vertical height [7:0]
 //
-//    OV5640_I2CWrite8(0x380C, 0x02) ; // total horizontal size [11:8]
-//    OV5640_I2CWrite8(0x380D, 0xf8); // total horizontal size [7:0]
-//    OV5640_I2CWrite8(0x380E, 0x02); // total vertical size[11:8]
-//    OV5640_I2CWrite8(0x380F, 0xe0); // total vertical size[ 7:0]
+//    OV5640_I2CWrite8(0x380C, 0x0b) ; // total horizontal size [11:8]
+//    OV5640_I2CWrite8(0x380D, 0x1c); // total horizontal size [7:0]
+//    OV5640_I2CWrite8(0x380E, 0x0f); // total vertical size[11:8]
+//    OV5640_I2CWrite8(0x380F, 0x60); // total vertical size[ 7:0]
+
 //    	0x380c, 0x0b, // HTS 		//
 //    	0x380d, 0x1c, // HTS
 //    	0x380e, 0x07, // VTS 		//
@@ -660,3 +682,70 @@ void fill_framebuffer_gradient(uint8_t *framebuffer, int width, int height) {
         }
     }
 }
+
+//void OV5640_SetBlackPoint(uint8_t exposure){
+//	// revise AEC target
+//	//	main wpt bpt
+//		OV5640_I2CWrite8(0x3a10, exposure); // , bpt
+//		OV5640_I2CWrite8(0x3a1e, exposure-2); // , bpt-2 (a little stability)
+//}
+//
+//void OV5640_SetWhitePoint(uint8_t exposure){
+//	// revise AEC target
+//	//	main wpt bpt
+//		OV5640_I2CWrite8(0x3a0f, exposure); // , wpt
+//		OV5640_I2CWrite8(0x3a1b, exposure); // , wpt2
+//}
+//
+
+
+#define MIN_VTS 1968 // working
+/* this should actually set frame rate with exposure at some specific steps */
+void OV5640_SetExposure(uint32_t exposure){
+
+
+	// bounds checking why do i need that :)
+	if((exposure > 7000) || (exposure == 0)) return;
+
+	uint32_t raw = exposure << 4;        // convert lines to raw register units
+	uint8_t upper  = (raw >> 16) & 0x0F; // bits 16–19
+	uint8_t middle = (raw >> 8)  & 0xFF; // bits 8–15
+	uint8_t lower  = raw & 0xF0;         // bits 4–7 into high nibble
+	
+	// //get the upper 4 bits 
+	// uint8_t upper = (exposure >> 8) & 0x0F;
+
+	// // shift the middle 8 bits (4:12)
+	// uint8_t middle = (exposure >> 4) & 0xFF; //middle 8 bits
+	
+	// // take the bottom 4 bits of the number and shift left 4
+	// uint8_t lower = (exposure & 0x0F) << 4; //lower 8 bits ( Lower four bits are a fraction of a line; they should be 0 since OV5640 does not support fraction line exposure)
+
+	OV5640_I2CWrite8(0x3500, upper); // don't write the top reg
+	OV5640_I2CWrite8(0x3501, middle); // guess an exposure value
+	OV5640_I2CWrite8(0x3502, lower); // guess an exposure value
+
+	// so then VTS should be exposure/16+safety, where safety = 8 or so
+	uint32_t vertical_size = 0;
+	if(exposure > MIN_VTS){
+		vertical_size = exposure+8;
+		OV5640_I2CWrite8(0x380E, (vertical_size >> 8) & 0xFF); // total vertical size[15:8]
+		OV5640_I2CWrite8(0x380F, vertical_size & 0xFF); // total vertical size[ 7:0]
+	}
+	else{ 
+		vertical_size = MIN_VTS;
+		OV5640_I2CWrite8(0x380E, (vertical_size >> 8) & 0xFF); // total vertical size[15:8]
+		OV5640_I2CWrite8(0x380F, vertical_size & 0xFF); // total vertical size[ 7:0]
+	}
+
+}
+
+void OV5640_SetGain(uint8_t gain){
+
+	if( gain > 64 || gain == 0 ) return;
+
+	OV5640_I2CWrite8(0x350B, gain);
+
+}
+
+

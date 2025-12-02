@@ -53,6 +53,8 @@ volatile long button_press_start = 0;
         // Handle state transitions based on duration
         if (duration < 400000) { // short press
             adjustMailbox.multifunction_toggle = 1;
+            STATE_set_current(ADJUST);
+
 
         }
         // else STATE_set_current(ADJUST);
