@@ -17,7 +17,7 @@
 //#include "clock_config.h"
 //#include "board.h"
 
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/

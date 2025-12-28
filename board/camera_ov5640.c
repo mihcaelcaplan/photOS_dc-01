@@ -9,7 +9,7 @@
 #include "fsl_lpi2c.h"
 #include "fsl_gpio.h"
 #include "fsl_common.h"
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 #include "fsl_csi.h"
 #include "fsl_debug_console.h"
 #include "fsl_elcdif.h"

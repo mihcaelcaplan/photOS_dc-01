@@ -6,7 +6,7 @@
  */
 
 #include "display_file.h"
-#include "elcdif_rgb.h"
+#include "hardware/elcdif_rgb.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -19,11 +19,11 @@
 
 #include "lcd_st7701.h"
 #include "fsl_elcdif.h"
-#include "global_buffers.h"
-#include "storage_sd_device.h"
+#include "app/global_buffers.h"
+#include "hardware/storage_sd_device.h"
 #include "fsl_elcdif.h"
-#include "jpeg_interface.h"
-#include "global_buffers.h"
+#include "image/jpeg_interface.h"
+#include "app/global_buffers.h"
 
 
 

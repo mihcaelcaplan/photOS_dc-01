@@ -6,8 +6,8 @@
  */
 
  #include "button.h"
- #include "state.h"
- #include "state_adjust.h"
+ #include "app/state.h"
+ #include "app/state_adjust.h"
 #include "timer.h"
 
 

@@ -5,7 +5,7 @@
  *      Author: mcaplan
  */
 
-#include "sdmmc_config.h"
+#include "device_conf/sdmmc_config.h"
 #include "fsl_common.h"
 #include "usb.h"
 

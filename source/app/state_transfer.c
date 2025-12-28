@@ -7,7 +7,7 @@
 
 #include "state_transfer.h"
 #include "fsl_debug_console.h"
-#include "display_interface.h"
+#include "hardware/display_interface.h"
 
 void STATE_Transfer_Enter(void) {
     DISPLAY_Off();

@@ -15,20 +15,20 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "fsl_debug_console.h"
-#include "storage_usb_device.h"
-#include "sdmmc_config.h"
-#include "usb_mux.h"
+#include "hardware/storage_usb_device.h"
+#include "device_conf/sdmmc_config.h"
+#include "hardware/usb_mux.h"
 #include "debug_shell.h"
-#include "display_interface.h"
+#include "hardware/display_interface.h"
 #include "utils.h"
-#include "camera_interface.h"
-#include "battery_interface.h"
-#include "state.h"
-#include "events.h"
-#include "timer.h"
-#include "display_file.h"
-#include "button.h"
-#include "knob.h"
+#include "hardware/camera_interface.h"
+#include "hardware/battery_interface.h"
+#include "app/state.h"
+#include "app/events.h"
+#include "hardware/timer.h"
+#include "app/display_file.h"
+#include "hardware/button.h"
+#include "hardware/knob.h"
 
 /*
  * @brief   Application entry point.
@@ -44,10 +44,12 @@ int main(void) {
     BUTTON_Init();
     TIMER_Init();
     KNOB_Init();
-    
+      
+    // no gas guge yet
+
     // set up pmic
     MUX_Init(); //switch mux to pmic
-    pmic_connected_t usb_connected = BATTERY_Init(); // turn on dp/dm detection
+    pmic_connected_t usb_connected = BATTERY_Init(); // turn on dp/dm detection   
     MUX_ToUSBC();
     
     BOARD_USB_Disk_Config(USB_DEVICE_INTERRUPT_PRIORITY);
@@ -55,14 +57,16 @@ int main(void) {
     USB_DeviceApplicationInit();
     USB_DeviceAppStart();
     
-    DISPLAY_Init();
+    // imx rt 
+    DISPLAY_Init();  // overlay, 
     CAMERA_Init();
-    
     
     PRINTF("Hello World, I'm photOS, the operating system for the DC-0x cameras.\r\n");
 //    TIMER_TurnOnInterrupts();
     STATE_Init(); //start the state machine
 
+    //parallel
+    // 8 sensor, 18 
 
     // shouldn't get here but will let debugger hook if it does
     PRINTF("IDLE... \r\n");

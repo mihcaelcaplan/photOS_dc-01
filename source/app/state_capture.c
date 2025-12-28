@@ -7,13 +7,13 @@
 
 #include "state.h"
 #include "fsl_debug_console.h"
-#include "global_buffers.h"
-#include "image_processing.h"
-#include "jpeg_interface.h"
-#include "storage_sd_device.h"
-#include "display_file.h"
+#include "app/global_buffers.h"
+#include "image/image_processing.h"
+#include "image/jpeg_interface.h"
+#include "hardware/storage_sd_device.h"
+#include "app/display_file.h"
 #include "fsl_csi.h"
-#include "image_processing.h"
+#include "image/image_processing.h"
 
 
 // declare some objects

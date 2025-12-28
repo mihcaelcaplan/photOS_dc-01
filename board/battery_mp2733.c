@@ -5,7 +5,7 @@
  *      Author: mcaplan
  */
 
-#include "battery_interface.h"
+#include "hardware/battery_interface.h"
 #include "fsl_lpi2c.h"
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"

@@ -5,7 +5,7 @@
  *      Author: mcaplan
  */
 
-#include "display_interface.h"
+#include "hardware/display_interface.h"
 
 #include "fsl_lpspi.h"
 #include "fsl_debug_console.h"
@@ -13,8 +13,8 @@
 #include"lcd_st7701.h"
 #include "utils.h"
 
-#include "elcdif_rgb.h"
-#include "global_buffers.h"
+#include "hardware/elcdif_rgb.h"
+#include "app/global_buffers.h"
 #include "fsl_elcdif.h"
 
 
@@ -612,7 +612,7 @@ void DISPLAY_Init(void){
 //    * Here use the video pll (93MHz) as pixel clock source,
 //    * pixel clock = F_video_pll / (prediv + 1) / (div + 1) = 93 / 5 / 2 = 9.3M.
 //    */
-uint32_t videoPllFreq;
+//uint32_t videoPllFreq;
 
    CLOCK_EnableClock(kCLOCK_Lcd);
    CLOCK_EnableClock(kCLOCK_LcdPixel);
@@ -630,7 +630,7 @@ uint32_t videoPllFreq;
 			.vfp           = APP_VFP,
 			.vbp           = APP_VBP,
 			.polarityFlags = APP_POL_FLAGS,
-			.bufferAddr    = NULL,
+			.bufferAddr    = (uint32_t)NULL,
 			.pixelFormat   = kELCDIF_PixelFormatRGB888,
 			.dataBus       = kELCDIF_DataBus18Bit,
 		};

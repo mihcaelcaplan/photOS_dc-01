@@ -8,7 +8,7 @@
 #include "fsl_common.h"
 #include "fsl_debug_console.h"
 #include "storage_usb_device.h"
-#include "state.h"
+#include "app/state.h"
 
 // Global variable definitions
 USB_DMA_INIT_DATA_ALIGN(USB_DATA_ALIGN_SIZE)

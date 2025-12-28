@@ -8,7 +8,7 @@
 #include "image_processing.h"
 #include "camera_ov5640.h"
 #include "fsl_debug_console.h"
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 #include "jpeglib.h"
 
 // create row buffer pointers for use in pointer rotations

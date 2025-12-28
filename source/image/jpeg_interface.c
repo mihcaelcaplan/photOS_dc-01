@@ -5,9 +5,9 @@
  *      Author: mcaplan
  */
 
-#include "jpeg_interface.h"
+#include "image/jpeg_interface.h"
 #include "jpeglib.h"
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 
 #include "fsl_debug_console.h"
 

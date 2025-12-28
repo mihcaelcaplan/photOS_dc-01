@@ -11,7 +11,7 @@
 #define I2C_CAMERA_CONTROL
 
 #include "fsl_common.h"
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 
 // internal prototypes
 void OV5640_Init(void);

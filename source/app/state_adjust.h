@@ -9,7 +9,7 @@
 #define STATE_ADJUST_H_
 
 #include "state.h"
-#include "knob.h"
+#include "hardware/knob.h"
 
 void STATE_Adjust_Enter(void);
 void STATE_Adjust_Exit(void);

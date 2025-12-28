@@ -7,12 +7,12 @@
 
 #include "state.h"
 #include "fsl_debug_console.h"
-#include "battery_interface.h"
-#include "storage_usb_device.h"
-#include "state_compose.h"
-#include "state_capture.h"
-#include "state_transfer.h"
-#include "state_adjust.h"
+#include "hardware/battery_interface.h"
+#include "hardware/storage_usb_device.h"
+#include "app/state_compose.h"
+#include "app/state_capture.h"
+#include "app/state_transfer.h"
+#include "app/state_adjust.h"
 
 
 
@@ -81,7 +81,7 @@ void STATE_transition() {
                 STATE_Transfer_Enter();
                 break;
             case STOW:
-                // PRINTF("STATE: Entering STOW mode\r\n");
+                // PRINTF("STATE: Entering STOW mode\r\n"); // low power sleep
                 break;
             default:
                 // PRINTF("STATE: Unknown state %d\r\n", new_state);

@@ -8,7 +8,7 @@
 #ifndef USB_DEVICE_H_
 #define USB_DEVICE_H_
 
-#include "sdmmc_config.h"
+#include "device_conf/sdmmc_config.h"
 #include "fsl_common.h"
 #include "board.h"
 #include "storage_sd_device.h"

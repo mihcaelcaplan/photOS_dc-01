@@ -9,7 +9,7 @@
 #define UTILS_H_
 
 #include "fsl_common.h"
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 
 // redefine the entry vector for the on tick interrupt to make g_systickCounter* 1 ms resolution timer
 //void SysTick_Handler(void);

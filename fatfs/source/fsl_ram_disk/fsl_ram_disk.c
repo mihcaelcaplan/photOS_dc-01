@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "ffconf.h"
+#include "device_conf/ffconf.h"
 
 /* This fatfs subcomponent is disabled by default
  * To enable it, define following macro in ffconf.h */

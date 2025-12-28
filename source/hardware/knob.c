@@ -5,8 +5,8 @@
  *      Author: mcaplan
  */
 #include "knob.h"
-#include "state_adjust.h"
-#include "state.h"
+#include "app/state_adjust.h"
+#include "app/state.h"
 //#include "fsl_pit.h"
 #include "fsl_gpt.h"
 #include "timer.h"

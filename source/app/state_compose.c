@@ -13,14 +13,22 @@
 #include "fsl_gpio.h"
 #include "fsl_common.h"
 #include <stdbool.h>
-#include "global_buffers.h"
+#include "app/global_buffers.h"
 #include "lcd_st7701.h"
 #include "camera_ov5640.h"
 #include "utils.h"
-#include "timer.h"
-#include "image_processing.h"
+#include "hardware/timer.h"
+#include "image/image_processing.h"
 
 
+
+// compose, 
+
+// fllow of user, 
+// adjust settings, opaque 
+//exp, gain, zoom, 
+// color grading
+// 
 
 void STATE_Compose_Enter(void) {
     PRINTF("COMPOSE: Entering compose loop\r\n");
