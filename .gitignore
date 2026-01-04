@@ -3,3 +3,9 @@
 *.launch
 /.settings/
 *.DS_Store
+/ReleaseFR/
+/Partion_A/
+/Partition_A/
+/A_Partition/
+/Partition_Bootloader/
+/B_Partition/

@@ -29,7 +29,6 @@
 #include "app/display_file.h"
 #include "hardware/button.h"
 #include "hardware/knob.h"
-
 /*
  * @brief   Application entry point.
  */
