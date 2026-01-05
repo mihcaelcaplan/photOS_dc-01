@@ -56,7 +56,7 @@ int main(void) {
     USB_DeviceApplicationInit();
     USB_DeviceAppStart();
     
-    // imx rt 
+    // imx rt
     DISPLAY_Init();  // overlay, 
     CAMERA_Init();
     

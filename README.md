@@ -23,3 +23,18 @@ To make the image bootable, vs. debuggable, you must change the Active Build Con
 - Add SDK components as in [SDK Components](https://www.notion.so/Programming-Guide-19efa9aeb374801a982dc767bf2b354d?pvs=21).
 - Can change memory regions, linker settings and execution from memory [Image Structure and Memory](https://www.notion.so/Image-Structure-and-Memory-1edfa9aeb37480cd91cdcb594340707d?.pvs=21)
 - For all the details, see the full processor reference manual in `/documentation/IMXRT1060XRM.pdf`.
+
+## To build release
+add to environment variables
+    MCU_IDE - /path/to/xpressoide
+    MCU_WORKSPACE - /path/to/mcuworkspace
+
+    
+
+
+
+
+
+
+
+
