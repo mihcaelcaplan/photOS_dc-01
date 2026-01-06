@@ -29,7 +29,13 @@ add to environment variables
     MCU_IDE - /path/to/xpressoide
     MCU_WORKSPACE - /path/to/mcuworkspace
 
-    
+close mcuxpresso (workspace cant be used in two places at once lmao)
+
+make executable and run release_scripts/build_release.sh with first argument being tag to pass (i.e)
+
+chmod +x release_scripts/build_release.sh
+release_scripts/build_release.sh example_tag_1_0_0
+
 
 
 
