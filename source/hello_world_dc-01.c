@@ -29,6 +29,7 @@
 #include "display_file.h"
 #include "button.h"
 #include "knob.h"
+#include "ff.h"
 
 /*
  * @brief   Application entry point.

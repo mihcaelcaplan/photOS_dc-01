@@ -5,18 +5,26 @@
  *      Author: mcaplan
  */
 
- #include "button.h"
- #include "state.h"
- #include "state_adjust.h"
+#include "button.h"
+#include "state.h"
+#include "state_adjust.h"
+#include "state_capture.h"
 #include "timer.h"
 
+
+/* maybe should really be called buttonS.c because i implement the 2 main buttons in here :) */
 
 // ONOFF BUTTON (already debounced in hardware)
 void SNVS_LP_WRAPPER_IRQHandler(void){
 //	clear flag
 	SNVS->LPSR |= SNVS_LPSR_SPOF_MASK; // w1c reg
 
-    STATE_set_current(CAPTURE);
+	if(STATE_get_current() == CAPTURE && CAPTURE_MODE == MOVIE){
+		// set capture end
+		cap_control.capture_end = true;
+	}
+
+	STATE_set_current(CAPTURE);
 }
 
 
