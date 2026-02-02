@@ -230,7 +230,8 @@ void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *use
     ((sd_card_t *)card)->usrParam.pwr        = BOARD_SDCardPowerControl;
     ((sd_card_t *)card)->usrParam.ioStrength = BOARD_SD_Pin_Config;
     ((sd_card_t *)card)->usrParam.ioVoltage  = &s_ioVoltage;
-    ((sd_card_t *)card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
+     ((sd_card_t *)card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
+//    ((sd_card_t *)card)->usrParam.maxFreq    = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
 
     BOARD_SDCardPowerResetInit();
     BOARD_SDCardDetectInit(cd, userData);

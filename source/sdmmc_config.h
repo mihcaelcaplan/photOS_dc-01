@@ -48,7 +48,7 @@
  * detect pin for card detection is recommended.
  */
 #define BOARD_SDMMC_SD_CD_TYPE                       kSD_DetectCardByGpioCD
-#define BOARD_SDMMC_SD_CARD_DETECT_DEBOUNCE_DELAY_MS (100U)
+#define BOARD_SDMMC_SD_CARD_DETECT_DEBOUNCE_DELAY_MS (50U)
 /*! @brief SD power reset */
 #define BOARD_SDMMC_SD_POWER_RESET_GPIO_BASE GPIO1
 #define BOARD_SDMMC_SD_POWER_RESET_GPIO_PORT 1

@@ -21,6 +21,7 @@ typedef struct {
     DWORD patch_riff_avi_size;
     DWORD patch_avih_totalframes;
     DWORD patch_movi_size;
+    DWORD patch_strh_length;
 } patch_info_t;
 
 // typedef struct patches;
@@ -91,34 +92,36 @@ typedef struct {
     DWORD dwReserved[4];
 } MainAVIHeader;
 
-/* for audio */
-// typedef struct {
-//     DWORD dwFourCC;
-//     DWORD dwSize;
+typedef struct {
+    DWORD dwFourCC;
+    DWORD dwSize;
 
-//     DWORD fccType;
-//     DWORD fccHandler;
-//     DWORD dwFlags;
-//     WORD  wPriority;
-//     WORD  wLanguage;
-//     DWORD dwInitialFrames;
-//     DWORD dwScale;
-//     DWORD dwRate;
-//     DWORD dwStart;
-//     DWORD dwLength;
-//     DWORD dwSuggestedBufferSize;
-//     DWORD dwQuality;
-//     DWORD dwSampleSize;
+    DWORD fccType;
+    DWORD fccHandler;
+    DWORD dwFlags;
+    WORD  wPriority;
+    WORD  wLanguage;
+    DWORD dwInitialFrames;
+    DWORD dwScale;
+    DWORD dwRate;
+    DWORD dwStart;
+    DWORD dwLength;
+    DWORD dwSuggestedBufferSize;
+    DWORD dwQuality;
+    DWORD dwSampleSize;
+    // do i need rcFrame here? yes i think
+    DWORD dwRcStart;
+    DWORD dwRcEnd;
 
-// } AVIStreamHeader;
+} AVIStreamHeader;
 
 typedef struct {
     DWORD dwFourCC;
     DWORD dwSize;
 
     DWORD biSize;
-    DWORD  biWidth;
-    DWORD  biHeight;
+    DWORD biWidth;
+    DWORD biHeight;
     WORD  biPlanes;
     WORD  biBitCount;
     DWORD biCompression;

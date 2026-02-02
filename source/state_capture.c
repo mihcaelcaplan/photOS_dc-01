@@ -16,6 +16,8 @@
 #include "fsl_csi.h"
 #include "image_processing.h"
 #include "avi.h"
+#include "timer.h"
+
 
 
 // declare some objects
@@ -31,6 +33,25 @@ capture_control_t cap_control = {
 		.capture_end = false
 };
 
+// set up filename and iterate counter and open jpg file
+FRESULT error;
+UINT br;
+TCHAR filename[64];
+
+
+static void iterateDCIMCounter(void){
+//	 iterate the counter
+	global_dcim_counter++;
+
+	// write the file
+	error = f_open(&attributeFil, "DCIM/DC01/attrib.dat", FA_OPEN_EXISTING | FA_WRITE);
+		if (error != FR_OK){
+			PRINTF("counter update fail");
+		}
+	f_write(&attributeFil, &global_dcim_counter, sizeof(global_dcim_counter), &br);
+	f_close(&attributeFil);
+}
+
 
 void STATE_Capture_Enter(void){
 
@@ -38,11 +59,6 @@ void STATE_Capture_Enter(void){
     // demosaic_options_t db_options;
 	// #define ZOOM_LEVEL zoom_level_2
     PROCESSING_MakeOptions(zoom_level, &db_options);
-
-    // set up filename and iterate counter and open jpg file
-    FRESULT error;
-    UINT br;
-    TCHAR filename[64];
     
     unsigned char* jpg_buffer = p_frameBuffer;
     unsigned long jpg_size = sizeof(p_frameBuffer);
@@ -84,7 +100,13 @@ void STATE_Capture_Enter(void){
         cameraMailbox.data = 0;
 
         //process the image from the framebuffer
+        uint32_t processing_start = TIMER_GetCurrentUs();
+
         PROCESSING_DebayerJPEG(camera_buffer_manager.procesing_buffer_sa, &jpg_buffer, &jpg_size, &db_options);
+
+        uint32_t processing_elapsed = TIMER_GetCurrentUs() - processing_start;
+
+        PRINTF("CAPTURE: Processing time %d ms\r\n", processing_elapsed/1000);
     
 
         /* runs once and exits the loop */
@@ -108,6 +130,8 @@ void STATE_Capture_Enter(void){
             jpeg_destroy_compress(&cinfo);
             f_close(&jpgFil);
 
+            iterateDCIMCounter();
+
             // signal that we will go back to compose
             STATE_set_current(COMPOSE);
         
@@ -116,6 +140,7 @@ void STATE_Capture_Enter(void){
             // if this our first loop, init things
             if (continuing_capture == false) {
                 snprintf(filename, sizeof(filename), "DCIM/DC01/dci_%d.avi", global_dcim_counter);
+
                 error = f_open(&jpgFil, filename, FA_OPEN_ALWAYS | FA_WRITE);
                 if (error != FR_OK){
                     PRINTF("file %s open fail with error %d", filename, error);
@@ -139,6 +164,7 @@ void STATE_Capture_Enter(void){
                 AVI_AddFrame(jpg_buffer, jpg_size);
 
                 if(cap_control.capture_end == true){ //TODO: this needs to be set by another button press i think
+                    PRINTF("Capture end, patching...\r\n");
                     AVI_Patch();
                     
                     continuing_capture == false;
@@ -149,27 +175,14 @@ void STATE_Capture_Enter(void){
                     // flush everything to file
                     f_close(&jpgFil);
 
+                    iterateDCIMCounter();
+
                     // go back to compose
                     STATE_set_current(COMPOSE);
                 }
             }        
         }
         
-
-
-    //	 iterate the counter
-        global_dcim_counter++;
-        
-        // write the file
-        error = f_open(&attributeFil, "DCIM/DC01/attrib.dat", FA_OPEN_EXISTING | FA_WRITE);
-            if (error != FR_OK){
-                PRINTF("counter update fail");
-            }
-        f_write(&attributeFil, &global_dcim_counter, sizeof(global_dcim_counter), &br);
-        f_close(&attributeFil);
-        // f_mount(NULL, "2:/", 0); //TODO: delete
-
-
         // switch back to compose if necessary, does nothing if we are in continuing capture
         STATE_transition();
     }

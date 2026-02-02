@@ -10,7 +10,7 @@
 #include "fsl_debug_console.h"
 #include "global_buffers.h"
 #include "jpeglib.h"
-
+#include "timer.h"
 // create row buffer pointers for use in pointer rotations
 uint8_t* buffered_row[3] = {rowBuffer[0], rowBuffer[1], rowBuffer[2]};
 
@@ -28,7 +28,7 @@ demosaic_options_t db_options = {
 void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options){
 
 	switch (zoom) {
-		case zoom_level_1:
+	case zoom_level_1:
 			options->roi_width = 1920;
 			options->roi_height = 1920;
 			options->start_col = 0;
@@ -69,13 +69,29 @@ static inline int clampi(int v, int low, int high){
 
 
 
-void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b){
+static inline void processOnePixel_CheapBilinear(int row_even,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b){
 		//get options
 		int roi_width = options->roi_width;
 
 		// clamps the offsets so edges mirror themselves across the edge
-		int left_offset = clampi(col_i - 1, 0, roi_width);
-		int right_offset = clampi(col_i + 1, 0, roi_width);
+		int left_offset;
+		int right_offset;
+
+		left_offset = col_i - 1;
+		right_offset = col_i + 1;
+
+		if(col_i == 0){
+			left_offset = 0;
+		}
+		else if(col_i == roi_width){
+			right_offset = roi_width;
+		}
+
+		bool col_even = ((col_i & 1 ) == 0);
+
+
+//		int left_offset = clampi(col_i - 1, 0, roi_width);
+//		int right_offset = clampi(col_i + 1, 0, roi_width);
 
 		uint8_t* top_row = buffered_row[2];
 		uint8_t* center_row = buffered_row[1];
@@ -90,14 +106,14 @@ void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* op
 
 		// even rows: BG..
 		// even col, B 
-		if((row_i & 1) == 0 && (col_i & 1) == 0){
+		if(row_even && col_even){
 			*b = center;
-			*r = ((int)down_left + (int)down_right) >> 1;// diagonals
-			*g = ((int)right + (int)up) >> 1; // straight
+			*r = (down_left + down_right) >> 1;// diagonals
+			*g = (right + up) >> 1; // straight
 		}
 		
 		// odd col, G 
-		else if((row_i & 1) == 0 && (col_i & 1) == 1){
+		else if(row_even && !col_even){
 			*g = center;
 			*b = right;
 			*r = up;
@@ -105,7 +121,7 @@ void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* op
 
 		// odd cols: GR
 		// even col: G
-		else if((row_i & 1) == 1 && (col_i & 1) == 0){
+		else if(!row_even && col_even){
 			*g = center;
 			*r = right;
 			*b = up;
@@ -113,11 +129,12 @@ void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* op
 		}
 		
 		// odd col, R
-		else if((row_i & 1) == 1 && (col_i & 1) == 1){
+		else if(!row_even && !col_even){
 			*r = center;
-			*b = ((int)down_left + (int)down_right) >> 1;// diagonals
-			*g = ((int)right + (int)up) >> 1; // straight
+			*b = (down_left + down_right) >> 1;// diagonals
+			*g = (right + up) >> 1; // straight
 		}
+	return;
 }
 
 processOnePixel_Luma(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b){
@@ -404,6 +421,11 @@ void PROCESSING_DebayerLiveView_Raw(uint8_t* source_buffer, uint8_t* dest_buffer
 	}
 }
 
+static inline uint8_t clamp_u8(int x) {
+    if (x & ~255) return (x < 0) ? 0 : 255;
+    return x;
+}
+
 // globalize cinfo
 struct jpeg_compress_struct cinfo;
 struct jpeg_error_mgr jerr;
@@ -446,22 +468,39 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, unsigned char** jpg_buffer_p
 
 	jpeg_set_defaults( &cinfo );
 
-	 jpeg_set_quality(&cinfo, 95, TRUE);        // High quality (85-95 range)
-//	 cinfo.dct_method = JDCT_ISLOW;             // Most accurate DCT method
-	 cinfo.dct_method = JDCT_FLOAT;             // Most accurate DCT method
-	 cinfo.smoothing_factor = 0;                 // Keep at 0 (smoothing reduces quality)
-//	 cinfo.optimize_coding = TRUE;               // Enable Huffman optimization
+	 jpeg_set_quality(&cinfo, 75, TRUE);        // High quality (85-95 range)
+	 cinfo.dct_method = JDCT_IFAST;             // Most accurate DCT method
+	//  cinfo.dct_method = JDCT_FLOAT;             // Most accurate DCT method
+//	 cinfo.smoothing_factor = 0;                 // Keep at 0 (smoothing reduces quality)
+//	 cinfo.optimize_coding = FALSE;               // Enable Huffman optimization
 //	 cinfo.progressive_mode = TRUE;              // Optional: enables progressive JPEG
 
 	jpeg_start_compress( &cinfo, TRUE );
+
+	uint32_t processing_start = TIMER_GetCurrentUs();
 
 	while( cinfo.next_scanline < cinfo.image_height )
 	{
 		// get raw data rows
 		int row_i = start_row + cinfo.next_scanline; //absolute row index
-		
-		int row_above_i = clampi(row_i - 1, 0, source_buffer_stride-1);
-		int row_below_i = clampi(row_i + 1, 0, source_buffer_stride-1);
+
+		int row_above_i;
+		int row_below_i;
+
+		// remove clamps with branches only on edges
+
+		row_above_i = row_i - 1;
+		row_below_i = row_i + 1;
+
+		if(row_i == 0){
+			row_above_i = 0;
+		}
+ 		else if (row_i == source_buffer_stride-1){
+			row_below_i = source_buffer_stride-1;
+		}
+
+		// int row_above_i = clampi(row_i - 1, 0, source_buffer_stride-1);
+		// int row_below_i = clampi(row_i + 1, 0, source_buffer_stride-1);
 		
 		// get row pointers
 		uint8_t* row = source_buffer + row_i * source_buffer_stride;
@@ -484,9 +523,10 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, unsigned char** jpg_buffer_p
 
 				memcpy(buffered_row[0], row_below + start_col, roi_width );
 			}
-			
 		// create destination row pointer
 		uint8_t* out_row = scanlineBuffer; 
+
+		bool row_even = ((row_i & 1 ) == 0);
 			
 		// debayer 1 row to processing buffer
 		for( int pixel_col = 0; pixel_col < roi_width; pixel_col++ ){
@@ -497,24 +537,31 @@ void PROCESSING_DebayerJPEG(uint8_t* source_buffer, unsigned char** jpg_buffer_p
 			
 			// declare output pixel values
 			uint8_t r,g,b;
-			
 			// process and set rgb, assumes rowbuffers are memcopyed to and rotated
-			processOnePixel_CheapBilinear(row_i, col_i, options, &r, &g, &b);
-
+			processOnePixel_CheapBilinear(row_even, col_i, options, &r, &g, &b);
+			
 			uint8_t* out_px = out_row + col_i * 3;
-			out_px[0] = clampi(( b * combined_b_gain ) >> 8, 0, 255);
-			out_px[1] = clampi(( g * combined_g_gain ) >> 8, 0, 255);
-			out_px[2] = clampi(( r * combined_r_gain ) >> 8, 0, 255);
+			out_px[0] = ( b * combined_b_gain ) >> 8;
+			out_px[1] = ( g * combined_g_gain ) >> 8;
+			out_px[2] = ( r * combined_r_gain ) >> 8;
+
 		}
 
 		// set row pointer and write; iterates the scanline counter
 		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 	}
 	
+	uint32_t processing_elapsed = TIMER_GetCurrentUs() - processing_start;
+
+	PRINTF("PROCESSING: jpeg + debayer %d ms\r\n", processing_elapsed/1000);
+
 	// finish compression when whole image is done
 	jpeg_finish_compress(&cinfo);
 	
+	return;
 }
+
+
 
 // NOTES
 

@@ -14,10 +14,25 @@
 
 /* maybe should really be called buttonS.c because i implement the 2 main buttons in here :) */
 
+// need my own debounce for this
+volatile bool capture_button_pressed = 0;
+volatile long capture_now = 0;
+volatile long capture_last_irq_time = 0;
+// volatile long capture_button_press_start = 0;
+#define CAPTURE_DEBOUNCE_TIME 50000
+
 // ONOFF BUTTON (already debounced in hardware)
 void SNVS_LP_WRAPPER_IRQHandler(void){
 //	clear flag
 	SNVS->LPSR |= SNVS_LPSR_SPOF_MASK; // w1c reg
+
+    capture_now = TIMER_GetCurrentUs();
+
+
+    if (capture_now - capture_last_irq_time < CAPTURE_DEBOUNCE_TIME) {
+          return;  // Ignore bounces
+      }
+      capture_last_irq_time = capture_now;
 
 	if(STATE_get_current() == CAPTURE && CAPTURE_MODE == MOVIE){
 		// set capture end

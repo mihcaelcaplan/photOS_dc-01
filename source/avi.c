@@ -54,7 +54,7 @@ RIFF riff_avi = {
 
 LIST hdrl = {
     .dwList = MAKEFOURCC('L','I','S','T'),
-    .dwSize = 208,
+    .dwSize = 192,
     .dwFourCC = MAKEFOURCC('h','d','r','l')
 };
 
@@ -76,17 +76,39 @@ MainAVIHeader avih = {
 
 LIST strl = {
     .dwList = MAKEFOURCC('L','I','S','T'),
-    // .dwSize = , // stream header (strh) + stream format (strf) doesnt seem to have one in my avi??
+    .dwSize =116, 
     .dwFourCC = MAKEFOURCC('s','t','r','l')
 };
 
-CHUNK strh = {
+// CHUNK strh = {
+//     .dwFourCC = MAKEFOURCC('s','t','r','h'),
+//     .dwSize = 56
+// };
+
+AVIStreamHeader strh = {
     .dwFourCC = MAKEFOURCC('s','t','r','h'),
-    .dwSize = 56
+    .dwSize = 56,
+    .fccType = MAKEFOURCC('v','i','d','s'),
+    .fccHandler = MAKEFOURCC('M','J','P','G'),
+    .dwFlags = 0,
+    .wPriority = 0,
+    .wLanguage = 0,
+    .dwInitialFrames = 0,
+    .dwScale = 1,
+    .dwRate = 15,
+    .dwStart = 0,
+    .dwLength = 0XDEADBEEF,
+    .dwSuggestedBufferSize = 0,
+    .dwQuality = 0,
+    .dwSampleSize = 10000,
+    .dwRcStart = 0, // 0,0
+    .dwRcEnd = 0, // fill in during init
 };
 
+
+
 BITMAPINFOHEADER strf = {
-    .dwFourCC = MAKEFOURCC('v','i','d','s'),
+    .dwFourCC = MAKEFOURCC('s','t','r','f'),
     .dwSize = 40, // bitmapinfoheader size
     .biSize = 40,
     .biWidth = 0, //set in init
@@ -108,7 +130,7 @@ LIST movi = {
 };
 
 CHUNK movie_chunk = {
-    .dwFourCC = MAKEFOURCC('0','1','w','b'), // c? ??
+    .dwFourCC = MAKEFOURCC('0','0','d','c'), // c? ??
     .dwSize = 0 //set at encode time
 };
 
@@ -130,11 +152,18 @@ void AVI_Init(FIL* fp, uint32_t img_width, uint32_t img_height, uint32_t img_siz
     strf.biSizeImage = img_size;
 
     // do the file init :)
+    // RIFF chunk
     write_DWORD(riff_avi.dwRIFF);
     patches.patch_riff_avi_size = f_tell(fp);
     write_DWORD(riff_avi.dwSize);
     write_DWORD(riff_avi.dwFourCC);
 
+    // hdrl chunk
+    write_DWORD(hdrl.dwList);
+    write_DWORD(hdrl.dwSize);
+    write_DWORD(hdrl.dwFourCC);
+
+    // avi header
     write_DWORD(avih.dwFourCC);
     write_DWORD(avih.dwSize);
     write_DWORD(avih.dwMicroSecPerFrame);
@@ -148,18 +177,39 @@ void AVI_Init(FIL* fp, uint32_t img_width, uint32_t img_height, uint32_t img_siz
     write_DWORD(avih.dwSuggestedBufferSize);
     write_DWORD(avih.dwWidth);
     write_DWORD(avih.dwHeight);
-    write_DWORD(avih.dwHeight);
     write_DWORD(avih.dwReserved[0]); // just 0s 
     write_DWORD(avih.dwReserved[1]); // just 0s 
     write_DWORD(avih.dwReserved[2]); // just 0s 
     write_DWORD(avih.dwReserved[3]); // just 0s 
     
+    // stream list
     write_DWORD(strl.dwList); 
+    write_DWORD(strl.dwSize); 
     write_DWORD(strl.dwFourCC); 
     
+    // stream header
     write_DWORD(strh.dwFourCC); 
     write_DWORD(strh.dwSize); 
     
+    write_DWORD(strh.fccType); 
+    write_DWORD(strh.fccHandler); 
+    write_DWORD(strh.dwFlags); 
+    write_WORD(strh.wPriority); 
+    write_WORD(strh.wLanguage); 
+    write_DWORD(strh.dwInitialFrames); 
+    write_DWORD(strh.dwScale); 
+    write_DWORD(strh.dwRate); 
+    write_DWORD(strh.dwStart); 
+    patches.patch_strh_length = f_tell(fp);
+    write_DWORD(strh.dwLength); 
+    write_DWORD(strh.dwSuggestedBufferSize); 
+    write_DWORD(strh.dwQuality); 
+    write_DWORD(strh.dwSampleSize); 
+    write_DWORD(strh.dwRcStart); 
+    write_DWORD( ((img_width & 0xFFFF) << 16) | (img_height & 0xFFFF) ); // RcEnd
+    
+    
+    // stream format
     write_DWORD(strf.dwFourCC); 
     write_DWORD(strf.dwSize); 
     write_DWORD(strf.biSize); 
@@ -174,6 +224,7 @@ void AVI_Init(FIL* fp, uint32_t img_width, uint32_t img_height, uint32_t img_siz
     write_DWORD(strf.biClrUsed); 
     write_DWORD(strf.biClrImportant); 
     
+    // movi list
     write_DWORD(movi.dwList); 
     patches.patch_movi_size = f_tell(fp);
     write_DWORD(movi.dwSize); 
@@ -186,11 +237,12 @@ void AVI_Init(FIL* fp, uint32_t img_width, uint32_t img_height, uint32_t img_siz
 // add the jpeg frame to the the movie
 void AVI_AddFrame( uint32_t* img_ptr, uint32_t img_size ){
     
-    uint32_t cur_frame_offset = f_tell(avi_handle.file_pointer) - avi_handle.movie_start;
     
     write_DWORD(movie_chunk.dwFourCC);
-    write_DWORD(img_size);
+    write_DWORD(img_size); //subtract dword header from size
     
+    uint32_t cur_frame_offset = f_tell(avi_handle.file_pointer) - avi_handle.movie_start;
+
     // create index chunk 
     AVIINDEXENTRY index = {
         .ckid = movie_chunk.dwFourCC,
@@ -199,7 +251,8 @@ void AVI_AddFrame( uint32_t* img_ptr, uint32_t img_size ){
         .dwChunkLength = img_size,
     };
     
-    // write data 
+
+    // write data TODO: need to cutoff jpeg headers and get the size from the encode probably :)
     uint32_t bytesWritten = 0;
     uint32_t* write_pos = img_ptr;
     uint32_t bytesRemain = img_size;
@@ -208,6 +261,11 @@ void AVI_AddFrame( uint32_t* img_ptr, uint32_t img_size ){
         bytesRemain -= bytesWritten;
         write_pos += bytesWritten;
     }
+    // check for padding
+    if(img_size & 1){
+        uint8_t pad = 0;
+            f_write(avi_handle.file_pointer, &pad, 1, 0); // pad
+    }   
 
     // write index chunk to tmp file
     f_write(avi_handle.index_pointer, &index.ckid, 4, 0);
@@ -266,6 +324,9 @@ void AVI_Patch( void ){
     // calculate total frames and patch
     
     f_lseek(avi_handle.file_pointer, patches.patch_avih_totalframes);
+    write_DWORD(total_frames);
+
+    f_lseek(avi_handle.file_pointer, patches.patch_strh_length);
     write_DWORD(total_frames);
     
     // calculate movie size and patch
