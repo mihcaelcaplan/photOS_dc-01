@@ -30,10 +30,10 @@ SDK_ALIGN
 ) __attribute__((section(".bss.$BOARD_SDRAM")));
 
 // row buffers for debayer
-	uint8_t rowBuffer[3][C_IMG_WIDTH] __attribute__((section(".bss.$SRAM_OC")));
+	uint8_t rowBuffer[3][C_IMG_WIDTH] __attribute__((section(".bss.$SRAM_OC"))) __attribute__(( aligned(32)));
 
 // row buffer for jpeg scanline output
-	uint8_t scanlineBuffer[C_IMG_WIDTH*APP_FB_BPP] __attribute__((section(".bss.$SRAM_OC")));
+	uint8_t scanlineBuffer[C_IMG_WIDTH*APP_FB_BPP] __attribute__((section(".bss.$SRAM_OC"))) __attribute__(( aligned(32)));
 
 // init the manager
 camera_buffer_manager_t camera_buffer_manager = {

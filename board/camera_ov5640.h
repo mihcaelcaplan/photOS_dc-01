@@ -35,4 +35,19 @@ extern volatile bool pending_frame;
 extern volatile uint32_t pending_frame_sa;
 extern volatile uint32_t active_frame_sa;
 
+typedef struct {
+    uint8_t exp_width;
+    uint32_t exposure;
+    uint8_t gain;
+    uint32_t vts;
+} ov5640_settings_t;
+
+extern ov5640_settings_t ov5640_settings;
+
+
+// access and adjustment for external world
+void OV5640_SetExposure(uint32_t exposure_midpoint);
+void OV5640_SetGain(uint8_t gain);
+
+
 #endif /* CAMERA_OV5640_H_ */

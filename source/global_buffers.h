@@ -42,7 +42,7 @@ extern uint8_t scanlineBuffer[C_IMG_WIDTH*APP_FB_BPP];
     } camera_buffer_manager_t;
 
     //need a display buffer ready manage
-    typedef str
+    typedef struct{
         // addresses
         uint32_t buffer0_sa;
 	    uint32_t buffer1_sa;

@@ -28,11 +28,14 @@
 
 
 /*Variables and fun things*/
+FATFS g_fileSystem;
+const TCHAR driverName[3U] = {'2', ':', '/'};
+
 
 #define TEST_PHOTO _T("/DCIM/000.jpg")
 
 
-AT_NONCACHEABLE_SECTION(static FATFS g_fileSystem); /* File system object */
+// AT_NONCACHEABLE_SECTION(static FATFS g_fileSystem); /* File system object */
 AT_NONCACHEABLE_SECTION(static FIL jpgFil);
 
 
@@ -59,7 +62,7 @@ FRESULT mkdir_p(const char *path) {
 int MOUNT_SDCard(void)
 {
     FRESULT error;
-    const TCHAR driverName[3U] = {SDDISK + '0', ':', '/'};
+    // const TCHAR driverName[3U] = {SDDISK + '0', ':', '/'};
 
     // const TCHAR directoryName[4U] = {'D', 'C', 'I', 'M'};
 

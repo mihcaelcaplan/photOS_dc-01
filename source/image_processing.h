@@ -27,6 +27,8 @@ typedef struct {
 	int pixel_gain; // brightness (iso?) = pixel * pixel_gain/255
 } demosaic_options_t;
 
+extern demosaic_options_t db_options; 
+
 extern struct jpeg_compress_struct cinfo;
 extern struct jpeg_error_mgr jerr;
 
@@ -34,7 +36,7 @@ void PROCESSING_MakeOptions(zoom_level_t zoom, demosaic_options_t* options);
 
 void PROCESSING_Debayer(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_options_t* options);
 
-void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b);
+//void processOnePixel_CheapBilinear(int row_i,  int col_i, demosaic_options_t* options, uint8_t* r, uint8_t* g, uint8_t* b);
 
 void PROCESSING_DebayerLiveView(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_options_t* options);
 void PROCESSING_DebayerLiveView_Raw(uint8_t* source_buffer, uint8_t* dest_buffer, demosaic_options_t* options);

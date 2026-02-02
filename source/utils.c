@@ -35,3 +35,8 @@ void simpleDelay(uint32_t ms){
 //
 //	while (g_systickCounter < (countNow + ms)){}
 }
+
+void columnFPNCapture(uint16_t *columnFPNArray){
+	// parse an image in the framebuffer get an average column FPN for subtraction
+
+}
